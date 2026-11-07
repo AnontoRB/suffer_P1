@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>My plan to Jan 6</title>
+<style>
+:root{--bg:#F1EFF7;--surface:#fff;--ink:#1E1B2E;--muted:#5F5B75;--line:#D9D5E8;--rust:#B4441F;--teal:#0E7C7B;--font:"Gill Sans","Trebuchet MS",system-ui,sans-serif}
+@media (prefers-color-scheme:dark){:root{--bg:#15131F;--surface:#1F1C2E;--ink:#ECE9F7;--muted:#A29EBB;--line:#34304A;--rust:#E08A63;--teal:#4FC3C1}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:18px;line-height:1.6;min-height:100vh}
+.wrap{max-width:900px;margin:0 auto;padding:56px 20px}
+h1{font-size:clamp(2.4rem,8vw,4.6rem);line-height:1.02;margin:0 0 14px;letter-spacing:-.03em}
+.lead{color:var(--muted);max-width:56ch;margin:0 0 20px}
+.race{display:inline-block;background:var(--ink);color:var(--bg);padding:8px 14px;font-weight:700;margin-bottom:36px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px}
+.card{background:var(--surface);border:1px solid var(--line);padding:26px;display:flex;flex-direction:column;gap:12px}
+.card.r{border-top:8px solid var(--rust)}.card.h{border-top:8px solid var(--teal)}
+.card h2{margin:0;font-size:1.7rem}.card p{margin:0;color:var(--muted)}
+.prog{height:10px;background:var(--line);overflow:hidden}.prog i{display:block;height:100%;width:0}
+.r .prog i{background:var(--rust)}.h .prog i{background:var(--teal)}.small{font-size:.9rem;color:var(--muted)}
+.btn{margin-top:auto;display:inline-block;text-align:center;text-decoration:none;color:#fff;padding:13px 18px;font-weight:700}
+.r .btn{background:var(--rust)}.h .btn{background:var(--teal)}.btn:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+</style></head><body><div class="wrap">
+<h1>Nov 8 to Jan 6</h1>
+<p class="lead">Two plans, 60 days, one finish line: your 7.5 km race on January 6. Open a plan, pick any date, and tick off what you've done.</p>
+<div class="race" id="race"></div><div class="small" id="today" style="margin:-24px 0 28px"></div>
+<div class="cards">
+<div class="card r"><h2>Learn Rust</h2><p>2 hours a day: review, a new topic, practice and a log. Streaks, XP and badges.</p>
+<div class="prog"><i id="pr"></i></div><div class="small" id="tr">0 / 60 days</div><a class="btn" href="rust-plan.html">Open the Rust plan</a></div>
+<div class="card h"><h2>Get fit</h2><p>Bodyweight strength, run/walk training up to 7.5 km, water and sleep tracking, with progressive overload.</p>
+<div class="prog"><i id="ph"></i></div><div class="small" id="th">0 / 60 days</div><a class="btn" href="health-plan.html">Open the fitness plan</a></div></div></div>
+<script>
+const t=new Date(),d=Math.ceil((new Date(2027,0,6)-new Date(t.getFullYear(),t.getMonth(),t.getDate()))/864e5);
+document.getElementById("race").textContent=d>0?"Race day, January 6: "+d+" days to go":"Race day is here!";
+const n=Math.min(60,Math.max(0,Math.round((new Date(t.getFullYear(),t.getMonth(),t.getDate())-new Date(2026,10,8))/864e5)+1));
+document.getElementById("today").textContent=n<1?"The plan starts on Nov 8.":"Today is day "+n+" of 60.";
+[["rust60","pr","tr"],["health60","ph","th"]].forEach(a=>{try{const s=JSON.parse(localStorage.getItem(a[0])||"null"),c=s&&s.n||0;
+document.getElementById(a[1]).style.width=c/60*100+"%";document.getElementById(a[2]).textContent=c+" / 60 days"}catch(e){}});
+</script></body></html>
