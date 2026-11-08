@@ -4,18 +4,17 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Learn Rust: Nov 8 to Jan 6</title>
-  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body class="theme-rust">
 
   <header class="site-header">
     <div class="wrap">
       <a class="home-link" href="index.html">&larr; Home</a>
-      <h1>Learn Rust, Nov 8 to Jan 6</h1>
+      <h1>Rust in 60 Days: Nov 8 to Jan 6</h1>
       <p>
-        Two hours every day for 60 days: 15 min review, 50 min new topic, 45 min practice,
-        10 min log. Every day follows the same pattern, and every day starts by revisiting
-        earlier lessons so they stick.
+        Goal: the highest level of Rust you can reach in about 118 hours: solid intermediate,
+        with 4 finished projects. Assumes you already know the basics of at least one programming language.
       </p>
     </div>
   </header>
@@ -48,13 +47,47 @@
     </section>
 
     <section>
-      <h2>How each day works</h2>
+      <h2>How this plan stays efficient</h2>
       <ul>
-        <li><b>Review (15 min):</b> close the book. Explain yesterday's topic, last week's topic and last month's topic aloud, then re-type one small example from memory.</li>
-        <li><b>Learn (50 min):</b> read the section, type every example yourself, and try to break it.</li>
-        <li><b>Practice (45 min):</b> exercises or the current mini project. Read the compiler error twice before searching.</li>
-        <li><b>Log (10 min):</b> three things learned, one error you met, one question for tomorrow.</li>
-        <li><b>Missed a day?</b> Don't double up. Do that day's review and the next topic, and tick the missed day only when you've really finished it.</li>
+        <li><b>Learn by doing, not watching.</b> Roughly 40% reading, 60% writing code. No long video courses.</li>
+        <li><b>Three resources do almost everything:</b> The Rust Book (the main text), Rustlings (small exercises, run in your terminal), and the Exercism Rust track (problems with feedback). Later you add the Tokio tutorial and axum docs.</li>
+        <li><b>Fight the compiler on purpose.</b> Read every error message fully. Rust's errors teach you the language.</li>
+        <li><b>Type all code yourself.</b> Never copy and paste.</li>
+        <li><b>Keep a notes file</b> (<code>notes.md</code>) with one line per new concept and every mistake you made. Review it on checkpoint days.</li>
+        <li><b>Commit all your code to Git daily.</b> One folder per project.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Every day has 3 parts (2 hours)</h2>
+      <div class="scroll">
+        <table>
+          <tr><th>Part</th><th>Time</th><th>What</th></tr>
+          <tr><td>1. Learn</td><td>45 min</td><td>Read the assigned section and type out every example</td></tr>
+          <tr><td>2. Practice</td><td>45 min</td><td>Rustlings or Exercism exercises on the same topic</td></tr>
+          <tr><td>3. Build/Review</td><td>30 min</td><td>Apply it in a small program, or review notes</td></tr>
+        </table>
+      </div>
+      <p><b>Marathon tip:</b> on run days, do Part 1 before your run and Parts 2 and 3 after, or vice versa. Do not skip the study on rest days. That is when you get your full 2 hours in one block.</p>
+      <p><b>Setup (do first, today):</b> install Rust with <code>rustup</code>, install VS Code with the rust-analyzer extension, and install Rustlings (<code>cargo install rustlings</code>).</p>
+    </section>
+
+    <section>
+      <h2>If you fall behind</h2>
+      <ul>
+        <li>Do not double up. Skip the Part 3 review first, then Part 2, but never skip Part 1.</li>
+        <li>If a chapter takes 2 days, repeat it, then drop one Exercism day later.</li>
+        <li>If the borrow checker has you stuck for more than 30 minutes, read the error again, simplify the code, and ask for help. Pasting the code and error is the fastest fix.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>After Jan 6: how to keep going</h2>
+      <ul>
+        <li>Contribute small fixes to an open-source Rust project (look for <i>good first issue</i>).</li>
+        <li>Read <i>Rust for Rustaceans</i> and <i>Programming Rust</i>.</li>
+        <li>Build one larger project in an area you like: CLI tools, web backends, embedded, games, or systems.</li>
+        <li>Do 1 to 2 Exercism problems a week to stay sharp.</li>
       </ul>
     </section>
 
@@ -62,13 +95,12 @@
 
   <footer>
     <div class="wrap">
-      Resources: The Rust Programming Language (doc.rust-lang.org/book), Rustlings,
-      Exercism Rust track, Rust by Example.
+      Resources: The Rust Book, Rustlings, Exercism Rust track, Rust by Example, Tokio tutorial, axum docs.
     </div>
   </footer>
 
-  <script src="js/common.js"></script>
-  <script src="js/rust-data.js"></script>
-  <script src="js/rust.js"></script>
+  <script src="common.js"></script>
+  <script src="rust-data.js"></script>
+  <script src="rust.js"></script>
 </body>
 </html>

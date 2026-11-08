@@ -1,16 +1,15 @@
 /* ==========================================================================
-   Shared styles for the home, Rust and fitness pages.
+   Shared styles for the home, Rust and marathon pages.
    Sections:
      1. Themes (colour variables per page, light + dark)
      2. Base and layout
      3. Header and stats
      4. Calendar and day navigation
      5. Day panel and checklists
-     6. Fitness trackers (water, sleep, trends)
-     7. Tables, lists, badges, notices
-     8. Effects (confetti canvas, toast)
-     9. Home page
-    10. Small screens
+     6. Tables, lists, badges, notices
+     7. Effects (confetti canvas, toast)
+     8. Home page (including the digital clock)
+     9. Small screens
    ========================================================================== */
 
 
@@ -25,32 +24,42 @@
   --font: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
 }
 
-.theme-fitness {
+.theme-marathon {
   --bg: #E8F1F0;  --surface: #FFFFFF;  --ink: #10252A;  --muted: #52696E;  --line: #C9DAD8;
   --acc: #D9561E;  --acc2: #0E7C7B;  --ok: #2E7D5B;  --on-ok: #FFFFFF;  --bad: #B3261E;
-  --water: #2D7FB8;  --sleep: #5A55B0;
   --font: "Trebuchet MS", "Segoe UI", system-ui, sans-serif;
 }
 
 .theme-home {
   --bg: #F1EFF7;  --surface: #FFFFFF;  --ink: #1E1B2E;  --muted: #5F5B75;  --line: #D9D5E8;
-  --rust: #B4441F;  --teal: #0E7C7B;
+  --rust: #B4441F;  --teal: #0E7C7B;  --health: #7B3FA0;
+  --acc: #7B3FA0;  --acc2: #2D7FB8;  --ok: #2E7D5B;  --on-ok: #FFFFFF;
   --font: "Gill Sans", "Trebuchet MS", system-ui, sans-serif;
 }
 
+.theme-health {
+  --bg: #F3EFF7;  --surface: #FFFFFF;  --ink: #221B2B;  --muted: #62586E;  --line: #DDD3E6;
+  --acc: #7B3FA0;  --acc2: #2D7FB8;  --ok: #2E7D5B;  --on-ok: #FFFFFF;  --bad: #B3261E;
+  --font: "Avenir Next", "Segoe UI", system-ui, sans-serif;
+}
+
 @media (prefers-color-scheme: dark) {
+  .theme-health {
+    --bg: #17121D;  --surface: #211A2A;  --ink: #EEE8F4;  --muted: #AA9FB8;  --line: #372D44;
+    --acc: #C79BE0;  --acc2: #6FB3E0;  --ok: #5CC08F;  --on-ok: #0B1F16;  --bad: #F28B82;
+  }
   .theme-rust {
     --bg: #141A21;  --surface: #1C242D;  --ink: #E7ECF1;  --muted: #98A5B4;  --line: #2E3946;
     --acc: #E08A63;  --acc2: #8FB0CF;  --ok: #5CC08F;  --on-ok: #0B1F16;  --bad: #F28B82;
   }
-  .theme-fitness {
+  .theme-marathon {
     --bg: #0F1B1D;  --surface: #172629;  --ink: #E4F0EE;  --muted: #9BB3B0;  --line: #2A3E41;
     --acc: #F08A5D;  --acc2: #4FC3C1;  --ok: #5CC08F;  --on-ok: #0B1F16;  --bad: #F28B82;
-    --water: #6DB4E6;  --sleep: #9A96E8;
   }
   .theme-home {
     --bg: #15131F;  --surface: #1F1C2E;  --ink: #ECE9F7;  --muted: #A29EBB;  --line: #34304A;
-    --rust: #E08A63;  --teal: #4FC3C1;
+    --rust: #E08A63;  --teal: #4FC3C1;  --health: #C79BE0;
+    --acc: #C79BE0;  --acc2: #6FB3E0;  --ok: #5CC08F;  --on-ok: #0B1F16;
   }
 }
 
@@ -65,11 +74,12 @@ body {
   background: var(--bg);
   color: var(--ink);
   font-family: var(--font);
-  font-size: 17px;
+  font-size: clamp(16px, 0.35vw + 12px, 19px);
   line-height: 1.6;
 }
 
-.wrap { max-width: 900px; margin: 0 auto; padding: 0 18px; }
+.wrap { width: 100%; margin: 0; padding: 0 clamp(16px, 3vw, 56px); }
+main.wrap > section > p, main.wrap > section > ul, main.wrap > section > ol { max-width: 105ch; }
 
 h1 { font-size: clamp(2.1rem, 7vw, 3.7rem); line-height: 1.05; margin: 0 0 12px; letter-spacing: -0.02em; }
 h2 { font-size: 1.6rem; margin: 0 0 6px; }
@@ -131,6 +141,7 @@ footer { padding: 34px 0 60px; color: var(--muted); font-size: 0.9rem; }
 
 .calendar .done     { background: var(--ok); border-color: var(--ok); color: var(--on-ok); }
 .calendar .missed   { border-color: var(--bad); color: var(--bad); }
+.calendar .no-plan  { opacity: 0.45; }
 .calendar .today    { outline: 2px dashed var(--acc); outline-offset: 1px; }
 .calendar .selected { border: 2px solid var(--acc2); font-weight: 700; }
 .calendar .race-day::after { content: " \1F3C1"; }
@@ -150,6 +161,11 @@ footer { padding: 34px 0 60px; color: var(--muted); font-size: 0.9rem; }
 .btn-outline:hover { background: var(--acc2); color: var(--surface); }
 
 
+@media (min-width: 1000px) {
+  main.wrap > section:first-of-type { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); column-gap: 36px; align-items: start; }
+  main.wrap > section:first-of-type > #panel { grid-column: 2; grid-row: 1 / span 12; margin-top: 0; }
+}
+
 /* 5. DAY PANEL AND CHECKLISTS --------------------------------------------- */
 
 .panel { margin-top: 14px; padding: 20px; background: var(--surface); border: 1px solid var(--line); border-top: 5px solid var(--acc2); }
@@ -165,7 +181,31 @@ footer { padding: 34px 0 60px; color: var(--muted); font-size: 0.9rem; }
 
 .check-item { display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line); }
 .check-item:last-child { border-bottom: 0; }
-.check-item input[type="checkbox"] { flex: none; width: 22px; height: 22px; margin-top: 3px; accent-color: var(--ok); }
+/* Every task shows a check mark: faint when not done, solid green when done. */
+.check-item input[type="checkbox"] {
+  -webkit-appearance: none;
+  appearance: none;
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  margin: 1px 0 0;
+  border: 2px solid var(--line);
+  background: var(--surface);
+  cursor: pointer;
+}
+.check-item input[type="checkbox"]::after {
+  content: "\2713";
+  color: var(--muted);
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1;
+  opacity: 0.45;
+}
+.check-item input[type="checkbox"]:hover { border-color: var(--ok); }
+.check-item input[type="checkbox"]:checked { background: var(--ok); border-color: var(--ok); }
+.check-item input[type="checkbox"]:checked::after { color: var(--on-ok); opacity: 1; }
 .check-item label { flex: 1; cursor: pointer; }
 .check-item small { display: block; color: var(--muted); }
 .check-item.checked b { text-decoration: line-through; opacity: 0.6; }
@@ -177,19 +217,7 @@ input[type="number"] { padding: 6px 8px; border: 1px solid var(--line); backgrou
 input[type="number"] { width: 70px; }
 
 
-/* 6. FITNESS TRACKERS ----------------------------------------------------- */
-
-.meter { height: 14px; margin: 8px 0; background: var(--line); overflow: hidden; }
-.meter i { display: block; height: 100%; background: var(--water); transition: width 0.3s; }
-
-.bars { display: flex; align-items: flex-end; gap: 2px; height: 70px; margin-top: 8px; }
-.bars i { flex: 1; min-height: 2px; background: var(--water); }
-.bars.sleep i { background: var(--sleep); }
-
-.muted-line { margin: 8px 0 0; color: var(--muted); }
-
-
-/* 7. TABLES, LISTS, BADGES, NOTICES --------------------------------------- */
+/* 6. TABLES, LISTS, BADGES, NOTICES --------------------------------------- */
 
 .scroll { overflow-x: auto; }
 
@@ -209,7 +237,20 @@ li { margin-bottom: 6px; }
 .notice { padding: 14px 16px; background: var(--surface); border: 2px solid var(--acc); }
 
 
-/* 8. EFFECTS -------------------------------------------------------------- */
+.muted-line { color: var(--muted); margin: 0 0 8px; }
+.log-title { margin-top: 18px; }
+.log-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px; }
+.field { display: flex; flex-direction: column; gap: 4px; font-size: 0.85rem; color: var(--muted); }
+.field input,
+.cell-input { width: 100%; padding: 7px 8px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font: inherit; font-size: 0.95rem; }
+.cell-input { min-width: 70px; margin-top: 4px; }
+table small { display: block; }
+
+
+.theme-health .race-badge { color: var(--bg); }
+
+
+/* 7. EFFECTS -------------------------------------------------------------- */
 
 .confetti-canvas { position: fixed; inset: 0; z-index: 50; width: 100%; height: 100%; pointer-events: none; }
 
@@ -227,22 +268,23 @@ li { margin-bottom: 6px; }
 }
 
 
-/* 9. HOME PAGE ------------------------------------------------------------ */
+/* 8. HOME PAGE ------------------------------------------------------------ */
 
-.home-wrap { max-width: 900px; margin: 0 auto; padding: 56px 20px; font-size: 18px; }
+.home-wrap { width: 100%; margin: 0; padding: clamp(20px, 3.5vw, 56px) clamp(16px, 3vw, 56px); font-size: clamp(16px, 0.35vw + 12px, 19px); }
 .home-wrap h1 { font-size: clamp(2.4rem, 8vw, 4.6rem); letter-spacing: -0.03em; line-height: 1.02; }
 .home-lead { max-width: 56ch; margin: 0 0 20px; color: var(--muted); }
 
 .home-race { display: inline-block; margin-bottom: 10px; padding: 8px 14px; background: var(--ink); color: var(--bg); font-weight: 700; }
 .home-today { margin-bottom: 28px; color: var(--muted); font-size: 0.9rem; }
 
-.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 18px; }
 
 .card { display: flex; flex-direction: column; gap: 12px; padding: 26px; background: var(--surface); border: 1px solid var(--line); }
 .card h2 { margin: 0; font-size: 1.7rem; }
 .card p { margin: 0; color: var(--muted); }
 .card-rust    { border-top: 8px solid var(--rust); --card-color: var(--rust); }
-.card-fitness { border-top: 8px solid var(--teal); --card-color: var(--teal); }
+.card-marathon { border-top: 8px solid var(--teal); --card-color: var(--teal); }
+.card-health  { border-top: 8px solid var(--health); --card-color: var(--health); }
 
 .progress { height: 10px; background: var(--line); overflow: hidden; }
 .progress i { display: block; width: 0; height: 100%; background: var(--card-color); }
@@ -251,6 +293,38 @@ li { margin-bottom: 6px; }
 .card-button { display: inline-block; margin-top: auto; padding: 13px 18px; background: var(--card-color); color: #fff; font-weight: 700; text-align: center; text-decoration: none; }
 .card-button:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
 
+
+/* Two-column home layout: info on the left, plan buttons and tasks on the right. */
+
+.home-grid { display: grid; grid-template-columns: 1fr; gap: 28px; align-items: start; }
+@media (min-width: 960px) {
+  .home-grid { grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 36px; }
+}
+
+.home-right .cards { grid-template-columns: 1fr; gap: 12px; }
+.home-right .card { padding: 14px 16px; gap: 8px; border-top-width: 6px; min-width: 0; }
+.home-right .card h2 { font-size: 1.25rem; }
+.home-right .card p { font-size: 0.9rem; }
+.home-right .card-button { margin-top: 4px; padding: 10px 12px; }
+
+/* From tablet width up: the three plan buttons sit side by side in one row. */
+@media (min-width: 640px) {
+  .home-right .cards { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .home-right .card p { display: none; }
+  .home-right .card h2 { font-size: clamp(1.05rem, 1.6vw, 1.4rem); }
+}
+
+.home-tasks { margin-top: 18px; padding: 18px 20px; background: var(--surface); border: 1px solid var(--line); border-top: 5px solid var(--acc2); }
+.home-tasks h2 { margin: 0 0 4px; font-size: 1.4rem; }
+.home-tasks .panel-date { margin-bottom: 6px; }
+.home-tasks section { padding: 0; }
+
+.task-group { margin-top: 14px; padding-left: 12px; border-left: 5px solid var(--g, var(--acc)); }
+.task-group h3 { margin: 0; font-size: 1.05rem; }
+.task-group h3 span { margin-left: 6px; font-size: 0.85rem; font-weight: 400; color: var(--muted); }
+.task-rust     { --g: var(--rust); }
+.task-marathon { --g: var(--teal); }
+.task-health   { --g: var(--health); }
 
 /* Digital clock (home page). Always dark, in both light and dark mode. */
 
@@ -302,6 +376,10 @@ li { margin-bottom: 6px; }
 .clock-seconds { font-size: 0.62em; color: var(--clock-accent); }
 .clock-period { margin-left: 0.4em; font-size: 0.28em; opacity: 0.7; }
 
+.tasks-head { margin-top: 20px; }
+.day-bar.tasks-bar i { width: 0; background: #7BD9A3; }
+.bar-ends { display: flex; justify-content: space-between; margin-top: 4px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.85rem; opacity: 0.75; }
+
 @keyframes clock-blink { 50% { opacity: 0.12; } }
 
 .clock-left { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px; margin-bottom: 8px; font-size: 0.95rem; }
@@ -313,7 +391,7 @@ li { margin-bottom: 6px; }
   display: block;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, #4FC3C1, var(--clock-accent));
+  background: #87CEEB; /* sky blue */
   transition: width 1s linear;
 }
 
@@ -323,7 +401,7 @@ li { margin-bottom: 6px; }
 }
 
 
-/* 10. SMALL SCREENS ------------------------------------------------------- */
+/* 9. SMALL SCREENS ------------------------------------------------------- */
 
 @media (max-width: 560px) {
   .stats { grid-template-columns: repeat(2, 1fr); }

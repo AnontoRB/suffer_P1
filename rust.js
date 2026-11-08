@@ -2,8 +2,8 @@
  * Rust learning page.
  * Needs: common.js (App) and rust-data.js (RUST_DAYS).
  *
- * Every day has the same four study blocks. A day is "complete"
- * when every block is ticked. Progress is saved in localStorage.
+ * Every day has three parts: Learn, Practice and Build/Review.
+ * A day is "complete" when every required part is ticked. Progress is saved in localStorage.
  */
 (() => {
   "use strict";
@@ -19,7 +19,6 @@
   // ---------------------------------------------------------------------
 
   const STORAGE_KEY = "rust-plan-v1";
-  const RACE_DAY = TOTAL_DAYS;
 
   const XP_PER_DAY = 100;
   const XP_PER_WEEK_BONUS = 150;
@@ -28,20 +27,12 @@
 
   const WEEK_COUNT = Math.ceil(TOTAL_DAYS / 7);
 
-  /** Each day's review looks back at these earlier lessons. */
-  const REVIEW_LOOKBACKS = [
-    { daysAgo: 1, label: "Yesterday" },
-    { daysAgo: 7, label: "One week ago" },
-    { daysAgo: 30, label: "One month ago" },
-  ];
-
-  /** The label shown for each stretch of the curriculum. */
+  /** The label shown for each stretch of the plan. */
   const PHASES = [
-    { lastDay: 16, name: "Foundations" },
-    { lastDay: 29, name: "Core language" },
-    { lastDay: 50, name: "Intermediate" },
-    { lastDay: 59, name: "Projects" },
-    { lastDay: 60, name: "Race day" },
+    { lastDay: 17, name: "Phase 1: Core Language" },
+    { lastDay: 32, name: "Phase 2: Traits, Testing, Iterators" },
+    { lastDay: 47, name: "Phase 3: Smart Pointers, Concurrency, Async" },
+    { lastDay: 60, name: "Phase 4: Capstone and Advanced Topics" },
   ];
 
   // ---------------------------------------------------------------------
@@ -65,38 +56,23 @@
     return PHASES.find((phase) => day <= phase.lastDay).name;
   }
 
-  /** HTML listing which earlier topics to review today. */
-  function reviewHtml(day) {
-    const lines = REVIEW_LOOKBACKS
-      .filter(({ daysAgo }) => day - daysAgo >= 1)
-      .map(({ daysAgo, label }) => `${label}: <b>${RUST_DAYS[day - daysAgo - 1].title}</b>`);
-
-    if (lines.length === 0) return "Nothing to review yet. Today is your first day.";
-    return `${lines.join("<br>")}<br>Close the book, explain each aloud, then re-type one example from memory.`;
-  }
-
-  /** The checklist for one day: [{ id, title, minutes, text }]. */
+  /** The checklist for one day: [{ id, title, minutes, text, optional? }]. */
   function getStudyBlocks(day) {
     const lesson = RUST_DAYS[day - 1];
-
-    if (day === RACE_DAY) {
-      return [
-        { id: "review", title: "Light review", minutes: 30, text: "Skim your logs and notes. No new material today." },
-        { id: "log", title: "Log", minutes: 10, text: "Write one thing you're proud of from these 60 days." },
-      ];
-    }
+    const [learnMin, practiceMin, buildMin] = lesson.minutes || [45, 45, 30];
 
     return [
-      { id: "review", title: "Review", minutes: 15, text: reviewHtml(day) },
-      { id: "learn", title: "Learn something new", minutes: 50, text: lesson.learn },
-      { id: "practice", title: "Practice", minutes: 45, text: lesson.practice },
-      { id: "log", title: "Log", minutes: 10, text: "Write 3 things you learned, 1 compiler error you met, and 1 question for tomorrow." },
+      { id: "learn",    title: "1. Learn",          minutes: learnMin,    text: lesson.learn },
+      { id: "practice", title: "2. Practice",       minutes: practiceMin, text: lesson.practice, optional: !!lesson.practiceOptional },
+      { id: "build",    title: "3. Build/Review",   minutes: buildMin,    text: lesson.build },
     ];
   }
 
   function isDayComplete(day) {
     const { checked } = getDayData(day);
-    return getStudyBlocks(day).every((block) => checked[block.id]);
+    return getStudyBlocks(day)
+      .filter((block) => !block.optional)
+      .every((block) => checked[block.id]);
   }
 
   // ---------------------------------------------------------------------
@@ -157,12 +133,12 @@
 
   const BADGES = [
     { icon: "&#129370;", name: "First step",              isEarned: () => countCompletedDays() >= 1 },
-    { icon: "&#128737;", name: "Borrow checker survivor", isEarned: () => isDayComplete(11) },
+    { icon: "&#128737;", name: "Borrow checker survivor", isEarned: () => isDayComplete(7) },
     { icon: "&#128311;", name: "Week 1 clear",            isEarned: () => isWeekComplete(0) },
     { icon: "&#128293;", name: "7-day streak",            isEarned: () => calculateStreaks().best >= 7 },
     { icon: "&#127755;", name: "14-day streak",           isEarned: () => calculateStreaks().best >= 14 },
     { icon: "&#9889;",   name: "Halfway: 30 days",        isEarned: () => countCompletedDays() >= 30 },
-    { icon: "&#128736;", name: "Capstone builder",        isEarned: () => allDaysComplete(51, 55) },
+    { icon: "&#128736;", name: "API builder",             isEarned: () => allDaysComplete(48, 54) },
     { icon: "&#127942;", name: "All 60 days",             isEarned: () => countCompletedDays() >= TOTAL_DAYS },
   ];
 
@@ -182,7 +158,7 @@
       <div class="check-item ${checked[block.id] ? "checked" : ""}">
         <input type="checkbox" id="block-${block.id}" ${checked[block.id] ? "checked" : ""}>
         <label for="block-${block.id}">
-          <b>${block.title} (${block.minutes} min)</b>
+          <b>${block.title}${block.minutes ? ` (${block.minutes} min)` : ""}${block.optional ? " (optional)" : ""}</b>
           <small>${block.text}</small>
         </label>
       </div>`).join("");

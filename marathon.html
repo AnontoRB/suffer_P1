@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Marathon: Nov 9 to Jan 6</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="theme-marathon">
+
+  <header class="site-header">
+    <div class="wrap">
+      <a class="home-link" href="index.html">&larr; Home</a>
+      <h1>Marathon plan: 7.5 km on Jan 6</h1>
+      <p>
+        Day-by-day jog/walk plan from Nov 9, 2026 to race day on Jan 6, 2027.
+        Training days alternate with rest days, all the way to the race.
+      </p>
+      <div class="race-badge" id="race-countdown"></div>
+    </div>
+  </header>
+
+  <main class="wrap">
+
+    <section>
+      <div class="stats">
+        <div class="stat"><b id="stat-streak">0</b><span>day streak &#128293;</span></div>
+        <div class="stat"><b id="stat-done">0</b><span>days completed</span></div>
+        <div class="stat"><b id="stat-runs">0</b><span>runs done</span></div>
+        <div class="stat"><b id="stat-left">0</b><span>days to race</span></div>
+      </div>
+      <p class="sub" id="next-up" style="margin-top:12px"></p>
+
+      <h2>Calendar</h2>
+      <p class="legend">
+        Green = done &middot; red outline = missed &middot; dashed = today.
+        Tap any date to see the session and tick it off.
+      </p>
+      <div id="calendar"></div>
+      <div class="day-nav" id="day-nav"></div>
+      <div class="panel" id="panel"></div>
+    </section>
+
+    <section>
+      <h2>Every training day</h2>
+      <ol>
+        <li>Walk briskly for 5 minutes to warm up.</li>
+        <li>Do the main session.</li>
+        <li>Walk slowly for 5 minutes to cool down, then stretch calves, thighs and hips for 3 to 5 minutes.</li>
+      </ol>
+      <p><b>Jog pace:</b> slow enough that you can talk in short sentences. If you can't, slow down or walk.</p>
+      <p><b>Rest days:</b> either full rest, or an easy 20 to 30 minute walk. Some rest days also suggest light strength work.</p>
+    </section>
+
+    <section>
+      <h2>Full plan</h2>
+      <div id="plan-tables"></div>
+    </section>
+
+    <section>
+      <h2>Race day tips</h2>
+      <ul>
+        <li>Start slower than feels natural. Most people burn out in the first kilometer.</li>
+        <li>Walk breaks are fine, and you've trained for them.</li>
+        <li>Wear only shoes and clothes you've already trained in.</li>
+        <li>Eat a light breakfast 2 to 3 hours before, and sip water.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Adjustments</h2>
+      <ul>
+        <li>If you miss a session, don't double up. Just repeat the missed one on your next training day.</li>
+        <li>If a session feels too hard, repeat the previous one before moving on.</li>
+        <li>If you feel sharp pain (not just tired muscles), skip the next session. At your weight, a gradual build-up protects your knees and shins.</li>
+        <li>If you have any heart, joint or blood pressure concerns, check with a doctor before starting.</li>
+      </ul>
+    </section>
+
+  </main>
+
+  <footer>
+    <div class="wrap">General guidance, not medical advice.</div>
+  </footer>
+
+  <script src="common.js"></script>
+  <script src="marathon-data.js"></script>
+  <script src="marathon.js"></script>
+</body>
+</html>

@@ -1,5 +1,5 @@
 /**
- * Shared helpers used by the home, Rust and fitness pages.
+ * Shared helpers used by the home, Rust and marathon pages.
  * Exposes one global object: App.
  *
  * The plan covers 60 calendar days, from Nov 8, 2026 (day 1)
@@ -171,8 +171,9 @@ const App = (() => {
    * @param {number}   options.selectedDay
    * @param {Function} options.isDayComplete  (day) => boolean
    * @param {Function} options.onPick         (day) => void
+   * @param {Function} [options.hasPlan]      (day) => boolean; days without a plan are shown muted
    */
-  function renderCalendar({ container, selectedDay, isDayComplete, onPick }) {
+  function renderCalendar({ container, selectedDay, isDayComplete, onPick, hasPlan = () => true }) {
     const today = todayNumber();
     const weekdayHeaders = "SMTWTFS".split("").map((letter) => `<b class="weekday">${letter}</b>`).join("");
     const leadingBlanks = "<span></span>".repeat(dayDate(1).getDay());
@@ -181,7 +182,8 @@ const App = (() => {
     for (let day = 1; day <= TOTAL_DAYS; day++) {
       const date = dayDate(day);
       const classes = [];
-      if (isDayComplete(day)) classes.push("done");
+      if (!hasPlan(day)) classes.push("no-plan");
+      else if (isDayComplete(day)) classes.push("done");
       else if (day < today) classes.push("missed");
       if (day === today) classes.push("today");
       if (day === selectedDay) classes.push("selected");

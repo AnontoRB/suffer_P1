@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Health: Nov 8 to Jan 6</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="theme-health">
+
+  <header class="site-header">
+    <div class="wrap">
+      <a class="home-link" href="index.html">&larr; Home</a>
+      <h1>60-Day Strength, Water and Food Plan</h1>
+      <p>
+        Nov 8, 2026 to Jan 6, 2027. This plan sits on your running rest days. You run on Nov 9, 11, 13 and so on,
+        and you do strength work on the days in between, so every day is either a run or a strength day.
+        It starts with your current numbers (8 push-ups, 30 sit-ups, 30 squats, no pull-ups) and gets harder in
+        four blocks. It ends with a rest day on Jan 5 and the race on Jan 6.
+      </p>
+      <div class="race-badge" id="race-countdown"></div>
+    </div>
+  </header>
+
+  <main class="wrap">
+
+    <section>
+      <div class="stats">
+        <div class="stat"><b id="stat-streak">0</b><span>day streak &#128293;</span></div>
+        <div class="stat"><b id="stat-done">0</b><span>days completed</span></div>
+        <div class="stat"><b id="stat-sessions">0</b><span>strength sessions</span></div>
+        <div class="stat"><b id="stat-left">0</b><span>days to race</span></div>
+      </div>
+      <p class="sub" id="next-up" style="margin-top:12px"></p>
+
+      <h2>Calendar</h2>
+      <p class="legend">
+        Green = done &middot; red outline = missed &middot; dashed = today.
+        Tap any date to see the session, tick it off and fill in your water and food log.
+      </p>
+      <div id="calendar"></div>
+      <div class="day-nav" id="day-nav"></div>
+      <div class="panel" id="panel"></div>
+    </section>
+
+    <section>
+      <h2>What to expect (honest version)</h2>
+      <p>
+        In 60 days of consistent work, a realistic result is: push-ups from 8 to about 20 or more, a plank hold of
+        90 seconds or more, 65+ squats and sit-ups, slow controlled pull-up negatives (a first full pull-up is
+        possible but not guaranteed), a smaller waist, better posture, and the ability to run 7.5 km. Fat loss of
+        roughly 3 to 6 kg is realistic if you follow the food and sleep advice, but it varies by person. You will
+        look and feel clearly different, which is not the same as being unrecognizable, and the plan is built to
+        get you as far as is safe.
+      </p>
+    </section>
+
+    <section>
+      <h2>The four blocks</h2>
+      <div id="block-table"></div>
+    </section>
+
+    <section>
+      <h2>Day 0 (today, Nov 8): baseline</h2>
+      <ul>
+        <li>Weigh yourself first thing in the morning, after the toilet, before eating.</li>
+        <li>Measure with a tape: waist (at the belly button), chest, upper arm and thigh. Write the numbers in the measurements table below.</li>
+        <li>Take front, side and back photos in the same clothes and lighting. Repeat on Dec 10 and Jan 7.</li>
+        <li>Test: plank hold (max time) and dead hang (max time, only if you have a bar). Write the numbers down.</li>
+        <li>Read the exercise guide below so you know the movements before tomorrow.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Session structure (about 35 to 45 minutes)</h2>
+      <ol>
+        <li><b>Warm-up (5 min):</b> march in place 1 min, 20 arm circles, 10 leg swings per leg, 5 cat-cows, 5 slow squats, 5 easy incline push-ups.</li>
+        <li><b>Main work:</b> the day's list. Rest 60 to 90 seconds between sets (2 minutes for push-ups in Block 1).</li>
+        <li><b>Cooldown (5 min):</b> hold each stretch 30 seconds: calves, hamstrings, quads, hip flexors, chest.</li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>Rules</h2>
+      <ul>
+        <li>Stop most sets with 1 to 2 reps left, not at total failure.</li>
+        <li>Move to the next variation only when you hit the top reps in every set.</li>
+        <li>If a session feels impossible, repeat the previous session's numbers instead.</li>
+        <li>Your legs also have to run the next day. If they are very sore, drop one set from every leg exercise.</li>
+        <li>Sharp joint pain (not just tired muscles) means stop that exercise. At your weight, never do jumping moves.</li>
+        <li>If you have heart, joint or blood-pressure concerns, check with a doctor before starting.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Exercise guide</h2>
+      <div id="exercise-guide"></div>
+    </section>
+
+    <section>
+      <h2>Day-by-day strength schedule</h2>
+      <p>A days focus on pushing, legs and core. B days focus on pulling, glutes and core. Test days are explained below.</p>
+      <div id="schedule-tables"></div>
+    </section>
+
+    <section>
+      <h2>Checkpoint tests</h2>
+      <p>
+        On test days do the tests first, with 3 minutes of rest between them, then the short session listed.
+        Do each test with strict form (chest near floor, squats to parallel). Type your results in the boxes.
+      </p>
+      <div id="test-table"></div>
+    </section>
+
+    <section>
+      <h2>Body measurements</h2>
+      <div id="measure-table"></div>
+      <p class="sub" style="margin-top:12px">
+        Also weigh yourself every Sunday morning under the same conditions. Judge progress by the weekly trend,
+        not by day-to-day swings. Sundays have a weigh-in box in their daily log.
+      </p>
+      <p id="weights"></p>
+    </section>
+
+    <section>
+      <h2>Water plan</h2>
+      <ul>
+        <li><b>Goals:</b> until Nov 24: 2.5 L on strength days, 3.0 L on run days. From Nov 25: 3.0 L and 3.5 L. Drink more if you sweat a lot, and never force more than about 4.5 L.</li>
+        <li><b>Easy math:</b> one glass is 250 ml, so 3 L is 12 glasses.</li>
+        <li><b>Schedule:</b> 1 glass on waking, 1 before each meal, 1 mid-morning, 1 mid-afternoon, 1 in the evening, and the rest spread out. Drink 300 to 500 ml in the 2 hours before a run, and sip after it.</li>
+        <li><b>Check:</b> pale yellow urine means you are drinking enough.</li>
+        <li><b>Jan 5 and Jan 6:</b> drink steadily, don't gulp. On race day have about 500 ml 2 to 3 hours before the start.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Food plan</h2>
+      <p>
+        The goal is slow, steady fat loss while keeping your energy for running and strength work.
+        Aim for 0.3 to 0.5 kg per week. If you lose faster than about 0.7 kg per week, eat more.
+      </p>
+      <ul>
+        <li><b>Protein:</b> about 110 to 130 g a day (eggs, chicken, fish, dal and lentils, yogurt, paneer, beans).</li>
+        <li><b>Calories (rough guide):</b> about 2,200 to 2,500 kcal a day, higher on run days. Adjust using your weekly weight trend.</li>
+        <li><b>Plate method:</b> half the plate vegetables, a quarter protein, a quarter carbs (rice, roti, oats, potatoes). Fill the last bit with healthy fats.</li>
+        <li><b>Before a run:</b> a light carb snack 1 to 2 hours before, such as a banana or toast.</li>
+        <li><b>After a run or workout:</b> protein plus carbs within 1 to 2 hours, such as eggs and toast, or rice, dal and chicken.</li>
+        <li><b>Limit:</b> sugary drinks, fried snacks and late-night eating.</li>
+        <li><b>Sleep:</b> 7 to 8 hours. Muscle is built while you sleep.</li>
+        <li><b>Rust study:</b> stand up and walk for 5 minutes each hour while you code.</li>
+      </ul>
+      <h3 style="margin-top:20px">Sample day</h3>
+      <div id="sample-day"></div>
+    </section>
+
+    <section>
+      <h2>Daily log (water and food)</h2>
+      <p class="sub">
+        Open any date in the calendar to write the litres you drank, what you ate in each meal, and anything extra,
+        like cravings, sleep or soreness. This table shows your water goals and totals for every day.
+      </p>
+      <div id="log-table"></div>
+    </section>
+
+    <section>
+      <h2>After the race</h2>
+      <p>
+        On Jan 7, repeat your measurements and photos, and compare them with Nov 8. Take 2 or 3 easy days, then pick
+        the next goal: a faster 7.5 km, a 10 km run, or your first pull-up.
+      </p>
+    </section>
+
+  </main>
+
+  <footer>
+    <div class="wrap">General guidance, not medical advice.</div>
+  </footer>
+
+  <script src="common.js"></script>
+  <script src="health-data.js"></script>
+  <script src="health.js"></script>
+</body>
+</html>
