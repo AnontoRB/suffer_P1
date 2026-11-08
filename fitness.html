@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fitness: Nov 8 to Jan 6</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="theme-fitness">
+
+  <header class="site-header">
+    <div class="wrap">
+      <a class="home-link" href="index.html">&larr; Home</a>
+      <h1>Fitness plan: ready for 7.5 km</h1>
+      <p>
+        From Nov 8 to race day on Jan 6. Bodyweight strength, run/walk training that builds
+        to 7.5 km, plus water and sleep tracking. Built from your start: 8 push-ups, 30 sit-ups,
+        30 squats, no pull-ups, a 30-second sprint, and 40&ndash;60 minutes of easy walking.
+      </p>
+      <div class="race-badge" id="race-countdown"></div>
+    </div>
+  </header>
+
+  <main class="wrap">
+
+    <section>
+      <div class="stats">
+        <div class="stat"><b id="stat-streak">0</b><span>day streak &#128293;</span></div>
+        <div class="stat"><b id="stat-done">0</b><span>days completed</span></div>
+        <div class="stat"><b id="stat-sleep">&ndash;</b><span>avg sleep (h)</span></div>
+        <div class="stat"><b id="stat-water">&ndash;</b><span>avg water (L)</span></div>
+      </div>
+
+      <h2 style="margin-top:20px">Calendar</h2>
+      <p class="legend">
+        Green = done &middot; red outline = missed &middot; dashed = today.
+        Tap any date to see what's planned or what you logged.
+        A day counts when every item is ticked and you hit 3 L of water.
+      </p>
+      <div id="calendar"></div>
+      <div class="day-nav" id="day-nav"></div>
+      <div class="panel" id="panel"></div>
+    </section>
+
+    <section>
+      <h2>Trends</h2>
+      <p class="sub">One bar per day. Water goal 3 L, sleep goal 8 hours.</p>
+      <div class="box"><b>Water</b><div class="bars" id="water-bars"></div></div>
+      <div class="box"><b>Sleep</b><div class="bars sleep" id="sleep-bars"></div></div>
+    </section>
+
+    <section>
+      <h2>Strength retests</h2>
+      <p class="sub">Retest on Dec 5 (day 28) and Dec 26 (day 49). Max reps in one set. Targets are estimates.</p>
+      <div class="scroll" id="retest-table"></div>
+    </section>
+
+    <section>
+      <h2>Week by week</h2>
+      <div class="scroll" id="weekly-table"></div>
+      <p class="sub" style="margin-top:10px">
+        Weekly pattern: Run 1, Strength A, Run 2, Strength B, rest walk, Long run, Strength C.
+        Weeks 4 and 8 are lighter so your body can adapt. If a week feels too hard, repeat the previous week.
+      </p>
+    </section>
+
+    <section>
+      <h2>Progressive overload guide</h2>
+      <ul>
+        <li><b>Change one thing at a time:</b> reps, sets, slower tempo or shorter rest.</li>
+        <li><b>Double progression:</b> hold a rep target until every set feels easy, then add 1&ndash;2 reps.</li>
+        <li><b>Leave 2 reps in the tank</b> in early weeks. Form first.</li>
+        <li><b>Slow the lowering</b> to 3 seconds on push-ups and squats to make the same reps harder.</li>
+        <li><b>Push-up ladder:</b> knee push-ups, full, slow full, feet raised on a step, pike push-ups.</li>
+        <li><b>Squat ladder:</b> squats, slow squats, reverse lunges, split squats, single-leg sit-to-stand.</li>
+        <li><b>Running:</b> never raise weekly running time by more than about 10&ndash;15%. Easy pace means you can say a short sentence.</li>
+        <li><b>Pull-ups:</b> can't be trained with zero equipment. Superman holds build your back for now; with a bar, start with hangs and slow lowering.</li>
+        <li><b>Sharp or joint pain, or shin pain that worsens</b> means rest and drop back a week.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>7.5 km race tips</h2>
+      <div class="notice">
+        Run the first kilometre slower than feels natural. Walking breaks are fine, and many
+        finishers use them. Drink at the stations, eat a light breakfast 2&ndash;3 hours before,
+        and lay out your kit the night before. This plan peaks with a 50-minute jog on Dec 25,
+        so 7.5 km on race day is realistic. If anything hurts, back off rather than push through,
+        and check with a doctor before raising mileage.
+      </div>
+    </section>
+
+    <section>
+      <h2>Water and sleep</h2>
+      <ul>
+        <li><b>Water:</b> 3 L a day (more on hot or long-run days). A glass on waking and one before each meal.</li>
+        <li><b>Sleep:</b> 8 hours, for example 22:30 to 06:30, at the same times every day. Gains happen while you sleep.</li>
+      </ul>
+    </section>
+
+  </main>
+
+  <footer>
+    <div class="wrap">General fitness guidance, not medical advice. Stop for chest pain, dizziness or sharp pain.</div>
+  </footer>
+
+  <script src="js/common.js"></script>
+  <script src="js/fitness-data.js"></script>
+  <script src="js/fitness.js"></script>
+</body>
+</html>

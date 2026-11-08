@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Learn Rust: Nov 8 to Jan 6</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="theme-rust">
+
+  <header class="site-header">
+    <div class="wrap">
+      <a class="home-link" href="index.html">&larr; Home</a>
+      <h1>Learn Rust, Nov 8 to Jan 6</h1>
+      <p>
+        Two hours every day for 60 days: 15 min review, 50 min new topic, 45 min practice,
+        10 min log. Every day follows the same pattern, and every day starts by revisiting
+        earlier lessons so they stick.
+      </p>
+    </div>
+  </header>
+
+  <main class="wrap">
+
+    <section>
+      <div class="stats">
+        <div class="stat"><b id="stat-streak">0</b><span>day streak &#128293;</span></div>
+        <div class="stat"><b id="stat-done">0</b><span>days completed</span></div>
+        <div class="stat"><b id="stat-xp">0</b><span>XP</span></div>
+        <div class="stat"><b id="stat-level">1</b><span id="stat-level-name">Hatchling</span></div>
+      </div>
+      <div class="xp-bar" aria-hidden="true"><i id="xp-fill"></i></div>
+      <p class="sub" id="next-up"></p>
+
+      <h2>Calendar</h2>
+      <p class="legend">
+        Green = done &middot; red outline = missed &middot; dashed = today.
+        Tap any date, past or future.
+      </p>
+      <div id="calendar"></div>
+      <div class="day-nav" id="day-nav"></div>
+      <div class="panel" id="panel"></div>
+    </section>
+
+    <section>
+      <h2>Badges</h2>
+      <div class="badges" id="badges"></div>
+    </section>
+
+    <section>
+      <h2>How each day works</h2>
+      <ul>
+        <li><b>Review (15 min):</b> close the book. Explain yesterday's topic, last week's topic and last month's topic aloud, then re-type one small example from memory.</li>
+        <li><b>Learn (50 min):</b> read the section, type every example yourself, and try to break it.</li>
+        <li><b>Practice (45 min):</b> exercises or the current mini project. Read the compiler error twice before searching.</li>
+        <li><b>Log (10 min):</b> three things learned, one error you met, one question for tomorrow.</li>
+        <li><b>Missed a day?</b> Don't double up. Do that day's review and the next topic, and tick the missed day only when you've really finished it.</li>
+      </ul>
+    </section>
+
+  </main>
+
+  <footer>
+    <div class="wrap">
+      Resources: The Rust Programming Language (doc.rust-lang.org/book), Rustlings,
+      Exercism Rust track, Rust by Example.
+    </div>
+  </footer>
+
+  <script src="js/common.js"></script>
+  <script src="js/rust-data.js"></script>
+  <script src="js/rust.js"></script>
+</body>
+</html>
