@@ -15,7 +15,9 @@
      11. Small screens
      12. Top bar and settings panel
      13. My Tasks page
-     14. Home page: craft-shop layout
+     14. Home page: orbit hero
+     15. Home page: today's tasks grid
+     16. Plan pages: the home page look, for every device
    ========================================================================== */
 
 
@@ -24,18 +26,6 @@
    --ok   : completed day      --bad  : missed day
    ------------------------------------------------------------------------- */
 
-.theme-rust {
-  --bg: #F1EFF7;  --surface: #FFFFFF;  --ink: #1E1B2E;  --muted: #5F5B75;  --line: #D9D5E8;
-  --acc: #B4441F;  --acc2: #2F4A63;  --ok: #2E7D5B;  --on-ok: #FFFFFF;  --bad: #B3261E;
-  --font: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
-}
-
-.theme-marathon {
-  --bg: #F1EFF7;  --surface: #FFFFFF;  --ink: #1E1B2E;  --muted: #5F5B75;  --line: #D9D5E8;
-  --acc: #D9561E;  --acc2: #0E7C7B;  --ok: #2E7D5B;  --on-ok: #FFFFFF;  --bad: #B3261E;
-  --font: "Trebuchet MS", "Segoe UI", system-ui, sans-serif;
-}
-
 .theme-home {
   --bg: #F1EFF7;  --surface: #FFFFFF;  --ink: #1E1B2E;  --muted: #5F5B75;  --line: #D9D5E8;
   --rust: #B4441F;  --teal: #0E7C7B;  --health: #7B3FA0;  --cube: #B26A00;  --mine: #1F8A70;  --diary: #B23A5B;
@@ -43,59 +33,50 @@
   --font: "Gill Sans", "Trebuchet MS", system-ui, sans-serif;
 }
 
-.theme-health {
-  --bg: #F1EFF7;  --surface: #FFFFFF;  --ink: #1E1B2E;  --muted: #5F5B75;  --line: #D9D5E8;
-  --acc: #7B3FA0;  --acc2: #2D7FB8;  --ok: #2E7D5B;  --on-ok: #FFFFFF;  --bad: #B3261E;
-  --font: "Avenir Next", "Segoe UI", system-ui, sans-serif;
-}
+/* Plan pages (every page except the home page) share the home page's look:
+   deep indigo-black by default, light only when the user picks Light in Settings.
+   Each page keeps its own accent, using the same colour as its tile on the home page.
+   --acc / --acc2 : accents        --on-acc / --on-acc2 : text on top of them
+   --ok / --bad   : done / missed  --on-ok / --on-bad   : text on top of them
+   The accent rules for light mode use :where() so the user's own accent colour
+   (Settings > Accent colour) still wins over them. */
 
-.theme-cubing {
-  --bg: #F1EFF7;  --surface: #FFFFFF;  --ink: #1E1B2E;  --muted: #5F5B75;  --line: #D9D5E8;
-  --acc: #B26A00;  --acc2: #2B5FD9;  --ok: #2E7D5B;  --on-ok: #FFFFFF;  --bad: #B3261E;
-  --font: "Optima", "Candara", "Segoe UI", system-ui, sans-serif;
+.theme-rust, .theme-marathon, .theme-health, .theme-cubing, .theme-tasks, .theme-diary {
+  --bg: #0E0C15;  --surface: #16131F;  --ink: #F4F1FA;  --muted: #9A94AD;  --line: #292338;
+  --acc2: #9AA6FF;  --on-acc: #120C06;  --on-acc2: #0E0C15;
+  --ok: #5CC08F;  --on-ok: #08140E;  --bad: #F28B82;  --on-bad: #2A0B08;
+  --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --font: var(--sans);
+  --gut: clamp(16px, 3vw, 56px);
+  color-scheme: dark;
 }
+.theme-rust     { --acc: #FF7A59; }
+.theme-marathon { --acc: #3FD0C9; }
+.theme-health   { --acc: #C79BE0; }
+.theme-cubing   { --acc: #F0B429; }
+.theme-tasks    { --acc: #4DD4A8; }
+.theme-diary    { --acc: #F27A9C; }
 
-.theme-tasks {
-  --bg: #F1EFF7;  --surface: #FFFFFF;  --ink: #1E1B2E;  --muted: #5F5B75;  --line: #D9D5E8;
-  --acc: #1F8A70;  --acc2: #2D7FB8;  --ok: #2E7D5B;  --on-ok: #FFFFFF;  --bad: #B3261E;
-  --font: "Gill Sans", "Trebuchet MS", system-ui, sans-serif;
+html[data-theme="light"] :where(.theme-rust, .theme-marathon, .theme-health, .theme-cubing, .theme-tasks, .theme-diary) {
+  --bg: #F6F3EE;  --surface: #FFFFFF;  --ink: #17131F;  --muted: #6B657A;  --line: #E0DAD0;
+  --acc2: #3B4BB8;  --on-acc: #FFFFFF;  --on-acc2: #FFFFFF;
+  --ok: #2E7D5B;  --on-ok: #FFFFFF;  --bad: #B3261E;  --on-bad: #FFFFFF;
+  color-scheme: light;
 }
+html[data-theme="light"] :where(.theme-rust)     { --acc: #C9441F; }
+html[data-theme="light"] :where(.theme-marathon) { --acc: #0E7C7B; }
+html[data-theme="light"] :where(.theme-health)   { --acc: #7B3FA0; }
+html[data-theme="light"] :where(.theme-cubing)   { --acc: #A86400; }
+html[data-theme="light"] :where(.theme-tasks)    { --acc: #1F8A70; }
+html[data-theme="light"] :where(.theme-diary)    { --acc: #B23A5B; }
 
-.theme-diary {
-  --bg: #F6F1E8;  --surface: #FFFDF8;  --ink: #2A2118;  --muted: #6B5F52;  --line: #E4D9C7;
-  --acc: #B23A5B;  --acc2: #2D7FB8;  --ok: #2E7D5B;  --on-ok: #FFFFFF;  --bad: #B3261E;
-  --font: "Charter", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
-}
-
-/* Dark colours, used when the device is in dark mode and the user hasn't forced Light.
+/* Home page only: dark colours when the device is in dark mode and the user hasn't forced Light.
    The same values are repeated below for when the user forces Dark in Settings.
    (CSS can't share one block between a media query and an attribute selector.) */
 
 @media (prefers-color-scheme: dark) {
-  html:not([data-theme="light"]) .theme-health {
-    --bg: #15131F;  --surface: #1F1C2E;  --ink: #ECE9F7;  --muted: #A29EBB;  --line: #34304A;
-    --acc: #C79BE0;  --acc2: #6FB3E0;  --ok: #5CC08F;  --on-ok: #0B1F16;  --bad: #F28B82;
-  }
-  html:not([data-theme="light"]) .theme-rust {
-    --bg: #15131F;  --surface: #1F1C2E;  --ink: #ECE9F7;  --muted: #A29EBB;  --line: #34304A;
-    --acc: #E08A63;  --acc2: #8FB0CF;  --ok: #5CC08F;  --on-ok: #0B1F16;  --bad: #F28B82;
-  }
-  html:not([data-theme="light"]) .theme-marathon {
-    --bg: #15131F;  --surface: #1F1C2E;  --ink: #ECE9F7;  --muted: #A29EBB;  --line: #34304A;
-    --acc: #F08A5D;  --acc2: #4FC3C1;  --ok: #5CC08F;  --on-ok: #0B1F16;  --bad: #F28B82;
-  }
-  html:not([data-theme="light"]) .theme-cubing {
-    --bg: #15131F;  --surface: #1F1C2E;  --ink: #ECE9F7;  --muted: #A29EBB;  --line: #34304A;
-    --acc: #E8A92E;  --acc2: #7FA6F5;  --ok: #5CC08F;  --on-ok: #0B1F16;  --bad: #F28B82;
-  }
-  html:not([data-theme="light"]) .theme-diary {
-    --bg: #17131A;  --surface: #211B26;  --ink: #F0E9F2;  --muted: #B0A3B5;  --line: #3A3040;
-    --acc: #E58BA5;  --acc2: #6FB3E0;  --ok: #5CC08F;  --on-ok: #0B1F16;  --bad: #F28B82;
-  }
-  html:not([data-theme="light"]) .theme-tasks {
-    --bg: #15131F;  --surface: #1F1C2E;  --ink: #ECE9F7;  --muted: #A29EBB;  --line: #34304A;
-    --acc: #4DC4A0;  --acc2: #6FB3E0;  --ok: #5CC08F;  --on-ok: #0B1F16;  --bad: #F28B82;
-  }
   html:not([data-theme="light"]) .theme-home {
     --bg: #15131F;  --surface: #1F1C2E;  --ink: #ECE9F7;  --muted: #A29EBB;  --line: #34304A;
     --rust: #E08A63;  --teal: #4FC3C1;  --health: #C79BE0;  --cube: #B26A00;  --mine: #1F8A70;  --diary: #E58BA5;
@@ -105,30 +86,6 @@
 
 /* Dark colours when the user forces Dark in Settings. */
 
-html[data-theme="dark"] .theme-health {
-  --bg: #15131F;  --surface: #1F1C2E;  --ink: #ECE9F7;  --muted: #A29EBB;  --line: #34304A;
-  --acc: #C79BE0;  --acc2: #6FB3E0;  --ok: #5CC08F;  --on-ok: #0B1F16;  --bad: #F28B82;
-}
-html[data-theme="dark"] .theme-rust {
-  --bg: #15131F;  --surface: #1F1C2E;  --ink: #ECE9F7;  --muted: #A29EBB;  --line: #34304A;
-  --acc: #E08A63;  --acc2: #8FB0CF;  --ok: #5CC08F;  --on-ok: #0B1F16;  --bad: #F28B82;
-}
-html[data-theme="dark"] .theme-marathon {
-  --bg: #15131F;  --surface: #1F1C2E;  --ink: #ECE9F7;  --muted: #A29EBB;  --line: #34304A;
-  --acc: #F08A5D;  --acc2: #4FC3C1;  --ok: #5CC08F;  --on-ok: #0B1F16;  --bad: #F28B82;
-}
-html[data-theme="dark"] .theme-cubing {
-  --bg: #15131F;  --surface: #1F1C2E;  --ink: #ECE9F7;  --muted: #A29EBB;  --line: #34304A;
-  --acc: #E8A92E;  --acc2: #7FA6F5;  --ok: #5CC08F;  --on-ok: #0B1F16;  --bad: #F28B82;
-}
-html[data-theme="dark"] .theme-diary {
-  --bg: #17131A;  --surface: #211B26;  --ink: #F0E9F2;  --muted: #B0A3B5;  --line: #3A3040;
-  --acc: #E58BA5;  --acc2: #6FB3E0;  --ok: #5CC08F;  --on-ok: #0B1F16;  --bad: #F28B82;
-}
-html[data-theme="dark"] .theme-tasks {
-  --bg: #15131F;  --surface: #1F1C2E;  --ink: #ECE9F7;  --muted: #A29EBB;  --line: #34304A;
-  --acc: #4DC4A0;  --acc2: #6FB3E0;  --ok: #5CC08F;  --on-ok: #0B1F16;  --bad: #F28B82;
-}
 html[data-theme="dark"] .theme-home {
   --bg: #15131F;  --surface: #1F1C2E;  --ink: #ECE9F7;  --muted: #A29EBB;  --line: #34304A;
   --rust: #E08A63;  --teal: #4FC3C1;  --health: #C79BE0;  --cube: #B26A00;  --mine: #1F8A70;  --diary: #E58BA5;
@@ -235,15 +192,18 @@ footer { padding: 34px 0 60px; color: var(--muted); font-size: 0.9rem; }
 
 /* 5. DAY PANEL AND CHECKLISTS ----------------------------------------------- */
 
-/* Wide screens: the day panel sits beside the calendar. */
-@media (min-width: 1000px) {
-  main.wrap > section:first-of-type {
+/* Wide screens: the day panel sits beside the calendar.
+   Only pages that have a day panel use this. The last row takes all spare height,
+   so the items on the left stay together instead of spreading out. */
+@media (min-width: 960px) {
+  main.wrap > section:has(> #panel) {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+    grid-template-rows: repeat(11, auto) 1fr;
     column-gap: 36px;
     align-items: start;
   }
-  main.wrap > section:first-of-type > #panel { grid-column: 2; grid-row: 1 / span 12; margin-top: 0; }
+  main.wrap > section:has(> #panel) > #panel { grid-column: 2; grid-row: 1 / -1; margin-top: 0; }
 }
 
 .panel {
@@ -1226,3 +1186,343 @@ html[data-theme="light"] body.theme-home.theme-home.theme-home {
 .tcol > .task-group:last-child { flex: 1 1 auto; }
 .tcol.probe { position: absolute; left: 0; top: 0; visibility: hidden; pointer-events: none; }
 #task-list.is-masonry .task-group h3::before { content: attr(data-n); }
+
+
+/* 16. PLAN PAGES: THE HOME PAGE LOOK, FOR EVERY DEVICE ----------------------- */
+/* Applies to every page except the home page (their <body> has class "plan-page").
+   Same palette, type, rounded shapes and mono labels as the home page, and the
+   same accent colour as each plan's tile. Built mobile first, then widened. */
+
+html:has(.plan-page) { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+
+.plan-page {
+  overflow-x: clip;            /* never a sideways scroll; "clip" keeps the sticky top bar working */
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+.plan-page :where(button, a, input, select, textarea) { touch-action: manipulation; }
+
+/* Page width: centred, with room for notches in landscape */
+.plan-page .wrap,
+.plan-page .wrap.wide {
+  width: min(1320px, 100%);
+  max-width: none;
+  margin-inline: auto;
+  padding-left: max(var(--gut), env(safe-area-inset-left));
+  padding-right: max(var(--gut), env(safe-area-inset-right));
+}
+
+/* Links and code */
+.plan-page a { color: var(--acc2); text-underline-offset: 3px; }
+.plan-page :where(code) {
+  padding: 0.1em 0.4em; border-radius: 6px; font-family: var(--mono); font-size: 0.9em;
+  background: color-mix(in srgb, var(--ink) 9%, transparent);
+}
+
+/* Focus rings for every control */
+.plan-page :where(a, button, input, select, textarea, summary):focus-visible { outline: 3px solid var(--acc); outline-offset: 2px; }
+
+/* Top bar: same as the home page, plus safe-area padding */
+.plan-page .topbar {
+  padding: max(10px, env(safe-area-inset-top)) max(var(--gut), env(safe-area-inset-right)) 10px max(var(--gut), env(safe-area-inset-left));
+  background: var(--bg);
+  background: color-mix(in srgb, var(--bg) 70%, transparent);
+  -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+  font-family: var(--mono); font-size: 0.75rem; letter-spacing: 0.14em; text-transform: uppercase;
+}
+.plan-page .topbar-name { font-size: 0.8rem; font-weight: 600; color: var(--ink); }
+.plan-page .topbar button {
+  min-height: 40px; border-radius: 10px; background: transparent;
+  font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase;
+}
+
+
+/* Page header */
+.plan-page .site-header {
+  padding: clamp(26px, 6vw, 72px) 0 clamp(24px, 4vw, 48px);
+  border-bottom: 1px solid var(--line);
+  background:
+    radial-gradient(60% 130% at 88% 0%, color-mix(in srgb, var(--acc) 15%, transparent), transparent 70%),
+    radial-gradient(50% 100% at 0% 100%, color-mix(in srgb, var(--acc2) 9%, transparent), transparent 75%);
+}
+.plan-page h1 {
+  margin: 0 0 14px; font-size: clamp(2rem, 6.4vw, 3.6rem); font-weight: 600;
+  line-height: 1.06; letter-spacing: -0.03em; text-wrap: balance; overflow-wrap: break-word;
+}
+.plan-page h1 span + span { color: var(--acc); font-family: var(--serif); font-style: italic; font-weight: 400; letter-spacing: -0.01em; }
+.plan-page .site-header p { max-width: 64ch; color: var(--muted); }
+
+.plan-page .home-link {
+  display: inline-flex; align-items: center; min-height: 36px; margin-bottom: 18px; padding: 6px 14px;
+  border: 1px solid var(--line); border-radius: 99px; color: var(--ink); text-decoration: none;
+  font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase;
+}
+.plan-page .race-badge {
+  display: inline-flex; align-items: center; margin-top: 16px; padding: 7px 16px;
+  border: 1px solid color-mix(in srgb, var(--acc) 45%, var(--line)); border-radius: 99px;
+  background: color-mix(in srgb, var(--acc) 10%, transparent); color: var(--ink);
+  font-family: var(--mono); font-size: 0.74rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+}
+.plan-page .race-badge::before { content: ""; flex: none; width: 8px; height: 8px; margin-right: 8px; border-radius: 50%; background: var(--acc); }
+.plan-page .race-badge:empty { display: none; }
+
+
+/* Sections: big gaps, a small numbered label above each heading (like the home page) */
+.plan-page main { counter-reset: sec; padding-bottom: 8px; }
+.plan-page main section { min-width: 0; margin-top: clamp(40px, 6vw, 80px); padding: 0; }
+.plan-page main > section:first-of-type { margin-top: clamp(24px, 4vw, 44px); }
+
+.plan-page main section > h2 {
+  counter-increment: sec; margin: 0 0 14px; font-size: clamp(1.6rem, 3.2vw, 2.4rem);
+  font-weight: 600; line-height: 1.08; letter-spacing: -0.03em; text-wrap: balance;
+}
+.plan-page main section > h2::before {
+  content: counter(sec, decimal-leading-zero); display: block; width: fit-content; margin-bottom: 10px; padding-right: 56px;
+  background: linear-gradient(90deg, var(--acc), transparent) right center / 44px 1px no-repeat;
+  color: var(--acc); font-family: var(--mono); font-size: 0.76rem; font-weight: 600; letter-spacing: 0.14em;
+}
+/* A heading that follows other content in its section (like Calendar after the stat boxes) */
+.plan-page main section > h2:not(:first-child) { margin-top: clamp(32px, 5vw, 48px); }
+.plan-page h3 { font-weight: 600; letter-spacing: -0.01em; }
+.plan-page main.wrap section > :where(p, ul, ol) { max-width: 72ch; }
+.plan-page ul, .plan-page ol { padding-left: 1.3em; }
+.plan-page li::marker { color: var(--acc); }
+.plan-page .sub, .plan-page .muted-line { color: var(--muted); }
+.plan-page .legend { max-width: 72ch; font-size: 0.85rem; line-height: 1.5; }
+
+
+/* Stat boxes */
+.plan-page .stats { grid-template-columns: repeat(auto-fit, minmax(min(100%, 130px), 1fr)); gap: 10px; }
+.plan-page .stat { padding: 16px 12px; border-radius: 16px; background: var(--surface); }
+.plan-page .stat b { font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 700; letter-spacing: -0.02em; }
+.plan-page .stat span { display: block; margin-top: 2px; font-family: var(--mono); font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; line-height: 1.4; }
+
+.plan-page .xp-bar { height: 8px; border-radius: 99px; background: color-mix(in srgb, var(--ink) 12%, transparent); }
+.plan-page .xp-bar i { border-radius: 99px; background: linear-gradient(90deg, var(--acc), var(--acc2)); }
+
+
+/* Calendar */
+.plan-page .calendar { gap: 6px; margin-top: 14px; }
+.plan-page .calendar .weekday { padding: 4px 0; font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.1em; }
+.plan-page .calendar button {
+  min-height: 44px; padding: 6px 0; border: 1px solid var(--line); border-radius: 10px;
+  background: var(--surface); color: var(--ink); font-size: 0.82rem; cursor: pointer;
+  transition: border-color 0.15s, background-color 0.15s;
+}
+.plan-page .calendar button.done     { background: var(--ok); border-color: var(--ok); color: var(--on-ok); }
+.plan-page .calendar button.missed   { border-color: var(--bad); color: var(--bad); }
+.plan-page .calendar button.has-tasks { border-color: var(--acc); box-shadow: inset 0 0 0 1px var(--acc); }
+.plan-page .calendar button.no-plan  { opacity: 0.4; }
+.plan-page .calendar button.today    { outline: 2px dashed var(--acc); outline-offset: 2px; }
+.plan-page .calendar button.selected { border-color: var(--acc2); box-shadow: inset 0 0 0 2px var(--acc2); font-weight: 700; }
+@media (hover: hover) { .plan-page .calendar button:not(.done):hover { border-color: var(--acc2); } }
+
+.plan-page .day-nav { gap: 8px; margin-top: 14px; }
+.plan-page .day-nav button,
+.plan-page .btn-outline {
+  min-height: 44px; padding: 8px 16px; border: 1px solid var(--line); border-radius: 12px;
+  background: transparent; color: var(--ink); font: inherit; font-size: 0.92rem; font-weight: 600; cursor: pointer;
+  transition: border-color 0.15s, background-color 0.15s;
+}
+@media (hover: hover) {
+  .plan-page .day-nav button:hover,
+  .plan-page .btn-outline:hover { background: color-mix(in srgb, var(--acc) 10%, transparent); color: var(--ink); border-color: var(--acc); }
+}
+.plan-page .btn-outline.danger { border-color: color-mix(in srgb, var(--bad) 50%, var(--line)); }
+.plan-page .day-nav .jump-date { min-width: 0; }
+
+/* Main buttons (Add, Add task, Add category ...) use the home page's gradient button */
+.plan-page .add-form button[type="submit"] {
+  border-color: transparent; background: var(--acc);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--acc) 76%, #fff), var(--acc));
+  color: var(--on-acc);
+}
+@media (hover: hover) { .plan-page .add-form button[type="submit"]:hover { filter: brightness(1.1); } }
+
+
+/* The selected day */
+.plan-page .panel {
+  margin-top: 18px; padding: clamp(16px, 3vw, 28px); min-width: 0;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 20px;
+  box-shadow: inset 0 3px 0 var(--acc);
+}
+.plan-page .panel > h2 { margin: 0 0 6px; font-size: clamp(1.3rem, 2.4vw, 1.7rem); font-weight: 600; letter-spacing: -0.02em; line-height: 1.2; }
+.plan-page .panel-date {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 2px 8px; margin-bottom: 12px;
+  font-family: var(--mono); font-size: 0.74rem; letter-spacing: 0.08em; line-height: 1.9; text-transform: uppercase;
+}
+#panel, #page { scroll-margin-top: 72px; }
+
+.plan-page .tag {
+  margin-left: 0; padding: 2px 10px; border-radius: 99px; background: var(--acc2); color: var(--on-acc2);
+  font-family: var(--mono); font-size: 0.68rem; font-weight: 600; letter-spacing: 0.08em; line-height: 1.6;
+}
+.plan-page .tag.ok       { background: var(--ok); color: var(--on-ok); }
+.plan-page .tag.missed   { background: var(--bad); color: var(--on-bad); }
+.plan-page .tag.upcoming { background: transparent; border: 1px solid var(--line); color: var(--muted); }
+
+.plan-page .box { margin-top: 12px; padding: 4px 16px; border: 1px solid var(--line); border-radius: 14px; }
+.plan-page .tip,
+.plan-page .notice { border-radius: 12px; }
+.plan-page .tip { background: color-mix(in srgb, var(--acc) 8%, var(--surface)); border-left-width: 3px; }
+
+/* Checklists */
+.plan-page .check-item { gap: 14px; padding: 12px 0; }
+.plan-page .check-item input[type="checkbox"] {
+  width: 28px; height: 28px; border-radius: 8px;
+  border-color: var(--muted);
+  border-color: color-mix(in srgb, var(--ink) 40%, var(--surface));   /* easier to see than the line colour */
+}
+.plan-page .check-item input[type="checkbox"]:checked { border-color: var(--ok); }
+.plan-page .check-item label { padding-block: 2px; line-height: 1.45; }
+.plan-page .check-item small { font-size: 0.85rem; line-height: 1.45; }
+.plan-page .subtasks .check-item input[type="checkbox"] { width: 24px; height: 24px; }
+
+
+/* Inputs */
+.plan-page .cell-input,
+.plan-page .field input,
+.plan-page input[type="time"],
+.plan-page input[type="number"] {
+  min-height: 44px; padding: 9px 12px; border: 1px solid var(--line); border-radius: 10px;
+  background: var(--bg); color: var(--ink); font: inherit; font-size: max(16px, 0.95rem);   /* 16px stops iPhones zooming in */
+}
+.plan-page input[type="number"] { width: 100%; max-width: 100%; }
+.plan-page td .cell-input { min-height: 38px; padding: 6px 8px; }
+.plan-page ::placeholder { color: var(--muted); opacity: 0.8; }
+.plan-page .field { gap: 6px; font-size: 0.82rem; }
+.plan-page .log-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 170px), 1fr)); gap: 12px; }
+.plan-page .add-form { gap: 8px; margin: 4px 0 14px; }
+.plan-page .add-form .cell-input { min-width: 0; }
+.plan-page .add-form button { min-height: 44px; border-radius: 12px; font-weight: 700; }
+
+.plan-page .mode-toggle { border-radius: 12px; overflow: hidden; }
+.plan-page .add-form .mode-toggle button { min-height: 44px; border-radius: 0; }
+.plan-page .add-form .mode-toggle button[aria-pressed="true"] { background: var(--acc); border-color: var(--acc); color: var(--on-acc); }
+
+.plan-page .task-actions button { min-height: 36px; padding: 4px 12px; border-radius: 10px; font-size: 0.85rem; }
+.plan-page .icon-btn { width: 36px; height: 36px; border-radius: 10px; }
+.plan-page .cat-box { border-radius: 14px; border-left-width: 4px; }
+.plan-page .settings-status { border-radius: 10px; }
+
+
+/* Tables scroll sideways inside a rounded box, with a soft edge where more is hidden */
+.plan-page .scroll {
+  max-width: 100%; overflow-x: auto; border: 1px solid var(--line); border-radius: 16px;
+  background: var(--surface);
+  -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain;
+  scrollbar-width: thin; scrollbar-color: var(--line) transparent;
+}
+@supports (background: color-mix(in srgb, red, blue)) {
+  .plan-page .scroll {
+    background:
+      linear-gradient(to right, var(--surface) 30%, transparent) left center / 40px 100% no-repeat local,
+      linear-gradient(to left, var(--surface) 30%, transparent) right center / 40px 100% no-repeat local,
+      radial-gradient(farthest-side at 0 50%, color-mix(in srgb, var(--ink) 22%, transparent), transparent) left center / 14px 100% no-repeat scroll,
+      radial-gradient(farthest-side at 100% 50%, color-mix(in srgb, var(--ink) 22%, transparent), transparent) right center / 14px 100% no-repeat scroll,
+      var(--surface);
+  }
+}
+.plan-page table { border: 0; background: transparent; font-size: 0.92rem; }
+.plan-page th, .plan-page td { padding: 11px 14px; overflow-wrap: break-word; }
+.plan-page th {
+  background: color-mix(in srgb, var(--ink) 5%, var(--surface)); color: var(--muted);
+  font-family: var(--mono); font-size: 0.7rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; white-space: nowrap;
+}
+.plan-page tr:last-child > td { border-bottom: 0; }
+@media (hover: hover) { .plan-page tr:hover > td { background: color-mix(in srgb, var(--ink) 3%, transparent); } }
+/* Wide tables keep a sensible width and scroll, instead of squashing their columns */
+.plan-page table:has(th:nth-child(4)) { min-width: 520px; }
+.plan-page table:has(th:nth-child(5)) { min-width: 680px; }
+.plan-page table:has(th:nth-child(7)) { min-width: 900px; }
+.plan-page table:has(th:nth-child(4)) td:first-child { white-space: nowrap; }
+
+
+/* Rust page: badges */
+.plan-page .badges { grid-template-columns: repeat(auto-fill, minmax(min(100%, 150px), 1fr)); gap: 10px; }
+.plan-page .badge { padding: 16px 10px; border-radius: 16px; font-size: 0.85rem; }
+.plan-page .badge.earned { box-shadow: 0 0 28px color-mix(in srgb, var(--acc) 25%, transparent); }
+.plan-page .badge.locked { opacity: 0.45; }
+
+
+/* Daily Diary page */
+.plan-page .diary-page {
+  padding: clamp(18px, 3.5vw, 36px) clamp(18px, 3.5vw, 36px) clamp(18px, 3vw, 28px) clamp(22px, 4vw, 40px);
+  min-width: 0; border: 1px solid var(--line); border-radius: 24px;
+  box-shadow: inset 5px 0 0 var(--acc), 0 18px 40px -24px rgba(0, 0, 0, 0.5);
+}
+.plan-page .diary-head h2 { font-family: var(--serif); font-weight: 600; letter-spacing: -0.02em; line-height: 1.15; }
+.plan-page .diary-prompt, .plan-page .paper { font-family: var(--serif); }
+.plan-page .paper { font-size: max(16px, 1rem); }
+.plan-page .diary-label { margin-top: 24px; }
+.plan-page .mood button { width: 2.4em; height: 2.4em; font-size: 1.5rem; }
+.plan-page .carry { border-radius: 0 12px 12px 0; background: color-mix(in srgb, var(--acc) 9%, var(--surface)); }
+.plan-page .entry { min-height: 48px; border-radius: 12px; }
+.plan-page .entry-list { max-height: 260px; }
+.plan-page .diary-foot .btn-outline { padding: 6px 14px; }
+
+
+/* Wide screens: calendar on the left, the selected day beside it.
+   Stat boxes stay in 2 columns until there is room for 4. */
+@media (min-width: 960px) {
+  .plan-page .stats { grid-template-columns: repeat(4, 1fr); }
+  .plan-page main > section:has(> #panel) .stats { grid-template-columns: repeat(2, 1fr); }
+  .plan-page .entry-list { max-height: 340px; }
+  .plan-page .diary-side { top: 72px; max-height: calc(100vh - 88px); max-height: calc(100dvh - 88px); }
+  #panel, #page { scroll-margin-top: 0; }
+}
+@media (min-width: 1280px) {
+  .plan-page main > section:has(> #panel) .stats { grid-template-columns: repeat(4, 1fr); }
+}
+@media (min-width: 640px) {
+  .plan-page .calendar button { min-height: 52px; }
+}
+
+
+/* Phones */
+@media (max-width: 640px) {
+  /* Tasks: put the row of action buttons under the text so the text keeps its width */
+  .plan-page .check-item { flex-wrap: wrap; }
+  .plan-page .check-item label { flex: 1 1 10em; }
+  .plan-page .task-actions { flex: 1 1 calc(100% - 42px); margin-left: 42px; flex-wrap: wrap; }
+  .plan-page .subtasks { margin-left: 6px; padding-left: 16px; }
+  .plan-page .add-form > .cell-input,
+  .plan-page .add-form > .select-cat { flex: 1 1 100%; }
+  .plan-page .add-form > button[type="submit"] { flex: 1 1 100%; }
+  .plan-page .add-form > .mode-toggle { flex: 1 1 100%; }
+  .plan-page .add-form .mode-toggle button { flex: 1; }
+  .plan-page .day-nav button { flex: 1 1 0; padding-inline: 8px; font-size: 0.85rem; }
+  .plan-page .day-nav .jump-date { flex: 1 1 100%; }
+  .plan-page .diary-foot .btn-outline { margin-left: 0; }
+  .plan-page .box { padding-inline: 12px; }
+}
+@media (max-width: 420px) {
+  .plan-page .calendar { gap: 4px; }
+  .plan-page .calendar button { font-size: 0.74rem; }
+  .plan-page .mood { gap: 6px; }
+  .plan-page .mood button { width: 2.2em; height: 2.2em; font-size: 1.35rem; }
+  .plan-page th, .plan-page td { padding: 10px; }
+}
+/* Touch screens: bigger tick boxes */
+@media (pointer: coarse) {
+  .plan-page .check-item input[type="checkbox"] { width: 30px; height: 30px; }
+}
+
+/* Alerts and messages */
+.plan-page .toast { bottom: max(24px, env(safe-area-inset-bottom)); border-radius: 99px; font-family: var(--sans); }
+
+/* Footer */
+.plan-page footer {
+  margin-top: clamp(48px, 8vw, 100px); padding: 28px 0 calc(48px + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--line);
+  font-family: var(--mono); font-size: 0.74rem; letter-spacing: 0.08em; line-height: 1.7; text-transform: uppercase;
+}
+.plan-page footer .wrap { padding-top: 0; }
+
+/* The user's own accent colour needs white text on top of it */
+html[data-accent] .plan-page { --on-acc: #FFFFFF; }
+
+@media (prefers-reduced-motion: reduce) {
+  html:has(.plan-page) { scroll-behavior: auto; }
+  .plan-page * { transition: none !important; }
+}

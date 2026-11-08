@@ -2,12 +2,14 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="A daily diary with a mood, notes and things to do better tomorrow.">
+  <meta name="theme-color" content="#0b0b0c">
   <title>Daily Diary</title>
   <link rel="stylesheet" href="styles.css">
   <script src="common.js"></script>
 </head>
-<body class="theme-diary">
+<body class="theme-diary plan-page">
 
   <!-- Page header -->
   <header class="site-header">
@@ -241,7 +243,7 @@
     }).join("");
 
     $("entry-list").querySelectorAll(".entry").forEach((button) => {
-      button.onclick = () => selectDay(Number(button.dataset.day));
+      button.onclick = () => { selectDay(Number(button.dataset.day)); App.revealPanel(); };
     });
   }
 

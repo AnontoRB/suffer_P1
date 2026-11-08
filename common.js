@@ -478,6 +478,19 @@ const App = (() => {
   // ---------------------------------------------------------------------
 
   /**
+   * On a single-column layout the day panel sits below the calendar, so after a date
+   * is picked it is scrolled into view. Does nothing on wide screens, or when the
+   * panel is already visible.
+   */
+  function revealPanel(target) {
+    const el = target || $("panel") || $("page");
+    if (!el || !window.matchMedia("(max-width: 959px)").matches) return;
+    const top = el.getBoundingClientRect().top;
+    if (top > 0 && top < window.innerHeight * 0.5) return;
+    el.scrollIntoView({ behavior: prefersReducedMotion ? "auto" : "smooth", block: "start" });
+  }
+
+  /**
    * Draws the 60-day calendar into `container`.
    * @param {Object}   options
    * @param {HTMLElement} options.container
@@ -512,7 +525,10 @@ const App = (() => {
 
     container.innerHTML = `<div class="calendar">${weekdayHeaders}${leadingBlanks}${cells}</div>`;
     container.querySelectorAll("button").forEach((button) => {
-      button.onclick = () => onPick(Number(button.dataset.day));
+      button.onclick = () => {
+        onPick(Number(button.dataset.day));
+        revealPanel();
+      };
     });
   }
 
@@ -549,6 +565,6 @@ const App = (() => {
     esc, isoDate, dayDate, todayNumber, daysUntil, daysUntilRace, clampDay, formatDate, shortDate,
     loadState, saveState,
     burstConfetti, showToast,
-    renderCalendar, renderDayNav, dayTag,
+    renderCalendar, renderDayNav, dayTag, revealPanel,
   };
 })();

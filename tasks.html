@@ -2,12 +2,14 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="Your own tasks by date, with subtasks and categories.">
+  <meta name="theme-color" content="#0b0b0c">
   <title>My Tasks</title>
   <link rel="stylesheet" href="styles.css">
   <script src="common.js"></script>
 </head>
-<body class="theme-tasks">
+<body class="theme-tasks plan-page">
 
   <!-- Page header -->
   <header class="site-header">
@@ -217,7 +219,7 @@
       cells += `<button type="button" class="${classes.join(" ")}" data-iso="${iso}" aria-label="${longLabel(iso)}, ${listFor(iso).length} tasks">${day}</button>`;
     }
     $("calendar").innerHTML = `<div class="calendar">${cells}</div>`;
-    $("calendar").querySelectorAll("button").forEach((button) => { button.onclick = () => selectDate(button.dataset.iso); });
+    $("calendar").querySelectorAll("button").forEach((button) => { button.onclick = () => { selectDate(button.dataset.iso); App.revealPanel(); }; });
   }
 
   // ---------------------------------------------------------------------
@@ -433,7 +435,11 @@
       ? `<div class="box">${rows.join("")}</div>`
       : '<p class="muted-line">Nothing left over. Nice.</p>';
     $("overdue").querySelectorAll("button").forEach((button) => {
-      button.onclick = () => { selectDate(button.dataset.iso); window.scrollTo({ top: 0, behavior: "smooth" }); };
+      button.onclick = () => {
+        selectDate(button.dataset.iso);
+        if (window.matchMedia("(max-width: 959px)").matches) App.revealPanel();
+        else window.scrollTo({ top: 0, behavior: "smooth" });
+      };
     });
   }
 
