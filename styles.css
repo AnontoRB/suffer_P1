@@ -996,6 +996,13 @@ html[data-theme="light"] body.theme-home.theme-home.theme-home {
 .icon:focus-visible { outline: 3px solid var(--ink); outline-offset: 4px; }
 .icon.ghost { opacity: 0.35; pointer-events: none; }
 .icon.ghost::after { display: none; }
+/* Scroll-driven spin. When the script in index.html is running (class js-orbit), it turns each
+   ring by setting --spin (degrees), so scrolling down speeds the rings up and scrolling up
+   reverses them. Each logo turns back by the same amount so it stays upright. */
+@media (min-width: 760px) and (prefers-reduced-motion: no-preference) {
+  .float-icons.js-orbit .ring { animation: none; rotate: var(--spin, 0deg); }
+  .float-icons.js-orbit .icon { animation: none; rotate: calc(var(--a) * -1 - var(--spin, 0deg)); }
+}
 /* Hold still while you aim at a logo */
 .float-icons:has(.icon:hover) .ring, .float-icons:has(.icon:hover) .icon { animation-play-state: paused; }
 
@@ -1525,4 +1532,150 @@ html[data-accent] .plan-page { --on-acc: #FFFFFF; }
 @media (prefers-reduced-motion: reduce) {
   html:has(.plan-page) { scroll-behavior: auto; }
   .plan-page * { transition: none !important; }
+}
+
+
+/* 17. PHONE POLISH ----------------------------------------------------------- */
+/* Everything here sits inside a phone-width media query, so the desktop layout
+   is not touched. It adds to the rules in sections 9 and 16, it does not replace them. */
+
+@media (max-width: 759px) {
+  /* Keep text from being enlarged or pushed out of its box on small screens */
+  html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+  body { overflow-wrap: break-word; -webkit-tap-highlight-color: transparent; }
+
+  /* Home: the six plan logos sit in one even row (no lone logo on a second line) */
+  .float-icons {
+    display: grid; grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 8px; width: min(100%, 380px); margin-inline: auto; justify-items: center;
+  }
+  .slot:has(> .ghost) { display: none; }
+  .icon { --sz: min(52px, 12.6vw); }
+
+  /* Fields: 16px text stops iPhones from zooming the page when you tap into a box */
+  .cell-input, input[type="text"], input[type="number"], input[type="date"],
+  input[type="search"], select, textarea { font-size: 16px; }
+
+  /* Home: the number and note boxes under a task use the full width */
+  .task-fields { margin-left: 0; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); }
+
+  /* Buttons and links are easier to hit */
+  .btn, .card-button, .clock-toggle { min-height: 44px; }
+
+  /* Settings: closer to the screen edges, and no scroll-through to the page behind */
+  .settings-overlay { padding: 12px; overscroll-behavior: contain; }
+  .settings-box { padding: 18px; }
+
+  /* Room for the notch and the home bar */
+  .site-header .wrap, .plan-page .wrap, .home-wrap {
+    padding-left: max(16px, env(safe-area-inset-left));
+    padding-right: max(16px, env(safe-area-inset-right));
+  }
+  .plan-page footer, .home-foot { padding-bottom: calc(28px + env(safe-area-inset-bottom)); }
+}
+
+@media (max-width: 640px) {
+  /* My Tasks: month bar as a tidy grid: title on top, then Previous | Next, then Today | date */
+  #month-nav { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  #month-nav .month-title { grid-column: 1 / -1; order: -1; text-align: center; font-size: 1.15rem; }
+  #month-nav button { white-space: nowrap; padding-inline: 8px; }
+  #month-nav .jump-date { grid-column: auto; width: 100%; min-width: 0; }
+
+  /* Category names: keep "0 / 1 done" together instead of splitting it */
+  .cat-head h3, .cat-heading { flex: 1 1 100%; }
+  .cat-head h3 span, .cat-heading span { white-space: nowrap; }
+  .cat-head .task-actions { margin-left: 0; }
+
+  /* Task action buttons sit in an even row under the task text */
+  .plan-page .task-actions > button { flex: 1 1 auto; }
+  .plan-page .check-item > .btn-outline { min-height: 40px; }
+
+  /* Long words and links never push a card wider than the screen */
+  .plan-page .box, .plan-page .panel, .task-group, .card { min-width: 0; overflow-wrap: anywhere; }
+}
+
+@media (max-width: 380px) {
+  /* Very small phones */
+  .icon { --sz: 11.8vw; }
+  .float-icons { gap: 6px; }
+  .plan-page .stat b { font-size: 1.35rem; }
+  .plan-page .stat span { font-size: 0.6rem; letter-spacing: 0.06em; }
+  .plan-page .calendar { gap: 3px; }
+  .plan-page .day-nav button { font-size: 0.8rem; padding-inline: 6px; }
+}
+
+
+/* Home, phones: the six plan cards become one compact panel (about the height of a
+   single card) holding all six logos in a 3 x 2 grid. Each tile still opens its plan. */
+@media (max-width: 759px) {
+  .rail {
+    grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; padding: 12px;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 20px;
+  }
+  .rail .card {
+    position: relative; align-items: center; gap: 6px; padding: 14px 6px 10px; text-align: center;
+    background: color-mix(in srgb, var(--ink) 4%, transparent); border-radius: 14px;
+  }
+  .rail .card p, .rail .card-top b, .rail .card-top span:not(.app-icon) { display: none; }
+  .rail .card-top { justify-content: center; }
+  .rail .card-top .app-icon { --sz: 46px; }
+  .rail .card { overflow-wrap: normal; }
+  .rail .card h2 { margin: 2px 0 0; font-size: clamp(0.7rem, 3.4vw, 0.9rem); letter-spacing: -0.01em; white-space: nowrap; }
+  .rail .progress { width: 100%; height: 4px; }
+  .rail .progress-label { font-size: 0.68rem; color: var(--muted); }
+  /* The whole tile is the link; its button text is hidden */
+  .rail .card-button, .rail .card-button:hover {
+    position: absolute; inset: 0; width: auto; min-height: 0; margin: 0; padding: 0;
+    border: 0; border-radius: inherit; background: transparent; font-size: 0; filter: none;
+  }
+  .rail .card-button:focus-visible { outline-offset: -3px; }
+}
+@media (max-width: 380px) {
+  .rail { gap: 8px; padding: 10px; }
+}
+
+
+/* Left-edge ruler: more detail on every screen.
+   Ticks every 1%, longer ones every 5% and 10%, a filled line up to where you are,
+   a notch where each section starts, and a marker that says the percent and the section. */
+.ruler {
+  background:
+    linear-gradient(color-mix(in srgb, var(--ink) 55%, transparent), color-mix(in srgb, var(--ink) 55%, transparent)) left bottom / 16px 1px no-repeat,
+    repeating-linear-gradient(to bottom, color-mix(in srgb, var(--ink) 55%, transparent) 0 1px, transparent 1px 10%) left / 16px 100% no-repeat,
+    repeating-linear-gradient(to bottom, color-mix(in srgb, var(--ink) 38%, transparent) 0 1px, transparent 1px 5%) left / 11px 100% no-repeat,
+    repeating-linear-gradient(to bottom, color-mix(in srgb, var(--ink) 20%, transparent) 0 1px, transparent 1px 1%) left / 5px 100% no-repeat;
+}
+.ruler::after { /* the line that fills as you scroll */
+  content: ""; position: absolute; left: 0; top: 0; width: 2px; height: calc(var(--sp, 0) * 100%);
+  background: linear-gradient(to bottom, transparent, var(--acc2)); opacity: 0.55;
+}
+.ruler-mark { z-index: 2; }
+.ruler-mark::before { /* a dot on the end of the marker */
+  content: ""; position: absolute; left: 34px; top: -2px; width: 6px; height: 6px; border-radius: 50%; background: var(--acc2);
+}
+.ruler-mark b {
+  padding: 2px 8px; border: 1px solid color-mix(in srgb, var(--acc2) 55%, transparent); border-radius: 99px;
+  background: var(--surface); top: -11px;
+}
+.ruler-mark b em { margin-left: 8px; font-style: normal; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink); }
+.ruler-mark b em:empty { display: none; }
+.ruler-sec { font-style: normal; position: absolute; left: 0; width: 24px; height: 2px; background: var(--acc); opacity: 0.85; transform: translateY(-1px); }
+.ruler-sec span { display: none; position: absolute; left: 52px; top: -6px; font-family: var(--mono); font-size: 0.56rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
+.ruler-num.alt { display: none; }
+@media (min-width: 1360px) {
+  .ruler-num.alt { display: block; opacity: 0.7; }
+  .ruler-sec span { display: block; }
+}
+
+/* Tablets and phones: a slim version of the same ruler, with a gutter so it never covers text */
+@media (max-width: 899px) {
+  .ruler { display: block; top: 12px; bottom: 12px; width: 34px; }
+  .ruler-num { display: block; left: 13px; font-size: 0.5rem; letter-spacing: 0; }
+  .ruler-num.alt { display: none; }
+  .ruler-mark { width: 12px; transform: translateY(calc(var(--sp, 0) * (100svh - 26px))); }
+  .ruler-mark::before { left: 10px; }
+  .ruler-mark b { display: block; left: 14px; top: -9px; padding: 1px 5px; font-size: 0.52rem; letter-spacing: 0; }
+  .ruler-mark b em { display: none; }
+  .ruler-sec { width: 14px; }
+  .theme-home .home-wrap { padding-left: 20px; }
 }

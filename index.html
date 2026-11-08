@@ -409,13 +409,18 @@
     <!-- Right-edge ruler and section index -->
     <div class="ruler" id="ruler" aria-hidden="true">
       <span class="ruler-num" style="top: 0%">0</span
+      ><span class="ruler-num alt" style="top: 10%">10</span
       ><span class="ruler-num" style="top: 20%">20</span
+      ><span class="ruler-num alt" style="top: 30%">30</span
       ><span class="ruler-num" style="top: 40%">40</span
+      ><span class="ruler-num alt" style="top: 50%">50</span
       ><span class="ruler-num" style="top: 60%">60</span
+      ><span class="ruler-num alt" style="top: 70%">70</span
       ><span class="ruler-num" style="top: 80%">80</span
+      ><span class="ruler-num alt" style="top: 90%">90</span
       ><span class="ruler-num" style="top: 100%">100</span
       ><i class="ruler-mark"
-        ><b><span id="scroll-pct">000</span>%</b></i
+        ><b><span id="scroll-pct">000</span>%<em id="scroll-sec"></em></b></i
       >
     </div>
     <nav class="side-index" aria-label="Sections">
@@ -1289,6 +1294,63 @@
     </script>
 
     <script>
+      /* Scroll-driven orbit. The rings keep turning slowly by themselves. Scroll down and
+   they spin up fast in their normal direction; scroll up and they spin fast the
+   other way. When you stop scrolling they ease back to the slow drift.
+   Each ring's angle goes into --spin, and the CSS turns each logo back by the
+   same amount so it stays upright. */
+      (() => {
+        "use strict";
+        const box = document.querySelector(".float-icons");
+        if (!box) return;
+        const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
+        if (reduce.matches) return;
+
+        const rings = [...box.querySelectorAll(".ring")].map((el) => {
+          const cs = getComputedStyle(el);
+          const period = parseFloat(cs.getPropertyValue("--t")) || 120;
+          const reverse = cs.getPropertyValue("--dir").trim() === "reverse";
+          return {
+            el,
+            angle: 0,
+            base: (360 / period) * (reverse ? -1 : 1), // degrees per second
+          };
+        });
+        if (!rings.length) return;
+        box.classList.add("js-orbit");
+
+        const BOOST = 0.03; // how strongly scroll speed changes the spin
+        const MAX = 40; // top speed, as a multiple of the normal drift
+        let lastY = window.scrollY;
+        let lastT = performance.now();
+        let velocity = 0; // smoothed scroll speed, px per second
+
+        function frame(now) {
+          const dt = Math.min(0.1, (now - lastT) / 1000);
+          lastT = now;
+          if (dt > 0) {
+            const y = window.scrollY;
+            const instant = (y - lastY) / dt;
+            lastY = y;
+            // Speed up quickly when scrolling, ease off slowly when you stop.
+            const rate = Math.abs(instant) > Math.abs(velocity) ? 14 : 2.5;
+            velocity += (instant - velocity) * Math.min(1, rate * dt);
+
+            // 1 = normal drift, above 1 = faster, below 0 = backwards.
+            const speed = Math.max(-MAX, Math.min(MAX, 1 + velocity * BOOST));
+            const held = box.querySelector(".icon:hover"); // hold still while aiming
+            rings.forEach((ring) => {
+              if (!held) ring.angle = (ring.angle + ring.base * speed * dt) % 360;
+              ring.el.style.setProperty("--spin", ring.angle.toFixed(2) + "deg");
+            });
+          }
+          requestAnimationFrame(frame);
+        }
+        requestAnimationFrame(frame);
+      })();
+    </script>
+
+    <script>
       /* Scroll helpers: the ruler readout and marker, the section index, and (only in
    browsers without scroll-driven CSS animations) the hero fade. Updates run at
    most once per frame, and the numbers are set on the small elements that use
@@ -1307,6 +1369,35 @@
         let queued = false;
         let lastPercent = -1;
 
+        // Section notches on the ruler: one per section, placed where that section starts.
+        const secOut = document.getElementById("scroll-sec");
+        const secs = [...document.querySelectorAll(".side-index a")]
+          .map((a) => ({
+            name: a.textContent.trim(),
+            el: document.querySelector(a.getAttribute("href")),
+          }))
+          .filter((x) => x.el);
+        const notches = secs.map((sec) => {
+          const n = document.createElement("i");
+          n.className = "ruler-sec";
+          n.innerHTML = "<span></span>";
+          n.firstChild.textContent = sec.name;
+          if (ruler) ruler.appendChild(n);
+          return n;
+        });
+        let starts = secs.map(() => 0);
+        let lastSec = "";
+        const placeNotches = () => {
+          const max = Math.max(1, root.scrollHeight - window.innerHeight);
+          starts = secs.map((sec, i) => {
+            const y = i === 0 ? 0 : sec.el.getBoundingClientRect().top + window.scrollY;
+            return Math.min(max, Math.max(0, y));
+          });
+          notches.forEach((n, i) => {
+            n.style.top = (starts[i] / max) * 100 + "%";
+          });
+        };
+
         const update = () => {
           queued = false;
           const y = window.scrollY;
@@ -1318,6 +1409,16 @@
               "--hp",
               Math.min(1, y / Math.max(1, window.innerHeight * 0.7)).toFixed(3),
             );
+          if (secOut && secs.length) {
+            let cur = secs[0].name;
+            starts.forEach((start, i) => {
+              if (y + window.innerHeight * 0.35 >= start) cur = secs[i].name;
+            });
+            if (cur !== lastSec) {
+              lastSec = cur;
+              secOut.textContent = cur;
+            }
+          }
           const percent = Math.round(progress * 100);
           if (readout && percent !== lastPercent) {
             lastPercent = percent;
@@ -1334,7 +1435,21 @@
           },
           { passive: true },
         );
-        window.addEventListener("resize", update);
+        window.addEventListener("resize", () => {
+          placeNotches();
+          update();
+        });
+        if ("ResizeObserver" in window) {
+          let placing = 0;
+          new ResizeObserver(() => {
+            cancelAnimationFrame(placing);
+            placing = requestAnimationFrame(() => {
+              placeNotches();
+              update();
+            });
+          }).observe(document.body);
+        }
+        placeNotches();
         update();
 
         // Enlarge the section you are in, in the index.
