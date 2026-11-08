@@ -102,7 +102,7 @@
   function buildItems(day) {
     const kind = kindOf(day);
     const session = SESSION_BY_DAY.get(day);
-    const items = [];
+    const items = [...HEALTH.HABITS.morning];
 
     if (kind === "baseline") {
       items.push(
@@ -132,6 +132,7 @@
 
     items.push(waterItem(day));
     items.push({ id: "food", label: "Followed the food plan (optional)", detail: FOOD_TICK, optional: true });
+    items.push(...HEALTH.HABITS.evening);
     return items;
   }
 

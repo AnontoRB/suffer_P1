@@ -11,6 +11,17 @@ const HEALTH = {
 
   RUN_LABELS: { 52: "Run (long, 6.5 km)" },
 
+  /** Daily habits, ticked every day: the morning ones come first on the checklist, the evening ones last. */
+  HABITS: {
+    morning: [
+      { id: "brush-am", label: "Brush your teeth (morning)", detail: "After waking up." },
+    ],
+    evening: [
+      { id: "shower",   label: "Take a shower", detail: "" },
+      { id: "brush-pm", label: "Brush your teeth (night)", detail: "Before going to bed." },
+    ],
+  },
+
   BLOCKS: [
     { name: "Day 0: Baseline",          dates: "Nov 8",           goal: "Measure your starting point",                                          feel: "Easy",        firstDay: 1,  lastDay: 1 },
     { name: "Block 1: Foundation",      dates: "Nov 10 to Nov 24", goal: "Learn the form, build the habit",                                      feel: "Easy. 2 to 3 sets, stop with 2 reps left", firstDay: 2,  lastDay: 18 },

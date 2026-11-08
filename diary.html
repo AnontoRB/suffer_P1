@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Daily Diary</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="settings.js"></script>
+</head>
+<body class="theme-diary">
+
+  <header class="site-header">
+    <div class="wrap wide">
+      <a class="home-link" href="index.html">&larr; Home</a>
+      <h1>Daily Diary</h1>
+      <p>
+        Write about your day, note how you felt, and list the things you want to do better tomorrow.
+        Tomorrow's page (and the home page) shows those things back to you so you can tick them off.
+        Everything saves by itself as you type.
+      </p>
+    </div>
+  </header>
+
+  <main class="wrap wide">
+
+    <section>
+      <div class="stats">
+        <div class="stat"><b id="stat-streak">0</b><span>day streak &#128293;</span></div>
+        <div class="stat"><b id="stat-entries">0</b><span>entries written</span></div>
+        <div class="stat"><b id="stat-words">0</b><span>words written</span></div>
+        <div class="stat"><b id="stat-open">0</b><span>open "do better" items</span></div>
+      </div>
+      <p class="sub" id="next-up" style="margin-top:12px"></p>
+    </section>
+
+    <section class="diary-grid">
+
+      <aside class="diary-side">
+        <h2>Calendar</h2>
+        <p class="legend">
+          Green = entry written &middot; red outline = no entry on a past day &middot; dashed = today.
+          Tap any date to open its page.
+        </p>
+        <div id="calendar"></div>
+        <div class="day-nav" id="day-nav"></div>
+
+        <h2 class="side-title">Entries</h2>
+        <input type="search" class="cell-input" id="entry-search" placeholder="Search your entries" aria-label="Search your entries">
+        <div class="entry-list" id="entry-list"></div>
+      </aside>
+
+      <article class="diary-page" id="page" aria-label="Diary page"></article>
+
+    </section>
+
+  </main>
+
+  <footer>
+    <div class="wrap wide">Saved in this browser only. Use Settings to export a backup.</div>
+  </footer>
+
+  <script src="common.js"></script>
+  <script src="diary.js"></script>
+</body>
+</html>

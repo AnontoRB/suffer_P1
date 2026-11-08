@@ -1,0 +1,369 @@
+/**
+ * Daily Diary page. Needs: common.js (App).
+ *
+ * One diary page for each plan day (Nov 8 to Jan 6). Saved in localStorage as:
+ *   { days: { "<day>": { mood: 0-5, good: "text", notes: "text",
+ *                        better: [{ id, text, done }], updated: "ISO time" } } }
+ *
+ * - "Do better tomorrow" items show up again on the next day's page and on
+ *   the home page, where they can be ticked off.
+ * - Everything saves by itself shortly after you stop typing.
+ */
+(() => {
+  "use strict";
+
+  const {
+    $, TOTAL_DAYS,
+    loadState, saveState, todayNumber, clampDay, formatDate, shortDate, dayDate,
+    renderCalendar, renderDayNav,
+  } = App;
+
+  const STORAGE_KEY = "diary-plan-v1";
+  const SAVE_DELAY_MS = 500;
+
+  const MOODS = [
+    ["\u{1F61E}", "Awful"], ["\u{1F615}", "Not great"], ["\u{1F610}", "Okay"], ["\u{1F642}", "Good"], ["\u{1F604}", "Great"],
+  ];
+
+  /** A different writing prompt each day. */
+  const PROMPTS = [
+    "What happened today that you want to remember?",
+    "What are you proud of today, even if it is small?",
+    "What was the hardest part of the day, and how did you handle it?",
+    "What did you learn today?",
+    "Who or what are you grateful for today?",
+    "What gave you energy today, and what drained it?",
+    "What would you do differently if you could repeat today?",
+  ];
+
+  const state = loadState(STORAGE_KEY);
+  let selectedDay = clampDay(todayNumber());
+  let query = "";
+  let saveTimer = 0;
+  let dirty = false;
+
+  const esc = (text) => String(text == null ? "" : text).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
+  const newId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  const wordsIn = (text) => (text && text.trim() ? text.trim().split(/\s+/).length : 0);
+
+  // ---------------------------------------------------------------------
+  // Entries
+  // ---------------------------------------------------------------------
+
+  /** The entry for a day, created (empty) if it doesn't exist yet. */
+  function getEntry(day) {
+    const entry = state.days[day] || (state.days[day] = {});
+    entry.mood = entry.mood || 0;
+    entry.good = entry.good || "";
+    entry.notes = entry.notes || "";
+    entry.better = entry.better || [];
+    return entry;
+  }
+
+  /** True when the day has anything written, a mood, or a "do better" item. */
+  function hasEntry(day) {
+    const entry = state.days[day];
+    return !!entry && !!(entry.mood || (entry.good || "").trim() || (entry.notes || "").trim() || (entry.better || []).length);
+  }
+
+  function entryWords(entry) {
+    return wordsIn(entry.good) + wordsIn(entry.notes) + (entry.better || []).reduce((sum, item) => sum + wordsIn(item.text), 0);
+  }
+
+  const daysWithEntries = () => Array.from({ length: TOTAL_DAYS }, (_, i) => i + 1).filter(hasEntry);
+
+  function snippetOf(entry) {
+    const text = (entry.notes || entry.good || (entry.better[0] && entry.better[0].text) || "").replace(/\s+/g, " ").trim();
+    return text.length > 90 ? `${text.slice(0, 90)}…` : text;
+  }
+
+  function entryMatches(day, needle) {
+    const entry = state.days[day];
+    const haystack = [entry.good, entry.notes, ...(entry.better || []).map((item) => item.text)].join(" ").toLowerCase();
+    return haystack.includes(needle);
+  }
+
+  // ---------------------------------------------------------------------
+  // Saving
+  // ---------------------------------------------------------------------
+
+  function setStatus(text) {
+    const el = $("save-status");
+    if (el) el.textContent = text;
+  }
+
+  /** Writes everything to localStorage now and refreshes the side panels. */
+  function flush() {
+    clearTimeout(saveTimer);
+    if (!dirty) return;
+    dirty = false;
+
+    Object.keys(state.days).forEach((day) => { if (!hasEntry(Number(day))) delete state.days[day]; });
+    state.completedCount = daysWithEntries().length; // the home page can read this too
+    saveState(STORAGE_KEY, state);
+
+    setStatus(`Saved ${new Date().toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" })}`);
+    renderSide();
+  }
+
+  function scheduleSave() {
+    dirty = true;
+    getEntry(selectedDay).updated = new Date().toISOString();
+    setStatus("Saving…");
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(flush, SAVE_DELAY_MS);
+  }
+
+  window.addEventListener("pagehide", flush);
+  document.addEventListener("visibilitychange", () => { if (document.hidden) flush(); });
+
+  // ---------------------------------------------------------------------
+  // Side panel: stats, calendar, entry list
+  // ---------------------------------------------------------------------
+
+  function currentStreak() {
+    let streak = 0;
+    let day = Math.min(TOTAL_DAYS, todayNumber());
+    if (day >= 1 && !hasEntry(day)) day--; // today may not be written yet
+    while (day >= 1 && hasEntry(day)) { streak++; day--; }
+    return streak;
+  }
+
+  function renderStats() {
+    const days = daysWithEntries();
+    let words = 0;
+    let open = 0;
+    days.forEach((day) => {
+      const entry = state.days[day];
+      words += entryWords(entry);
+      open += (entry.better || []).filter((item) => !item.done).length;
+    });
+
+    $("stat-streak").textContent = currentStreak();
+    $("stat-entries").textContent = `${days.length} / ${TOTAL_DAYS}`;
+    $("stat-words").textContent = words.toLocaleString();
+    $("stat-open").textContent = open;
+
+    const today = todayNumber();
+    const parts = [];
+    if (today < 1) parts.push("Your diary starts on Nov 8, 2026.");
+    else if (today <= TOTAL_DAYS) parts.push(hasEntry(today) ? "Today's page is written. Nice." : "You haven't written today's page yet.");
+    $("next-up").textContent = parts.join(" ");
+  }
+
+  function renderEntryList() {
+    const needle = query.trim().toLowerCase();
+    const days = daysWithEntries().filter((day) => !needle || entryMatches(day, needle)).reverse();
+
+    if (days.length === 0) {
+      $("entry-list").innerHTML = `<p class="muted-line">${needle ? "No entries match your search." : "No entries yet. Your first page is on the right."}</p>`;
+      return;
+    }
+
+    $("entry-list").innerHTML = days.map((day) => {
+      const entry = state.days[day];
+      const mood = entry.mood ? MOODS[entry.mood - 1][0] : "";
+      const open = (entry.better || []).filter((item) => !item.done).length;
+      return `
+        <button type="button" class="entry ${day === selectedDay ? "selected" : ""}" data-day="${day}">
+          <b>${shortDate(day)} <span class="entry-mood">${mood}</span></b>
+          <small>${esc(snippetOf(entry)) || "(no text)"}${open ? ` · ${open} to do better` : ""}</small>
+        </button>`;
+    }).join("");
+
+    $("entry-list").querySelectorAll(".entry").forEach((button) => {
+      button.onclick = () => selectDay(Number(button.dataset.day));
+    });
+  }
+
+  function renderSide() {
+    renderCalendar({ container: $("calendar"), selectedDay, isDayComplete: hasEntry, onPick: selectDay });
+    renderStats();
+    renderEntryList();
+  }
+
+  // ---------------------------------------------------------------------
+  // The diary page for one day
+  // ---------------------------------------------------------------------
+
+  function dayTagHtml(day) {
+    const today = todayNumber();
+    if (day < today) return hasEntry(day) ? '<span class="tag ok">Written</span>' : '<span class="tag missed">No entry yet: you can still write it</span>';
+    return day === today ? '<span class="tag">Today</span>' : '<span class="tag upcoming">Upcoming</span>';
+  }
+
+  /** Yesterday's "do better" items, shown at the top of this page. */
+  function renderCarry() {
+    const day = selectedDay;
+    const box = $("carry");
+    const previous = day > 1 ? state.days[day - 1] : null;
+    const items = (previous && previous.better) || [];
+
+    if (items.length === 0) {
+      box.innerHTML = "";
+      return;
+    }
+
+    box.innerHTML = `
+      <div class="carry">
+        <h3>From yesterday: things to do better</h3>
+        ${items.map((item) => `
+          <div class="check-item ${item.done ? "checked" : ""}">
+            <input type="checkbox" id="carry-${item.id}" data-id="${item.id}" ${item.done ? "checked" : ""}>
+            <label for="carry-${item.id}"><b>${esc(item.text)}</b></label>
+          </div>`).join("")}
+      </div>`;
+
+    box.querySelectorAll("input").forEach((checkbox) => {
+      checkbox.onchange = () => {
+        const item = items.find((i) => i.id === checkbox.dataset.id);
+        item.done = checkbox.checked;
+        dirty = true;
+        flush();
+        renderCarry();
+      };
+    });
+  }
+
+  /** The editable "do better tomorrow" list for this day. */
+  function renderBetter() {
+    const day = selectedDay;
+    const items = getEntry(day).better;
+    const list = $("better");
+
+    list.innerHTML = items.length === 0
+      ? '<p class="muted-line">Nothing added yet.</p>'
+      : items.map((item) => `
+        <div class="check-item ${item.done ? "checked" : ""}">
+          <input type="checkbox" id="better-${item.id}" data-id="${item.id}" ${item.done ? "checked" : ""}>
+          <label for="better-${item.id}"><b>${esc(item.text)}</b></label>
+          <button type="button" class="icon-btn" data-remove="${item.id}" aria-label="Remove: ${esc(item.text)}">&times;</button>
+        </div>`).join("");
+
+    list.querySelectorAll("input").forEach((checkbox) => {
+      checkbox.onchange = () => {
+        getEntry(day).better.find((i) => i.id === checkbox.dataset.id).done = checkbox.checked;
+        scheduleSave();
+        flush();
+        renderBetter();
+      };
+    });
+    list.querySelectorAll("[data-remove]").forEach((button) => {
+      button.onclick = () => {
+        const entry = getEntry(day);
+        entry.better = entry.better.filter((i) => i.id !== button.dataset.remove);
+        scheduleSave();
+        flush();
+        renderBetter();
+      };
+    });
+  }
+
+  function updateWordCount() {
+    $("word-count").textContent = `${entryWords(getEntry(selectedDay))} words`;
+  }
+
+  function renderPage() {
+    const day = selectedDay;
+    const entry = getEntry(day);
+    const date = dayDate(day);
+
+    $("page").innerHTML = `
+      <div class="diary-head">
+        <h2>${date.toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" })}</h2>
+        <div class="panel-date">Day ${day} &middot; ${formatDate(day)}${dayTagHtml(day)}</div>
+      </div>
+
+      <div class="diary-label">How was your day?</div>
+      <div class="mood" id="mood">
+        ${MOODS.map(([emoji, name], i) => `
+          <button type="button" data-mood="${i + 1}" aria-label="${name}" title="${name}" aria-pressed="${entry.mood === i + 1}">${emoji}</button>`).join("")}
+      </div>
+
+      <div id="carry"></div>
+
+      <label class="diary-label" for="good">What went well today</label>
+      <textarea id="good" class="paper" rows="3" placeholder="Wins, big or small">${esc(entry.good)}</textarea>
+
+      <div class="diary-label">What I can do better tomorrow</div>
+      <div id="better"></div>
+      <form class="add-form" id="better-form">
+        <input type="text" class="cell-input" id="better-input" maxlength="200" placeholder="e.g. Start the run before lunch" aria-label="Something to do better tomorrow">
+        <button type="submit" class="btn-outline">Add</button>
+      </form>
+
+      <label class="diary-label" for="notes">Anything else on my mind</label>
+      <p class="diary-prompt">${PROMPTS[day % PROMPTS.length]}</p>
+      <textarea id="notes" class="paper tall" rows="10" placeholder="Write freely. No one is reading this but you.">${esc(entry.notes)}</textarea>
+
+      <div class="diary-foot">
+        <span id="word-count"></span>
+        <span id="save-status" role="status"></span>
+        <button type="button" class="btn-outline danger" id="delete-entry">Delete this entry</button>
+      </div>`;
+
+    renderCarry();
+    renderBetter();
+    updateWordCount();
+
+    $("mood").querySelectorAll("button").forEach((button) => {
+      button.onclick = () => {
+        const entryNow = getEntry(day);
+        const value = Number(button.dataset.mood);
+        entryNow.mood = entryNow.mood === value ? 0 : value;
+        $("mood").querySelectorAll("button").forEach((b) => b.setAttribute("aria-pressed", Number(b.dataset.mood) === entryNow.mood));
+        scheduleSave();
+      };
+    });
+
+    ["good", "notes"].forEach((field) => {
+      $(field).oninput = () => {
+        getEntry(day)[field] = $(field).value;
+        updateWordCount();
+        scheduleSave();
+      };
+    });
+
+    $("better-form").onsubmit = (event) => {
+      event.preventDefault();
+      const text = $("better-input").value.trim();
+      if (!text) return;
+      getEntry(day).better.push({ id: newId(), text, done: false });
+      $("better-input").value = "";
+      scheduleSave();
+      flush();
+      renderBetter();
+      updateWordCount();
+      $("better-input").focus();
+    };
+
+    $("delete-entry").onclick = () => {
+      if (!hasEntry(day)) return;
+      if (!confirm(`Delete the diary entry for ${shortDate(day)}? This cannot be undone.`)) return;
+      delete state.days[day];
+      dirty = true;
+      flush();
+      renderPage();
+    };
+  }
+
+  // ---------------------------------------------------------------------
+  // Start
+  // ---------------------------------------------------------------------
+
+  function selectDay(day) {
+    flush();
+    selectedDay = day;
+    renderSide();
+    renderPage();
+  }
+
+  $("entry-search").oninput = (event) => {
+    query = event.target.value;
+    renderEntryList();
+  };
+
+  renderDayNav({ container: $("day-nav"), getSelectedDay: () => selectedDay, onPick: selectDay });
+  renderSide();
+  renderPage();
+})();

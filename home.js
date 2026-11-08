@@ -1,7 +1,9 @@
 /**
  * Home page: digital clock with a "time left today" bar, a "tasks completed"
  * bar, race countdown, a progress bar for each plan, and today's tasks from
- * all four plans and your own tasks in one list.
+ * all four plans, your own tasks and the diary's "do better" items in one list.
+ * Tasks that need a number or a note (weight, test results, water drunk, solves...)
+ * have a small info box right under them.
  *
  * The task lists are built here from the same data files the plan pages use
  * (rust-data.js, marathon-data.js, health-data.js, cubing-data.js), and ticking a task saves
@@ -86,7 +88,7 @@
     const { WARM_UP, COOL_DOWN, FOOD_TICK } = HEALTH;
     const kind = healthKind(day);
     const session = healthSessions.get(day);
-    const items = [];
+    const items = [...HEALTH.HABITS.morning];
     let heading = { baseline: "Baseline day", run: "Run day", race: "Race day",
                     test: "Test day", mobility: "Mobility day", rest: "Full rest" }[kind];
 
@@ -124,6 +126,7 @@
       items.push({ id: "water", label: `Drink ${goal.toFixed(1)} L of water`, detail });
     }
     items.push({ id: "food", label: "Followed the food plan (optional)", detail: FOOD_TICK, optional: true });
+    items.push(...HEALTH.HABITS.evening);
     return { heading, items };
   }
 
@@ -139,6 +142,7 @@
   // ---------------------------------------------------------------------
 
   const MY_KEY = "tasks-plan-v1";
+  const DIARY_KEY = "diary-plan-v1";
   const esc = (text) => String(text).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
   const myTasksOn = (state, day) => (state.tasks || {})[isoDate(dayDate(day))] || [];
 
@@ -172,6 +176,140 @@
     const before = $("tasks-count").textContent;
     const { done, total } = renderTasks();
     renderMyTasksProgress();
+    if (total > 0 && done === total && before !== `${done} / ${total}`) {
+      burstConfetti(window.innerWidth / 2, window.innerHeight / 2, 160);
+    }
+  }
+
+  // ---------------------------------------------------------------------
+  // Info boxes under the tasks that need a number or a note.
+  // Each box saves exactly where the plan page keeps the same information
+  // (Health: log, tests and measurements; Speedcubing: daily log), so the
+  // home page and the plan pages always show the same values.
+  // ---------------------------------------------------------------------
+
+  const dayLog = (day, key) => ({
+    get: (s) => ((s.days[day] || {}).log || {})[key] || "",
+    set: (s, v) => { const d = s.days[day] || (s.days[day] = {}); (d.log = d.log || {})[key] = v; },
+  });
+  const testCell = (row, col) => ({
+    get: (s) => (s.tests || {})[`${row}-${col}`] || "",
+    set: (s, v) => { (s.tests = s.tests || {})[`${row}-${col}`] = v; },
+  });
+  const measureCell = (date, key) => ({
+    get: (s) => ((s.measurements || {})[date] || {})[key] || "",
+    set: (s, v) => { const m = (s.measurements = s.measurements || {}); (m[date] = m[date] || {})[key] = v; },
+  });
+  const both = (a, b) => ({ get: a.get, set: (s, v) => { a.set(s, v); b.set(s, v); } });
+  const field = (label, store, type = "text", extra = {}) => ({ label, type, ...store, ...extra });
+
+  const HEALTH_TEST_COLUMN = { 17: 1, 33: 2, 49: 3 }; // Nov 24, Dec 10, Dec 26
+  const HEALTH_TEST_NAMES = ["Push-ups, max", "Squats, max", "Sit-ups, max", "Plank hold, max", "Dead hang, max"];
+
+  /** Info boxes for each Health task of a day: { taskId: [field, ...] }. */
+  function healthInputs(day) {
+    const kind = healthKind(day);
+    const inputs = {};
+
+    if (kind === "baseline") {
+      inputs.weigh = [field("Weight (kg)", both(measureCell("Nov 8", "weight"), dayLog(day, "weight")), "number", { step: "0.1" })];
+      inputs.tape = [["waist", "Waist (cm)"], ["chest", "Chest (cm)"], ["arm", "Upper arm (cm)"], ["thigh", "Thigh (cm)"]]
+        .map(([key, label]) => field(label, measureCell("Nov 8", key), "number", { step: "0.1" }));
+      inputs.tests = [
+        field("Plank hold, max", testCell(3, 0), "text", { placeholder: "e.g. 45 s" }),
+        field("Dead hang, max", testCell(4, 0), "text", { placeholder: "e.g. 15 s" }),
+      ];
+    } else if (HEALTH_TEST_COLUMN[day]) {
+      inputs.tests = HEALTH_TEST_NAMES.map((name, row) => field(name, testCell(row, HEALTH_TEST_COLUMN[day])));
+    } else if (kind === "test") { // Jan 3 mini test
+      inputs.main = [["Push-ups, max", 0], ["Plank hold, max", 3], ["Dead hang, max", 4]]
+        .map(([name, row]) => field(name, testCell(row, 4)));
+    }
+
+    const water = [field("Water drunk (litres)", dayLog(day, "water"), "number", { step: "0.1" })];
+    if (dayDate(day).getDay() === 0 && kind !== "baseline") {
+      water.push(field("Sunday weigh-in (kg)", dayLog(day, "weight"), "number", { step: "0.1" }));
+    }
+    inputs.water = water;
+    inputs.food = [["breakfast", "Breakfast"], ["lunch", "Lunch"], ["dinner", "Dinner"], ["snacks", "Snacks / notes"]]
+      .map(([key, label]) => field(label, dayLog(day, key)));
+    return inputs;
+  }
+
+  /** Info boxes for each Speedcubing task of a day. */
+  function cubingInputs(day) {
+    const entry = CUBING.SCHEDULE[day - 1];
+    if (!entry || entry.kind === "race") return {};
+
+    const num = (label, key) => field(label, dayLog(day, key), "number", { step: "0.01" });
+    const resultLabel = entry.kind === "baseline" ? "Baseline ao12 (s)"
+      : entry.kind === "checkpoint" ? "Result: ao25 (s)" : "Result: ao12 (s)";
+    const notes = field("Notes", dayLog(day, "notes"));
+
+    if (entry.kind === "baseline") return { setup: [num(resultLabel, "result"), num("Minutes", "minutes")], audit: [notes] };
+    if (entry.kind === "light") return { main: [num("Minutes", "minutes"), notes] };
+
+    const special = entry.kind === "benchmark" || entry.kind === "checkpoint";
+    return {
+      timed: special
+        ? [num(resultLabel, "result"), num("Solves", "solves"), num("Best ao12 of the day (s)", "best")]
+        : [num("Solves", "solves"), num("Best ao12 of the day (s)", "best")],
+      review: [num("Minutes", "minutes"), notes],
+    };
+  }
+
+  const INPUTS = { health: healthInputs, cubing: cubingInputs };
+  let shownInputs = {}; // "plan:task" -> fields of the list on screen
+
+  function fieldsHtml(plan, itemId, state, fields) {
+    if (!fields || !fields.length) return "";
+    shownInputs[`${plan.id}:${itemId}`] = fields;
+    return `<div class="task-fields">${fields.map((spec, index) => `
+      <label>${spec.label}
+        <input class="cell-input" type="${spec.type}" ${spec.type === "number" ? `step="${spec.step || 1}" min="0" inputmode="decimal"` : ""}
+          placeholder="${esc(spec.placeholder || "")}" value="${esc(spec.get(state))}"
+          data-plan="${plan.id}" data-item="${itemId}" data-field="${index}">
+      </label>`).join("")}</div>`;
+  }
+
+  function saveField(input) {
+    const plan = PLANS.find((p) => p.id === input.dataset.plan);
+    const spec = (shownInputs[`${plan.id}:${input.dataset.item}`] || [])[Number(input.dataset.field)];
+    if (!spec) return;
+    const state = loadState(plan.storageKey);
+    spec.set(state, input.value);
+    saveState(plan.storageKey, state);
+  }
+
+  // ---------------------------------------------------------------------
+  // Daily Diary: progress on its card, and yesterday's "do better" items
+  // ---------------------------------------------------------------------
+
+  const hasDiaryEntry = (entry) => !!entry && !!(entry.mood || (entry.good || "").trim() || (entry.notes || "").trim() || (entry.better || []).length);
+
+  function renderDiaryProgress() {
+    const days = loadState(DIARY_KEY).days;
+    let written = 0;
+    for (let day = 1; day <= TOTAL_DAYS; day++) if (hasDiaryEntry(days[day])) written++;
+
+    const today = clampDay(todayNumber());
+    $("diary-bar").style.width = `${(written / TOTAL_DAYS) * 100}%`;
+    $("diary-label").textContent = written
+      ? `${written} / ${TOTAL_DAYS} days written${hasDiaryEntry(days[today]) ? " · today done" : ""}`
+      : "No entries yet";
+  }
+
+  function toggleDiaryItem(box) {
+    const state = loadState(DIARY_KEY);
+    const entry = state.days[shownDay - 1];
+    const item = entry && (entry.better || []).find((i) => i.id === box.dataset.item);
+    if (!item) return;
+    item.done = box.checked;
+    saveState(DIARY_KEY, state);
+
+    const before = $("tasks-count").textContent;
+    const { done, total } = renderTasks();
+    renderDiaryProgress();
     if (total > 0 && done === total && before !== `${done} / ${total}`) {
       burstConfetti(window.innerWidth / 2, window.innerHeight / 2, 160);
     }
@@ -238,11 +376,14 @@
     let done = 0;
     let html = "";
 
+    shownInputs = {};
+
     PLANS.forEach((plan) => {
       const tasks = plan.tasksFor(day);
       if (!tasks) return;
       const state = loadState(plan.storageKey);
       const checked = checkedFor(state, day);
+      const inputs = INPUTS[plan.id] ? INPUTS[plan.id](day) : {};
 
       const rows = tasks.items.map((item) => {
         if (!item.optional) {
@@ -257,7 +398,7 @@
               <b>${item.label}</b>
               ${item.detail ? `<small>${item.detail}</small>` : ""}
             </label>
-          </div>`;
+          </div>${fieldsHtml(plan, item.id, state, inputs[item.id])}`;
       }).join("");
 
       html += `
@@ -295,9 +436,29 @@
       html += `<div class="task-group task-mytasks"><h3>My Tasks <span>added by you</span></h3>${rows}</div>`;
     }
 
+    // Yesterday's diary "do better" items become today's tasks.
+    const yesterday = shownDay > 1 ? loadState(DIARY_KEY).days[shownDay - 1] : null;
+    const better = (yesterday && yesterday.better) || [];
+    if (better.length) {
+      const rows = better.map((item) => {
+        total++;
+        if (item.done) done++;
+        const id = `task-diary-${item.id}`;
+        return `
+          <div class="check-item ${item.done ? "checked" : ""}">
+            <input type="checkbox" id="${id}" data-plan="diary" data-item="${item.id}" ${item.done ? "checked" : ""}>
+            <label for="${id}"><b>${esc(item.text)}</b></label>
+          </div>`;
+      }).join("");
+      html += `<div class="task-group task-diary"><h3>Diary <span>to do better, from yesterday</span></h3>${rows}</div>`;
+    }
+
     $("task-list").innerHTML = html || '<p class="muted-line">No tasks today.</p>';
     $("task-list").querySelectorAll("input[type=checkbox]").forEach((box) => {
       box.onchange = () => toggleTask(box);
+    });
+    $("task-list").querySelectorAll(".task-fields input").forEach((input) => {
+      input.oninput = () => saveField(input);
     });
 
     const percent = total ? (done / total) * 100 : 0;
@@ -311,6 +472,7 @@
 
   function toggleTask(box) {
     if (box.dataset.plan === "mytasks") return toggleMyTask(box);
+    if (box.dataset.plan === "diary") return toggleDiaryItem(box);
     const plan = PLANS.find((p) => p.id === box.dataset.plan);
     const state = loadState(plan.storageKey);
     const day = shownDay;
@@ -336,6 +498,7 @@
     renderCountdown();
     PLANS.forEach(renderPlanProgress);
     renderMyTasksProgress();
+    renderDiaryProgress();
     renderTasks();
   }
 

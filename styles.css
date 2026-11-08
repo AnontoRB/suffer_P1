@@ -32,7 +32,7 @@
 
 .theme-home {
   --bg: #F1EFF7;  --surface: #FFFFFF;  --ink: #1E1B2E;  --muted: #5F5B75;  --line: #D9D5E8;
-  --rust: #B4441F;  --teal: #0E7C7B;  --health: #7B3FA0;  --cube: #B26A00;  --mine: #1F8A70;
+  --rust: #B4441F;  --teal: #0E7C7B;  --health: #7B3FA0;  --cube: #B26A00;  --mine: #1F8A70;  --diary: #B23A5B;
   --acc: #7B3FA0;  --acc2: #2D7FB8;  --ok: #2E7D5B;  --on-ok: #FFFFFF;
   --font: "Gill Sans", "Trebuchet MS", system-ui, sans-serif;
 }
@@ -55,6 +55,12 @@
   --font: "Gill Sans", "Trebuchet MS", system-ui, sans-serif;
 }
 
+.theme-diary {
+  --bg: #F6F1E8;  --surface: #FFFDF8;  --ink: #2A2118;  --muted: #6B5F52;  --line: #E4D9C7;
+  --acc: #B23A5B;  --acc2: #2D7FB8;  --ok: #2E7D5B;  --on-ok: #FFFFFF;  --bad: #B3261E;
+  --font: "Charter", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+}
+
 @media (prefers-color-scheme: dark) {
   html:not([data-theme="light"]) .theme-health {
     --bg: #15131F;  --surface: #1F1C2E;  --ink: #ECE9F7;  --muted: #A29EBB;  --line: #34304A;
@@ -72,13 +78,17 @@
     --bg: #15131F;  --surface: #1F1C2E;  --ink: #ECE9F7;  --muted: #A29EBB;  --line: #34304A;
     --acc: #E8A92E;  --acc2: #7FA6F5;  --ok: #5CC08F;  --on-ok: #0B1F16;  --bad: #F28B82;
   }
+  html:not([data-theme="light"]) .theme-diary {
+    --bg: #17131A;  --surface: #211B26;  --ink: #F0E9F2;  --muted: #B0A3B5;  --line: #3A3040;
+    --acc: #E58BA5;  --acc2: #6FB3E0;  --ok: #5CC08F;  --on-ok: #0B1F16;  --bad: #F28B82;
+  }
   html:not([data-theme="light"]) .theme-tasks {
     --bg: #15131F;  --surface: #1F1C2E;  --ink: #ECE9F7;  --muted: #A29EBB;  --line: #34304A;
     --acc: #4DC4A0;  --acc2: #6FB3E0;  --ok: #5CC08F;  --on-ok: #0B1F16;  --bad: #F28B82;
   }
   html:not([data-theme="light"]) .theme-home {
     --bg: #15131F;  --surface: #1F1C2E;  --ink: #ECE9F7;  --muted: #A29EBB;  --line: #34304A;
-    --rust: #E08A63;  --teal: #4FC3C1;  --health: #C79BE0;  --cube: #B26A00;  --mine: #1F8A70;
+    --rust: #E08A63;  --teal: #4FC3C1;  --health: #C79BE0;  --cube: #B26A00;  --mine: #1F8A70;  --diary: #E58BA5;
     --acc: #C79BE0;  --acc2: #6FB3E0;  --ok: #5CC08F;  --on-ok: #0B1F16;
   }
 }
@@ -99,13 +109,17 @@
     --bg: #15131F;  --surface: #1F1C2E;  --ink: #ECE9F7;  --muted: #A29EBB;  --line: #34304A;
     --acc: #E8A92E;  --acc2: #7FA6F5;  --ok: #5CC08F;  --on-ok: #0B1F16;  --bad: #F28B82;
   }
+  html[data-theme="dark"] .theme-diary {
+    --bg: #17131A;  --surface: #211B26;  --ink: #F0E9F2;  --muted: #B0A3B5;  --line: #3A3040;
+    --acc: #E58BA5;  --acc2: #6FB3E0;  --ok: #5CC08F;  --on-ok: #0B1F16;  --bad: #F28B82;
+  }
   html[data-theme="dark"] .theme-tasks {
     --bg: #15131F;  --surface: #1F1C2E;  --ink: #ECE9F7;  --muted: #A29EBB;  --line: #34304A;
     --acc: #4DC4A0;  --acc2: #6FB3E0;  --ok: #5CC08F;  --on-ok: #0B1F16;  --bad: #F28B82;
   }
   html[data-theme="dark"] .theme-home {
     --bg: #15131F;  --surface: #1F1C2E;  --ink: #ECE9F7;  --muted: #A29EBB;  --line: #34304A;
-    --rust: #E08A63;  --teal: #4FC3C1;  --health: #C79BE0;  --cube: #B26A00;  --mine: #1F8A70;
+    --rust: #E08A63;  --teal: #4FC3C1;  --health: #C79BE0;  --cube: #B26A00;  --mine: #1F8A70;  --diary: #E58BA5;
     --acc: #C79BE0;  --acc2: #6FB3E0;  --ok: #5CC08F;  --on-ok: #0B1F16;
   }
 
@@ -335,6 +349,7 @@ table small { display: block; }
 .card-health  { border-top: 8px solid var(--health); --card-color: var(--health); }
 .card-tasks   { border-top: 8px solid var(--mine); --card-color: var(--mine); }
 .card-cubing  { border-top: 8px solid var(--cube); --card-color: var(--cube); }
+.card-diary   { border-top: 8px solid var(--diary); --card-color: var(--diary); }
 
 .progress { height: 10px; background: var(--line); overflow: hidden; }
 .progress i { display: block; width: 0; height: 100%; background: var(--card-color); }
@@ -372,11 +387,75 @@ table small { display: block; }
 .task-group { margin-top: 14px; padding-left: 12px; border-left: 5px solid var(--g, var(--acc)); }
 .task-group h3 { margin: 0; font-size: 1.05rem; }
 .task-group h3 span { margin-left: 6px; font-size: 0.85rem; font-weight: 400; color: var(--muted); }
+.task-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px 10px; margin: 0 0 10px 40px; padding: 8px 10px; background: color-mix(in srgb, var(--g, var(--acc)) 9%, var(--surface)); border-left: 3px solid var(--g, var(--acc)); }
+.task-fields label { display: flex; flex-direction: column; gap: 3px; min-width: 0; font-size: 0.78rem; color: var(--muted); }
+.task-fields .cell-input { margin-top: 0; min-width: 0; }
 .task-rust     { --g: var(--rust); }
 .task-marathon { --g: var(--teal); }
 .task-health   { --g: var(--health); }
 .task-cubing   { --g: var(--cube); }
 .task-mytasks  { --g: var(--mine); }
+.task-diary    { --g: var(--diary); }
+
+
+/* Daily Diary page: a notebook-style layout (calendar and entries beside a lined page). */
+
+.wrap.wide { max-width: 1200px; }
+
+.diary-grid { display: grid; grid-template-columns: 1fr; gap: 28px; align-items: start; }
+@media (min-width: 960px) {
+  .diary-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.8fr); gap: 36px; }
+  .diary-side { position: sticky; top: 16px; max-height: calc(100vh - 32px); overflow-y: auto; padding-right: 4px; }
+}
+.side-title { margin-top: 26px; }
+
+.entry-list { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; max-height: 340px; overflow-y: auto; }
+.entry { display: block; width: 100%; padding: 9px 12px; background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--line); color: var(--ink); font: inherit; text-align: left; cursor: pointer; }
+.entry:hover { border-left-color: var(--acc); }
+.entry.selected { border-color: var(--acc); border-left-width: 6px; }
+.entry b { display: block; font-size: 0.95rem; }
+.entry small { display: block; color: var(--muted); font-size: 0.82rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.diary-page { padding: 24px 28px 22px; background: var(--surface); border: 1px solid var(--line); border-left: 8px solid var(--acc); box-shadow: 0 10px 28px rgba(0, 0, 0, 0.08); }
+.diary-head h2 { margin: 0; font-size: clamp(1.6rem, 3vw, 2.2rem); }
+.diary-label { display: block; margin: 20px 0 6px; font-weight: 700; }
+.diary-prompt { margin: 0 0 6px; color: var(--muted); font-style: italic; font-size: 0.92rem; }
+
+.mood { display: flex; flex-wrap: wrap; gap: 8px; }
+.mood button { width: 2.7em; height: 2.7em; border: 2px solid var(--line); border-radius: 50%; background: none; font-size: 1.5rem; line-height: 1; cursor: pointer; opacity: 0.6; transition: transform 0.15s, opacity 0.15s; }
+.mood button:hover { opacity: 1; transform: scale(1.08); }
+.mood button[aria-pressed="true"] { opacity: 1; border-color: var(--acc); background: color-mix(in srgb, var(--acc) 16%, transparent); transform: scale(1.12); }
+
+/* Lined paper: the ruled lines follow the text lines. */
+.paper {
+  display: block;
+  width: 100%;
+  min-height: 5.4em;
+  padding: 0 6px;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  background-color: transparent;
+  background-image: linear-gradient(transparent calc(1.8em - 1px), var(--line) 1px);
+  background-size: 100% 1.8em;
+  background-attachment: local;
+  color: var(--ink);
+  font: inherit;
+  line-height: 1.8em;
+  resize: vertical;
+}
+.paper.tall { min-height: 14.4em; }
+.paper:focus-visible { outline: 3px solid var(--acc); outline-offset: 3px; }
+.paper::placeholder { color: var(--muted); opacity: 0.7; }
+
+.carry { margin-top: 18px; padding: 10px 14px; background: color-mix(in srgb, var(--acc) 9%, var(--surface)); border-left: 4px solid var(--acc); }
+.carry h3 { margin: 0 0 2px; font-size: 1rem; }
+
+#better .check-item label { padding-top: 2px; }
+.icon-btn { flex: none; align-self: flex-start; width: 1.9rem; height: 1.9rem; border: 1px solid var(--line); background: none; color: var(--muted); font-size: 1.2rem; line-height: 1; cursor: pointer; }
+.icon-btn:hover { border-color: var(--bad); color: var(--bad); }
+
+.diary-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; margin-top: 20px; padding-top: 12px; border-top: 1px solid var(--line); color: var(--muted); font-size: 0.88rem; }
+.diary-foot .btn-outline { margin-left: auto; padding: 6px 12px; font-size: 0.85rem; }
 
 /* Digital clock (home page). Always dark, in both light and dark mode. */
 
