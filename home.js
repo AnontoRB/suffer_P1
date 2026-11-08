@@ -157,7 +157,16 @@
     const state = loadState(MY_KEY);
     const task = myTasksOn(state, shownDay).find((t) => t.id === box.dataset.item);
     if (!task) return;
-    task.done = box.checked;
+    const subs = task.subtasks || [];
+    if (box.dataset.sub) {
+      const sub = subs.find((s) => s.id === box.dataset.sub);
+      if (!sub) return;
+      sub.done = box.checked;
+      task.done = subs.every((s) => s.done);
+    } else {
+      task.done = box.checked;
+      subs.forEach((s) => { s.done = box.checked; });
+    }
     saveState(MY_KEY, state);
 
     const before = $("tasks-count").textContent;
@@ -258,17 +267,30 @@
         </div>`;
     });
 
-    const mine = myTasksOn(loadState(MY_KEY), day);
+    const myState = loadState(MY_KEY);
+    const mine = myTasksOn(myState, day);
     if (mine.length) {
       const rows = mine.map((task) => {
         total++;
         if (task.done) done++;
         const id = `task-mytasks-${task.id}`;
+        const subs = task.subtasks || [];
+        const category = (myState.categories || []).find((cat) => cat.id === task.categoryId);
+        const note = [category ? esc(category.name) : "", subs.length ? `${subs.filter((s) => s.done).length} / ${subs.length} subtasks` : ""]
+          .filter(Boolean).join(" · ");
+        const subRows = subs.map((sub) => {
+          const subId = `${id}-${sub.id}`;
+          return `
+          <div class="check-item ${sub.done ? "checked" : ""}" style="margin-left:40px">
+            <input type="checkbox" id="${subId}" data-plan="mytasks" data-item="${task.id}" data-sub="${sub.id}" ${sub.done ? "checked" : ""}>
+            <label for="${subId}"><b>${esc(sub.text)}</b></label>
+          </div>`;
+        }).join("");
         return `
           <div class="check-item ${task.done ? "checked" : ""}">
             <input type="checkbox" id="${id}" data-plan="mytasks" data-item="${task.id}" ${task.done ? "checked" : ""}>
-            <label for="${id}"><b>${esc(task.text)}</b></label>
-          </div>`;
+            <label for="${id}"><b>${esc(task.text)}</b>${note ? `<small>${note}</small>` : ""}</label>
+          </div>${subRows}`;
       }).join("");
       html += `<div class="task-group task-mytasks"><h3>My Tasks <span>added by you</span></h3>${rows}</div>`;
     }

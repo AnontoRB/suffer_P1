@@ -1,9 +1,18 @@
 /**
- * My Tasks page: your own tasks on any date.
+ * My Tasks page: your own tasks on any date, with categories and subtasks.
  * Needs: common.js (App).
  *
- * Saved in localStorage as { days: {}, tasks: { "2026-11-09": [{ id, text, done }] } }.
- * The home page reads the same data to show today's tasks.
+ * Saved in localStorage as:
+ *   {
+ *     days: {},
+ *     categories: [{ id, name }],
+ *     tasks: { "2026-11-09": [{ id, text, done, categoryId, subtasks: [{ id, text, done }] }] }
+ *   }
+ *
+ * - Categories are kept until you delete them, even when they have no tasks.
+ * - A task with subtasks is done when all of its subtasks are done. Ticking
+ *   the task ticks every subtask; unticking it clears them all.
+ * - The home page reads the same data to show today's tasks.
  */
 (() => {
   "use strict";
@@ -13,6 +22,7 @@
   const STORAGE_KEY = "tasks-plan-v1";
   const state = loadState(STORAGE_KEY);
   state.tasks = state.tasks || {};
+  state.categories = state.categories || [];
 
   const esc = (text) => String(text == null ? "" : text).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
   const parseIso = (iso) => { const [y, m, d] = iso.split("-").map(Number); return new Date(y, m - 1, d); };
@@ -23,11 +33,45 @@
 
   let selected = todayIso();
   let viewMonth = monthStart(parseIso(selected));
-  let editingId = null;
+  let editing = null;      // "t:<taskId>" or "s:<taskId>:<subId>"
+  let editingCat = null;   // category id being renamed
+  let addingSub = null;    // task id whose "add subtask" form is open
+  let chosenCat = "";      // category picked in the add-task form
+  let focusSel = null;     // selector to focus after the next render
+  let addMode = "task";    // what the main box creates: "task" or "category"
+  let addMsg = "";         // message under the main box
+  let addMsgIsError = false;
+  let draft = "";          // text kept in the main box when you switch mode
+  let catError = "";       // message while renaming a category
 
   const listFor = (iso) => state.tasks[iso] || [];
+  const subsOf = (task) => task.subtasks || [];
+  const findTask = (iso, id) => listFor(iso).find((task) => task.id === id);
   const isAllDone = (iso) => listFor(iso).length > 0 && listFor(iso).every((task) => task.done);
   const newId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  const categoryOf = (id) => state.categories.find((cat) => cat.id === id) || null;
+
+  /** A task with subtasks is done exactly when all of them are done. */
+  function syncDone(task) {
+    if (subsOf(task).length > 0) task.done = task.subtasks.every((sub) => sub.done);
+  }
+
+  /** Adds a category. Returns { id } on success or { error } with a readable message. */
+  function createCategory(rawName) {
+    const name = (rawName || "").trim();
+    if (!name) return { error: "Type a name for the category." };
+    if (state.categories.some((cat) => cat.name.toLowerCase() === name.toLowerCase())) {
+      return { error: `"${name}" already exists.` };
+    }
+    const cat = { id: newId(), name };
+    state.categories.push(cat);
+    save();
+    return { id: cat.id };
+  }
+
+  function addTask(iso, text, categoryId) {
+    (state.tasks[iso] = listFor(iso)).push({ id: newId(), text, done: false, categoryId: categoryId || null, subtasks: [] });
+  }
 
   function save() {
     // Drop empty dates so the saved data stays small.
@@ -49,7 +93,11 @@
   function selectDate(iso) {
     selected = iso;
     viewMonth = monthStart(parseIso(iso));
-    editingId = null;
+    editing = null;
+    editingCat = null;
+    addingSub = null;
+    addMsg = "";
+    catError = "";
     render();
   }
 
@@ -94,106 +142,177 @@
   }
 
   // ---------------------------------------------------------------------
-  // The day panel
+  // Task rows (used in the day panel and in the category boxes)
+  // ctx is "d" (day panel) or "c" (category box); it keeps element ids unique.
   // ---------------------------------------------------------------------
 
-  function taskRow(task) {
-    if (task.id === editingId) {
+  function catOptions(selectedId) {
+    return '<option value="">No category</option>' + state.categories.map((cat) =>
+      `<option value="${cat.id}" ${cat.id === selectedId ? "selected" : ""}>${esc(cat.name)}</option>`).join("");
+  }
+
+  function subRow(task, sub, iso, ctx) {
+    const data = `data-iso="${iso}" data-id="${task.id}" data-sub="${sub.id}"`;
+    if (editing === `s:${task.id}:${sub.id}`) {
       return `
         <div class="check-item">
-          <input type="text" class="cell-input" id="edit-input" maxlength="200" aria-label="Edit task" value="${esc(task.text)}">
+          <input type="text" class="cell-input" id="edit-input" maxlength="200" aria-label="Edit subtask" value="${esc(sub.text)}">
           <span class="task-actions">
-            <button type="button" data-act="save" data-id="${task.id}">Save</button>
-            <button type="button" data-act="cancel" data-id="${task.id}">Cancel</button>
+            <button type="button" data-act="save-sub" ${data}>Save</button>
+            <button type="button" data-act="cancel">Cancel</button>
           </span>
         </div>`;
     }
     return `
-      <div class="check-item ${task.done ? "checked" : ""}">
-        <input type="checkbox" id="task-${task.id}" data-id="${task.id}" ${task.done ? "checked" : ""}>
-        <label for="task-${task.id}"><b>${esc(task.text)}</b></label>
+      <div class="check-item ${sub.done ? "checked" : ""}">
+        <input type="checkbox" id="${ctx}-sub-${sub.id}" data-kind="sub" ${data} ${sub.done ? "checked" : ""}>
+        <label for="${ctx}-sub-${sub.id}"><b>${esc(sub.text)}</b></label>
         <span class="task-actions">
-          <button type="button" data-act="edit" data-id="${task.id}">Edit</button>
-          <button type="button" data-act="delete" data-id="${task.id}" class="danger">Delete</button>
+          <button type="button" data-act="edit-sub" ${data}>Edit</button>
+          <button type="button" data-act="delete-sub" ${data} class="danger">Delete</button>
         </span>
       </div>`;
+  }
+
+  function taskRow(task, iso, ctx) {
+    const data = `data-iso="${iso}" data-id="${task.id}"`;
+    const subs = subsOf(task);
+
+    let head;
+    if (editing === `t:${task.id}`) {
+      head = `
+        <div class="check-item">
+          <input type="text" class="cell-input" id="edit-input" maxlength="200" aria-label="Edit task" value="${esc(task.text)}">
+          <select class="cell-input select-cat" id="edit-cat" aria-label="Category">${catOptions(task.categoryId)}</select>
+          <span class="task-actions">
+            <button type="button" data-act="save" ${data}>Save</button>
+            <button type="button" data-act="cancel">Cancel</button>
+          </span>
+        </div>`;
+    } else {
+      const doneSubs = subs.filter((sub) => sub.done).length;
+      const note = subs.length ? `<small>${doneSubs} / ${subs.length} subtasks done</small>` : "";
+      const dateButton = ctx === "c" ? `<button type="button" class="btn-outline" data-act="goto" data-iso="${iso}">${shortLabel(iso)}</button>` : "";
+      head = `
+        <div class="check-item ${task.done ? "checked" : ""}">
+          ${dateButton}
+          <input type="checkbox" id="${ctx}-task-${task.id}" data-kind="task" ${data} ${task.done ? "checked" : ""}>
+          <label for="${ctx}-task-${task.id}"><b>${esc(task.text)}</b>${note}</label>
+          <span class="task-actions">
+            <button type="button" data-act="open-sub" ${data}>+ Subtask</button>
+            <button type="button" data-act="edit" ${data}>Edit</button>
+            <button type="button" data-act="delete" ${data} class="danger">Delete</button>
+          </span>
+        </div>`;
+    }
+
+    const subForm = addingSub === task.id ? `
+      <form class="add-form sub-form" data-form="add-sub" ${data}>
+        <input type="text" class="cell-input" id="sub-input" maxlength="200" placeholder="Add a subtask" aria-label="New subtask">
+        <button type="submit" class="btn-outline">Add</button>
+        <button type="button" class="btn-outline" data-act="sub-cancel">Done</button>
+      </form>` : "";
+
+    const subHtml = subs.length || subForm
+      ? `<div class="subtasks">${subs.map((sub) => subRow(task, sub, iso, ctx)).join("")}${subForm}</div>` : "";
+    return `<div class="task-block">${head}${subHtml}</div>`;
+  }
+
+  // ---------------------------------------------------------------------
+  // The day panel
+  // ---------------------------------------------------------------------
+
+  /** Day tasks grouped by category (uncategorized first). Headings only appear when there is more than one group. */
+  function dayTaskHtml(list, iso) {
+    const groups = [{ name: null, tasks: list.filter((task) => !categoryOf(task.categoryId)) }];
+    state.categories.forEach((cat) => groups.push({ name: cat.name, tasks: list.filter((task) => task.categoryId === cat.id) }));
+    const used = groups.filter((group) => group.tasks.length > 0);
+    const showHeadings = used.length > 1 || (used.length === 1 && used[0].name !== null);
+
+    return used.map((group) => {
+      const doneCount = group.tasks.filter((task) => task.done).length;
+      const heading = showHeadings
+        ? `<h3 class="cat-heading">${group.name === null ? "No category" : esc(group.name)} <span>${doneCount} / ${group.tasks.length}</span></h3>`
+        : "";
+      return heading + group.tasks.map((task) => taskRow(task, iso, "d")).join("");
+    }).join("");
   }
 
   function renderPanel() {
     const list = listFor(selected);
     const doneCount = list.filter((task) => task.done).length;
 
+    const isTask = addMode === "task";
+    const draftText = draft;
+    draft = "";
+    const addMsgHtml = addMsg
+      ? `<div class="settings-status${addMsgIsError ? " error" : ""}" role="status">${esc(addMsg)}</div>` : "";
+
     $("panel").innerHTML = `
       <h2>${longLabel(selected)}</h2>
       <div class="panel-date">${doneCount} / ${list.length} done${dayTag(selected)}</div>
-      <form class="add-form" id="add-form">
-        <input type="text" class="cell-input" id="new-task" maxlength="200" placeholder="Add a task for this day" aria-label="New task">
-        <button type="submit" class="btn-outline">Add task</button>
+      <form class="add-form" data-form="add-item">
+        <span class="mode-toggle" role="group" aria-label="What do you want to add?">
+          <button type="button" data-act="mode" data-mode="task" aria-pressed="${isTask}">Task</button>
+          <button type="button" data-act="mode" data-mode="category" aria-pressed="${!isTask}">Category</button>
+        </span>
+        <input type="text" class="cell-input" id="new-task" maxlength="${isTask ? 200 : 40}" value="${esc(draftText)}"
+          placeholder="${isTask ? "Add a task for this day" : "New category name, for example Study"}"
+          aria-label="${isTask ? "New task" : "New category name"}">
+        ${isTask ? `<select class="cell-input select-cat" id="new-task-cat" aria-label="Category for the new task">${catOptions(chosenCat)}</select>` : ""}
+        <button type="submit" class="btn-outline">${isTask ? "Add task" : "Add category"}</button>
       </form>
-      <div class="box">${list.length ? list.map(taskRow).join("") : '<p class="muted-line">No tasks on this day yet.</p>'}</div>
-      ${doneCount > 0 ? '<p><button type="button" class="btn-outline" id="clear-done">Clear completed tasks</button></p>' : ""}`;
-
-    $("add-form").onsubmit = (event) => {
-      event.preventDefault();
-      const text = $("new-task").value.trim();
-      if (!text) return;
-      (state.tasks[selected] = listFor(selected)).push({ id: newId(), text, done: false });
-      save();
-      render();
-      $("new-task").focus();
-    };
-
-    $("panel").querySelectorAll('input[type="checkbox"]').forEach((box) => {
-      box.onchange = () => {
-        const wasAllDone = isAllDone(selected);
-        listFor(selected).find((task) => task.id === box.dataset.id).done = box.checked;
-        save();
-        render();
-        if (!wasAllDone && isAllDone(selected)) burstConfetti(window.innerWidth / 2, window.innerHeight / 3, 120);
-      };
-    });
-
-    $("panel").querySelectorAll("[data-act]").forEach((button) => {
-      button.onclick = () => handleAction(button.dataset.act, button.dataset.id);
-    });
-
-    if (editingId) {
-      const input = $("edit-input");
-      input.focus();
-      input.setSelectionRange(input.value.length, input.value.length);
-      input.onkeydown = (event) => {
-        if (event.key === "Enter") handleAction("save", editingId);
-        if (event.key === "Escape") handleAction("cancel", editingId);
-      };
-    }
-
-    const clear = $("clear-done");
-    if (clear) {
-      clear.onclick = () => {
-        if (!confirm("Remove all completed tasks on this day?")) return;
-        state.tasks[selected] = listFor(selected).filter((task) => !task.done);
-        save();
-        render();
-      };
-    }
+      ${addMsgHtml}
+      <div class="box">${list.length ? dayTaskHtml(list, selected) : '<p class="muted-line">No tasks on this day yet.</p>'}</div>
+      ${doneCount > 0 ? '<p><button type="button" class="btn-outline" data-act="clear-done">Clear completed tasks</button></p>' : ""}`;
   }
 
-  function handleAction(action, id) {
-    const list = listFor(selected);
-    if (action === "edit") {
-      editingId = id;
-    } else if (action === "cancel") {
-      editingId = null;
-    } else if (action === "save") {
-      const text = $("edit-input").value.trim();
-      if (text) list.find((task) => task.id === id).text = text;
-      editingId = null;
-      save();
-    } else if (action === "delete") {
-      state.tasks[selected] = list.filter((task) => task.id !== id);
-      save();
+  // ---------------------------------------------------------------------
+  // Categories (always listed, with every task in them from any date)
+  // ---------------------------------------------------------------------
+
+  function renderCategories() {
+    const box = $("category-list");
+    if (state.categories.length === 0) {
+      box.innerHTML = '<p class="muted-line">No categories yet. Create one above, for example "Study" or "Home".</p>';
+      return;
     }
-    render();
+
+    box.innerHTML = state.categories.map((cat) => {
+      const items = [];
+      Object.keys(state.tasks).sort().forEach((iso) => {
+        state.tasks[iso].forEach((task) => { if (task.categoryId === cat.id) items.push([iso, task]); });
+      });
+      const doneCount = items.filter(([, task]) => task.done).length;
+
+      const head = editingCat === cat.id
+        ? `<div class="cat-head">
+             <input type="text" class="cell-input" id="edit-cat-name" maxlength="40" aria-label="Category name" value="${esc(cat.name)}">
+             <span class="task-actions">
+               <button type="button" data-act="save-cat" data-cat="${cat.id}">Save</button>
+               <button type="button" data-act="cancel">Cancel</button>
+             </span>
+           </div>`
+        : `<div class="cat-head">
+             <h3>${esc(cat.name)} <span>${doneCount} / ${items.length} done</span></h3>
+             <span class="task-actions">
+               <button type="button" data-act="edit-cat" data-cat="${cat.id}">Rename</button>
+               <button type="button" data-act="delete-cat" data-cat="${cat.id}" class="danger">Delete</button>
+             </span>
+           </div>`;
+
+      return `
+        <div class="box cat-box">
+          ${head}
+          ${editingCat === cat.id && catError ? `<div class="settings-status error" role="status">${esc(catError)}</div>` : ""}
+          <form class="add-form" data-form="cat-task" data-cat="${cat.id}">
+            <input type="text" class="cell-input" maxlength="200" placeholder="Add a task to ${esc(cat.name)}" aria-label="New task in ${esc(cat.name)}">
+            <input type="date" class="cell-input jump-date" aria-label="Date for the new task" value="${selected}">
+            <button type="submit" class="btn-outline">Add</button>
+          </form>
+          ${items.length ? items.map(([iso, task]) => taskRow(task, iso, "c")).join("") : '<p class="muted-line">No tasks in this category yet.</p>'}
+        </div>`;
+    }).join("");
   }
 
   // ---------------------------------------------------------------------
@@ -224,7 +343,11 @@
     Object.keys(state.tasks).sort().forEach((iso) => {
       if (iso >= today) return;
       state.tasks[iso].filter((task) => !task.done).forEach((task) => {
-        rows.push(`<div class="check-item"><button type="button" class="btn-outline" data-iso="${iso}">${shortLabel(iso)}</button><label><b>${esc(task.text)}</b></label></div>`);
+        const subs = subsOf(task);
+        const note = subs.length ? `<small>${subs.filter((sub) => sub.done).length} / ${subs.length} subtasks done</small>` : "";
+        const cat = categoryOf(task.categoryId);
+        const catNote = cat ? `<small>${esc(cat.name)}</small>` : "";
+        rows.push(`<div class="check-item"><button type="button" class="btn-outline" data-iso="${iso}">${shortLabel(iso)}</button><label><b>${esc(task.text)}</b>${catNote}${note}</label></div>`);
       });
     });
     $("overdue").innerHTML = rows.length
@@ -239,15 +362,255 @@
     renderMonthNav();
     renderCalendar();
     renderPanel();
+    renderCategories();
     renderStats();
     renderOverdue();
+
+    if (focusSel) {
+      const el = document.querySelector(focusSel);
+      focusSel = null;
+      if (el) {
+        el.focus();
+        if (el.type === "text") el.setSelectionRange(el.value.length, el.value.length);
+      }
+    }
   }
+
+  // ---------------------------------------------------------------------
+  // Events (one set of handlers for the day panel and the category list)
+  // ---------------------------------------------------------------------
+
+  function onClick(event) {
+    const button = event.target.closest("button[data-act]");
+    if (!button) return;
+    const { act, iso, id, sub, cat } = button.dataset;
+
+    switch (act) {
+      case "goto":
+        selectDate(iso);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        return;
+      case "mode":
+        draft = $("new-task") ? $("new-task").value : "";
+        addMode = button.dataset.mode;
+        addMsg = "";
+        focusSel = "#new-task";
+        break;
+      case "edit":
+        editing = `t:${id}`; editingCat = null; focusSel = "#edit-input";
+        break;
+      case "edit-sub":
+        editing = `s:${id}:${sub}`; editingCat = null; focusSel = "#edit-input";
+        break;
+      case "cancel":
+        editing = null; editingCat = null; catError = "";
+        break;
+      case "save": {
+        const task = findTask(iso, id);
+        const text = $("edit-input").value.trim();
+        if (task) {
+          if (text) task.text = text;
+          task.categoryId = $("edit-cat").value || null;
+        }
+        editing = null;
+        save();
+        break;
+      }
+      case "save-sub": {
+        const task = findTask(iso, id);
+        const target = task && subsOf(task).find((s) => s.id === sub);
+        const text = $("edit-input").value.trim();
+        if (target && text) target.text = text;
+        editing = null;
+        save();
+        break;
+      }
+      case "delete": {
+        const task = findTask(iso, id);
+        if (task && subsOf(task).length > 0 && !confirm("Delete this task and all of its subtasks?")) return;
+        state.tasks[iso] = listFor(iso).filter((t) => t.id !== id);
+        if (addingSub === id) addingSub = null;
+        save();
+        break;
+      }
+      case "delete-sub": {
+        const task = findTask(iso, id);
+        if (task) {
+          task.subtasks = subsOf(task).filter((s) => s.id !== sub);
+          syncDone(task);
+        }
+        save();
+        break;
+      }
+      case "open-sub":
+        addingSub = id; editing = null; focusSel = "#sub-input";
+        break;
+      case "sub-cancel":
+        addingSub = null;
+        break;
+      case "clear-done":
+        if (!confirm("Remove all completed tasks on this day?")) return;
+        state.tasks[selected] = listFor(selected).filter((task) => !task.done);
+        save();
+        break;
+      case "edit-cat":
+        editingCat = cat; editing = null; catError = ""; focusSel = "#edit-cat-name";
+        break;
+      case "save-cat": {
+        const name = $("edit-cat-name").value.trim();
+        const clash = state.categories.some((c) => c.id !== cat && c.name.toLowerCase() === name.toLowerCase());
+        if (clash) {
+          catError = "You already have a category with that name.";
+          focusSel = "#edit-cat-name";
+          break;
+        }
+        if (name) categoryOf(cat).name = name;
+        editingCat = null;
+        catError = "";
+        save();
+        break;
+      }
+      case "delete-cat": {
+        const count = Object.values(state.tasks).reduce((sum, list) => sum + list.filter((t) => t.categoryId === cat).length, 0);
+        const message = count
+          ? `Delete this category? Its ${count} task${count === 1 ? "" : "s"} will stay on their dates, with no category.`
+          : "Delete this category?";
+        if (!confirm(message)) return;
+        state.categories = state.categories.filter((c) => c.id !== cat);
+        Object.values(state.tasks).forEach((list) => list.forEach((t) => { if (t.categoryId === cat) t.categoryId = null; }));
+        if (chosenCat === cat) chosenCat = "";
+        save();
+        break;
+      }
+      default:
+        return;
+    }
+    render();
+  }
+
+  function onChange(event) {
+    const box = event.target;
+
+    if (box.id === "new-task-cat") { chosenCat = box.value; return; }
+    if (!box.matches("input[type=checkbox][data-kind]")) return;
+
+    const { kind, iso, id, sub } = box.dataset;
+    const task = findTask(iso, id);
+    if (!task) return;
+
+    const wasAllDone = isAllDone(iso);
+    if (kind === "task") {
+      task.done = box.checked;
+      subsOf(task).forEach((s) => { s.done = box.checked; });
+    } else {
+      const target = subsOf(task).find((s) => s.id === sub);
+      if (!target) return;
+      target.done = box.checked;
+      syncDone(task);
+    }
+    save();
+    render();
+    if (!wasAllDone && isAllDone(iso)) burstConfetti(window.innerWidth / 2, window.innerHeight / 3, 120);
+  }
+
+  function onSubmit(event) {
+    const form = event.target.closest("form[data-form]");
+    if (!form) return;
+    event.preventDefault();
+
+    const input = form.querySelector("input[type=text]");
+    const text = input.value.trim();
+
+    if (!text) {
+      if (form.dataset.form === "add-item" && addMode === "category") {
+        addMsg = "Type a name for the category.";
+        addMsgIsError = true;
+        focusSel = "#new-task";
+        render();
+      }
+      return;
+    }
+
+    switch (form.dataset.form) {
+      case "add-item":
+        if (addMode === "category") {
+          const result = createCategory(text);
+          addMsgIsError = !!result.error;
+          addMsg = result.error || `Category "${text}" created.`;
+          if (result.error) draft = text;
+        } else {
+          const select = form.querySelector("select");
+          chosenCat = select ? select.value : chosenCat;
+          addTask(selected, text, chosenCat);
+          addMsg = "";
+        }
+        focusSel = "#new-task";
+        break;
+      case "add-sub": {
+        const task = findTask(form.dataset.iso, form.dataset.id);
+        if (!task) return;
+        task.subtasks = subsOf(task);
+        task.subtasks.push({ id: newId(), text, done: false });
+        syncDone(task);
+        focusSel = "#sub-input";
+        break;
+      }
+      case "cat-task": {
+        const iso = form.querySelector("input[type=date]").value || selected;
+        addTask(iso, text, form.dataset.cat);
+        focusSel = `form[data-form="cat-task"][data-cat="${form.dataset.cat}"] input[type=text]`;
+        break;
+      }
+      default:
+        return;
+    }
+    save();
+    render();
+  }
+
+  /** Enter saves and Escape cancels while editing a task, subtask or category name. */
+  function onKeyDown(event) {
+    const target = event.target;
+    if (target.id === "sub-input" && event.key === "Escape") {
+      addingSub = null;
+      render();
+      return;
+    }
+    if (target.id !== "edit-input" && target.id !== "edit-cat-name") return;
+    const scope = target.closest(".check-item, .cat-head");
+    if (event.key === "Enter") {
+      event.preventDefault();
+      scope.querySelector('[data-act^="save"]').click();
+    } else if (event.key === "Escape") {
+      scope.querySelector('[data-act="cancel"]').click();
+    }
+  }
+
+  [$("panel"), $("category-list")].forEach((container) => {
+    container.addEventListener("click", onClick);
+    container.addEventListener("change", onChange);
+    container.addEventListener("submit", onSubmit);
+    container.addEventListener("keydown", onKeyDown);
+  });
+
+  // The "new category" form is fixed on the page, so it is set up once.
+  $("cat-form").onsubmit = (event) => {
+    event.preventDefault();
+    const input = $("new-cat");
+    const result = createCategory(input.value);
+    $("cat-status").textContent = result.error || "";
+    if (result.error) return;
+    input.value = "";
+    render();
+    input.focus();
+  };
 
   // Keep in sync when the home page ticks a task in another tab.
   window.addEventListener("storage", (event) => {
     if (event.key !== STORAGE_KEY) return;
     const fresh = loadState(STORAGE_KEY);
     state.tasks = fresh.tasks || {};
+    state.categories = fresh.categories || [];
     render();
   });
 

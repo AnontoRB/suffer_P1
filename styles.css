@@ -518,3 +518,33 @@ html[data-accent] body { --acc: var(--user-acc); }
 .task-actions button { padding: 4px 10px; font: inherit; font-size: 0.82rem; cursor: pointer; background: none; color: var(--ink); border: 1px solid var(--line); }
 .task-actions button:hover { border-color: var(--acc); }
 .task-actions .danger { color: var(--bad); }
+
+/* Subtasks and categories */
+.task-block { border-bottom: 1px solid var(--line); }
+.task-block:last-child { border-bottom: 0; }
+.task-block > .check-item { border-bottom: 0; }
+.subtasks { margin: 0 0 8px 14px; padding-left: 26px; border-left: 3px solid var(--line); }
+.subtasks .check-item { padding: 6px 0; border-bottom: 0; }
+.subtasks .check-item input[type="checkbox"] { width: 22px; height: 22px; }
+.subtasks .check-item input[type="checkbox"]::after { font-size: 15px; }
+.sub-form { margin: 4px 0 0; }
+.check-item .select-cat, .add-form .select-cat { flex: 0 1 170px; min-width: 120px; margin-top: 0; }
+.add-form .jump-date { flex: 0 1 160px; }
+.check-item small { margin-top: 2px; }
+.check-item > .btn-outline { flex: none; align-self: flex-start; padding: 4px 10px; font-size: 0.82rem; }
+.cat-heading { margin: 16px 0 2px; font-size: 1rem; color: var(--acc); }
+.cat-heading:first-child { margin-top: 0; }
+.cat-heading span, .cat-head h3 span { margin-left: 6px; font-size: 0.85rem; font-weight: 400; color: var(--muted); }
+.cat-box { margin-bottom: 14px; border-left: 5px solid var(--acc); }
+.cat-head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 8px; }
+.cat-head h3 { flex: 1; margin: 0; font-size: 1.15rem; }
+.cat-head .cell-input { flex: 1; margin-top: 0; }
+.cat-head .task-actions { align-self: center; }
+#cat-status:empty { display: none; }
+
+/* Task / Category switch next to the main input */
+.mode-toggle { display: inline-flex; flex: none; }
+.add-form .mode-toggle button { padding: 8px 14px; font: inherit; cursor: pointer; background: none; color: var(--ink); border: 1px solid var(--line); }
+.add-form .mode-toggle button + button { border-left: 0; }
+.add-form .mode-toggle button:hover { border-color: var(--acc); }
+.add-form .mode-toggle button[aria-pressed="true"] { background: var(--acc); border-color: var(--acc); color: #fff; }

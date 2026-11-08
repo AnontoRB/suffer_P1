@@ -14,7 +14,8 @@
       <a class="home-link" href="index.html">&larr; Home</a>
       <h1>My Tasks</h1>
       <p>
-        Your own to-do list. Pick any date, add as many tasks as you like, tick them off, edit them or delete them.
+        Your own to-do list. Pick any date, add tasks, split them into subtasks, sort them into your own categories,
+        tick them off, edit them or delete them.
         Today's tasks also show up on the home page.
       </p>
     </div>
@@ -33,11 +34,26 @@
       <h2>Calendar</h2>
       <p class="legend">
         Green = all done &middot; red outline = unfinished on a past day &middot; coloured border = has tasks &middot; dashed = today.
-        Tap a date to see and add its tasks.
+        Tap a date to see and add its tasks. Switch the box to <b>Category</b> to make a new category,
+        or <a href="#categories">manage all categories</a> further down.
       </p>
       <div class="day-nav" id="month-nav"></div>
       <div id="calendar"></div>
       <div class="panel" id="panel"></div>
+    </section>
+
+    <section id="categories">
+      <h2>Categories</h2>
+      <p class="sub">
+        Make a category once, like Study or Home, and it stays here until you delete it.
+        Pick it when you add a task, or add tasks to it directly below. Any task can also hold subtasks.
+      </p>
+      <form class="add-form" id="cat-form">
+        <input type="text" class="cell-input" id="new-cat" maxlength="40" placeholder="New category name" aria-label="New category name">
+        <button type="submit" class="btn-outline">Add category</button>
+      </form>
+      <div class="settings-status error" id="cat-status" role="status"></div>
+      <div id="category-list"></div>
     </section>
 
     <section>
