@@ -104,6 +104,7 @@ const App = (() => {
   /** Shoots `count` pieces of confetti outward from (x, y). */
   function burstConfetti(x, y, count) {
     if (prefersReducedMotion) return;
+    if (window.SiteSettings && !SiteSettings.get().confetti) return;
     ensureCanvas();
 
     for (let i = 0; i < count; i++) {

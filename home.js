@@ -1,10 +1,10 @@
 /**
  * Home page: digital clock with a "time left today" bar, a "tasks completed"
  * bar, race countdown, a progress bar for each plan, and today's tasks from
- * all three plans in one list.
+ * all four plans in one list.
  *
  * The task lists are built here from the same data files the plan pages use
- * (rust-data.js, marathon-data.js, health-data.js), and ticking a task saves
+ * (rust-data.js, marathon-data.js, health-data.js, cubing-data.js), and ticking a task saves
  * to the same localStorage keys, so the home page and the plan pages always
  * agree. A day is complete when every required task is ticked.
  */
@@ -131,6 +131,7 @@
     { id: "rust",     name: "Learn Rust", storageKey: "rust-plan-v1",     totalDays: TOTAL_DAYS, barId: "rust-bar",     labelId: "rust-label",     tasksFor: rustTasks },
     { id: "marathon", name: "Marathon",   storageKey: "marathon-plan-v1", totalDays: 59,         barId: "marathon-bar", labelId: "marathon-label", tasksFor: marathonTasks }, // Nov 9 - Jan 6
     { id: "health",   name: "Health",     storageKey: "health-plan-v1",   totalDays: TOTAL_DAYS, barId: "health-bar",   labelId: "health-label",   tasksFor: healthTasks },
+    { id: "cubing",   name: "Speedcubing", storageKey: "cubing-plan-v1",  totalDays: TOTAL_DAYS, barId: "cubing-bar",   labelId: "cubing-label",   tasksFor: (day) => CUBING.tasksFor(day) },
   ];
 
   // ---------------------------------------------------------------------

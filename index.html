@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>My plan to Jan 6</title>
   <link rel="stylesheet" href="styles.css">
+  <script src="settings.js"></script>
 </head>
 <body class="theme-home">
 
@@ -15,7 +16,7 @@
       <div class="home-left">
         <h1>Nov 8 to Jan 6</h1>
         <p class="home-lead">
-          Three plans, one finish line: your 7.5 km race on January 6.
+          Four plans, one finish line: January 6, the day of your 7.5 km race.
           Tick off today's tasks on the right, or open a plan to pick any date.
         </p>
         <div class="home-race" id="race-countdown"></div>
@@ -78,6 +79,14 @@
             <a class="card-button" href="health.html" aria-label="Open the health plan">Open plan</a>
           </div>
 
+          <div class="card card-cubing">
+            <h2>Speedcubing</h2>
+            <p>One hour a day, from a 26 s to a sub-20 average.</p>
+            <div class="progress"><i id="cubing-bar"></i></div>
+            <div class="progress-label" id="cubing-label">0 / 60 days</div>
+            <a class="card-button" href="cubing.html" aria-label="Open the speedcubing plan">Open plan</a>
+          </div>
+
         </div>
 
         <section class="home-tasks" aria-label="Today's tasks">
@@ -94,6 +103,7 @@
   <script src="rust-data.js"></script>
   <script src="marathon-data.js"></script>
   <script src="health-data.js"></script>
+  <script src="cubing-data.js"></script>
   <script src="home.js"></script>
 </body>
 </html>
