@@ -3,25 +3,164 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Daily checklist for six plans from Nov 8 to Jan 6: Rust, marathon, health, speedcubing, your own tasks and a diary."
+    />
+    <meta name="theme-color" content="#0b0b0c" />
     <title>My plan to Jan 6</title>
     <link rel="stylesheet" href="styles.css" />
     <script src="common.js"></script>
   </head>
   <body class="theme-home">
-    <div class="home-wrap">
-      <div class="home-grid">
-        <!-- ===== Left column: title, race countdown, clock and progress bars ===== -->
-        <div class="home-left">
-          <h1>Nov 8 to Jan 6</h1>
-          <p class="home-lead">
-            Four plans, your own tasks and a daily diary, one finish line:
-            January 6, the day of your 7.5 km race. Tick off today's tasks on
-            the right, or open a plan to pick any date.
-          </p>
-          <div class="home-race" id="race-countdown"></div>
-          <div class="home-today" id="today-label"></div>
+    <!-- Plan logos, drawn once and reused in the hero and on the plan tiles -->
+    <svg
+      width="0"
+      height="0"
+      style="position: absolute"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <defs>
+        <symbol id="g-rust" viewBox="0 0 64 64">
+          <circle cx="32" cy="32" r="12" />
+          <circle cx="32" cy="32" r="3.5" fill="currentColor" stroke="none" />
+          <path
+            d="M32 8v8M32 48v8M8 32h8M48 32h8M15 15l5.5 5.5M43.5 43.5L49 49M49 15l-5.5 5.5M20.5 43.5L15 49"
+          />
+        </symbol>
+        <symbol id="g-marathon" viewBox="0 0 64 64">
+          <path d="M18 54V10" />
+          <path d="M18 12h28l-6 9 6 9H18" fill="currentColor" />
+          <path d="M10 54h44" />
+        </symbol>
+        <symbol id="g-health" viewBox="0 0 64 64">
+          <path
+            d="M32 53C13 41 9 28 15 21c5-6 13-4 17 3 4-7 12-9 17-3 6 7 2 20-17 32z"
+            fill="currentColor"
+            stroke="none"
+          />
+          <path
+            d="M14 34h10l4-8 6 15 3-7h13"
+            style="stroke: var(--ic)"
+            stroke-width="3.5"
+          />
+        </symbol>
+        <symbol id="g-cubing" viewBox="0 0 64 64">
+          <path d="M32 8l20 11-20 11-20-11z" fill="currentColor" />
+          <path d="M12 19v23l20 11 20-11V19M32 30v23" />
+        </symbol>
+        <symbol id="g-tasks" viewBox="0 0 64 64">
+          <path d="M12 20l5 5 9-10M12 42l5 5 9-10M36 22h16M36 44h16" />
+        </symbol>
+        <symbol id="g-diary" viewBox="0 0 64 64">
+          <path
+            d="M12 14h15c3 0 5 2 5 5v32c0-3-2-5-5-5H12zM52 14H37c-3 0-5 2-5 5v32c0-3 2-5 5-5h15z"
+          />
+        </symbol>
+      </defs>
+    </svg>
 
-          <!-- Digital clock, "time left today" bar and "tasks completed" bar -->
+    <main class="home-wrap">
+      <!-- Hero: date range, race countdown, key numbers and the clock -->
+      <header class="hero" id="top">
+        <!-- Plan logos orbiting the clock. Each ring turns one way, and each logo turns back the other way so it stays upright. -->
+        <div class="float-icons">
+          <div
+            class="ring"
+            style="
+              --r: clamp(300px, 34vw, 520px);
+              --t: 90s;
+              --arc: #2a9d4a;
+              --arot: 20deg;
+            "
+          >
+            <span class="slot" style="--a: -60deg"
+              ><a
+                class="icon app-icon ic-rust"
+                href="rust.html"
+                data-name="Rust"
+                aria-label="Open the Rust plan"
+                ><svg><use href="#g-rust" /></svg></a
+            ></span>
+            <span class="slot" style="--a: 60deg"
+              ><a
+                class="icon app-icon ic-health"
+                href="health.html"
+                data-name="Health"
+                aria-label="Open the health plan"
+                ><svg><use href="#g-health" /></svg></a
+            ></span>
+            <span class="slot" style="--a: 180deg"
+              ><a
+                class="icon app-icon ic-tasks"
+                href="tasks.html"
+                data-name="My Tasks"
+                aria-label="Open my tasks"
+                ><svg><use href="#g-tasks" /></svg></a
+            ></span>
+          </div>
+          <div
+            class="ring"
+            style="
+              --r: clamp(400px, 45vw, 680px);
+              --t: 140s;
+              --dir: reverse;
+              --arc: #7a2fd0;
+              --arot: 200deg;
+            "
+          >
+            <span class="slot" style="--a: -120deg"
+              ><a
+                class="icon app-icon ic-diary"
+                href="diary.html"
+                data-name="Diary"
+                aria-label="Open the daily diary"
+                ><svg><use href="#g-diary" /></svg></a
+            ></span>
+            <span class="slot" style="--a: 0deg"
+              ><a
+                class="icon app-icon ic-cubing"
+                href="cubing.html"
+                data-name="Cubing"
+                aria-label="Open the speedcubing plan"
+                ><svg><use href="#g-cubing" /></svg></a
+            ></span>
+            <span class="slot" style="--a: 120deg"
+              ><a
+                class="icon app-icon ic-marathon"
+                href="marathon.html"
+                data-name="Marathon"
+                aria-label="Open the marathon plan"
+                ><svg><use href="#g-marathon" /></svg></a
+            ></span>
+          </div>
+          <div
+            class="ring"
+            style="
+              --r: clamp(500px, 57vw, 860px);
+              --t: 210s;
+              --arc: #2b4fd9;
+              --arot: 90deg;
+            "
+          >
+            <span class="slot" style="--a: 30deg"
+              ><span class="icon app-icon ghost ic-cubing" aria-hidden="true"
+                ><svg><use href="#g-cubing" /></svg></span
+            ></span>
+            <span class="slot" style="--a: 150deg"
+              ><span class="icon app-icon ghost ic-rust" aria-hidden="true"
+                ><svg><use href="#g-rust" /></svg></span
+            ></span>
+            <span class="slot" style="--a: 270deg"
+              ><span class="icon app-icon ghost ic-health" aria-hidden="true"
+                ><svg><use href="#g-health" /></svg></span
+            ></span>
+          </div>
+        </div>
+
+        <div class="hero-center">
+          <!-- Digital clock: takes the place of the big wordmark -->
           <section class="clock" aria-label="Clock">
             <div class="clock-top">
               <span id="clock-date"></span>
@@ -29,7 +168,6 @@
                 24h
               </button>
             </div>
-
             <div class="clock-time" role="timer" aria-live="off">
               <span id="clock-hours">00</span><span class="clock-colon">:</span
               ><span id="clock-minutes">00</span
@@ -37,7 +175,34 @@
               ><span class="clock-seconds" id="clock-seconds">00</span
               ><span class="clock-period" id="clock-period"></span>
             </div>
+          </section>
 
+          <h1><span>Nov 8</span> <span>to Jan 6.</span></h1>
+          <p class="home-lead">
+            Six plans, one finish line. Tick off what you did today and watch
+            the days fill in.
+          </p>
+
+          <div class="hero-meta">
+            <div class="home-race" id="race-countdown"></div>
+            <div class="home-today" id="today-label"></div>
+          </div>
+
+          <div class="hero-actions">
+            <a class="btn" href="#tasks">Today's tasks</a>
+            <a class="btn ghost" href="#plans">Browse plans</a>
+          </div>
+
+          <div class="facts">
+            <div><b id="ov-day">-</b><small>of the plan</small></div>
+            <div><b id="ov-percent">0%</b><small>of all plans done</small></div>
+            <div>
+              <b id="ov-today">0 / 4</b><small>plans finished today</small>
+            </div>
+          </div>
+
+          <!-- "Time left today" bar and "tasks completed" bar -->
+          <div class="hero-bars">
             <div class="clock-left">
               <span>Left today: <b id="clock-remaining">--</b></span>
               <span id="clock-percent"></span>
@@ -70,105 +235,306 @@
             <div class="bar-ends">
               <span>0</span><span id="tasks-total">0</span>
             </div>
-          </section>
+          </div>
         </div>
+      </header>
 
-        <!-- ===== Right column: one card per plan, then all of today's tasks ===== -->
-        <aside class="home-right">
-          <div class="cards">
-            <div class="card card-rust">
-              <h2>Learn Rust</h2>
-              <p>2 hours a day, ending with 4 finished projects.</p>
-              <div class="progress"><i id="rust-bar"></i></div>
-              <div class="progress-label" id="rust-label">0 / 60 days</div>
-              <a
-                class="card-button"
-                href="rust.html"
-                aria-label="Open the Rust plan"
-                >Open plan</a
-              >
-            </div>
+      <!-- The 60 days at a glance: brighter means more of that day's plans are done -->
+      <section class="block" id="days">
+        <div class="sec-head">
+          <p class="eyebrow"><b>01</b><i class="rule"></i>The days</p>
+          <h2>Sixty days. One line.</h2>
+          <p>
+            Each bar is a day. The brighter it is, the more of that day's plans
+            you finished.
+          </p>
+        </div>
+        <div
+          class="map"
+          id="day-map"
+          aria-label="Progress for each of the 60 days"
+        ></div>
+      </section>
 
-            <div class="card card-marathon">
-              <h2>Marathon</h2>
-              <p>Jog/walk plan from Nov 9 to your 7.5 km race.</p>
-              <div class="progress"><i id="marathon-bar"></i></div>
-              <div class="progress-label" id="marathon-label">0 / 59 days</div>
-              <a
-                class="card-button"
-                href="marathon.html"
-                aria-label="Open the marathon plan"
-                >Open plan</a
-              >
+      <!-- One tile per plan -->
+      <section class="block" id="plans">
+        <div class="sec-head">
+          <p class="eyebrow"><b>02</b><i class="rule"></i>The plans</p>
+          <h2>Pick a plan to open</h2>
+          <p>Six plans, each with its own daily checklist and progress.</p>
+        </div>
+        <div class="rail">
+          <div class="card card-rust">
+            <div class="card-top">
+              <span class="app-icon ic-rust"
+                ><svg><use href="#g-rust" /></svg></span
+              ><b>01</b><span>Language</span>
             </div>
-
-            <div class="card card-health">
-              <h2>Health</h2>
-              <p>Strength, water and food, with a daily log.</p>
-              <div class="progress"><i id="health-bar"></i></div>
-              <div class="progress-label" id="health-label">0 / 60 days</div>
-              <a
-                class="card-button"
-                href="health.html"
-                aria-label="Open the health plan"
-                >Open plan</a
-              >
-            </div>
-
-            <div class="card card-cubing">
-              <h2>Speedcubing</h2>
-              <p>One hour a day, from a 26 s to a sub-20 average.</p>
-              <div class="progress"><i id="cubing-bar"></i></div>
-              <div class="progress-label" id="cubing-label">0 / 60 days</div>
-              <a
-                class="card-button"
-                href="cubing.html"
-                aria-label="Open the speedcubing plan"
-                >Open plan</a
-              >
-            </div>
-
-            <div class="card card-tasks">
-              <h2>My Tasks</h2>
-              <p>Add your own tasks on any date.</p>
-              <div class="progress"><i id="mytasks-bar"></i></div>
-              <div class="progress-label" id="mytasks-label">No tasks yet</div>
-              <a
-                class="card-button"
-                href="tasks.html"
-                aria-label="Open my tasks"
-                >Open tasks</a
-              >
-            </div>
-
-            <div class="card card-diary">
-              <h2>Daily Diary</h2>
-              <p>Write about your day and note what to do better tomorrow.</p>
-              <div class="progress"><i id="diary-bar"></i></div>
-              <div class="progress-label" id="diary-label">No entries yet</div>
-              <a
-                class="card-button"
-                href="diary.html"
-                aria-label="Open the daily diary"
-                >Open diary</a
-              >
-            </div>
+            <h2>Learn Rust</h2>
+            <p>2 hours a day, ending with 4 finished projects.</p>
+            <div class="progress"><i id="rust-bar"></i></div>
+            <div class="progress-label" id="rust-label">0 / 60 days</div>
+            <a
+              class="card-button"
+              href="rust.html"
+              aria-label="Open the Rust plan"
+              >Open plan</a
+            >
           </div>
 
-          <!-- Today's tasks from every plan, your own tasks and the diary -->
-          <section class="home-tasks" aria-label="Today's tasks">
-            <h2>Today's tasks</h2>
-            <div class="panel-date" id="tasks-date"></div>
-            <div id="task-list"></div>
-          </section>
-        </aside>
-      </div>
+          <div class="card card-marathon">
+            <div class="card-top">
+              <span class="app-icon ic-marathon"
+                ><svg><use href="#g-marathon" /></svg></span
+              ><b>02</b><span>Running</span>
+            </div>
+            <h2>Marathon</h2>
+            <p>Jog/walk plan from Nov 9 to your 7.5 km race.</p>
+            <div class="progress"><i id="marathon-bar"></i></div>
+            <div class="progress-label" id="marathon-label">0 / 59 days</div>
+            <a
+              class="card-button"
+              href="marathon.html"
+              aria-label="Open the marathon plan"
+              >Open plan</a
+            >
+          </div>
+
+          <div class="card card-health">
+            <div class="card-top">
+              <span class="app-icon ic-health"
+                ><svg><use href="#g-health" /></svg></span
+              ><b>03</b><span>Body</span>
+            </div>
+            <h2>Health</h2>
+            <p>Strength, water and food, with a daily log.</p>
+            <div class="progress"><i id="health-bar"></i></div>
+            <div class="progress-label" id="health-label">0 / 60 days</div>
+            <a
+              class="card-button"
+              href="health.html"
+              aria-label="Open the health plan"
+              >Open plan</a
+            >
+          </div>
+
+          <div class="card card-cubing">
+            <div class="card-top">
+              <span class="app-icon ic-cubing"
+                ><svg><use href="#g-cubing" /></svg></span
+              ><b>04</b><span>Puzzle</span>
+            </div>
+            <h2>Speedcubing</h2>
+            <p>One hour a day, from a 26 s to a sub-20 average.</p>
+            <div class="progress"><i id="cubing-bar"></i></div>
+            <div class="progress-label" id="cubing-label">0 / 60 days</div>
+            <a
+              class="card-button"
+              href="cubing.html"
+              aria-label="Open the speedcubing plan"
+              >Open plan</a
+            >
+          </div>
+
+          <div class="card card-tasks">
+            <div class="card-top">
+              <span class="app-icon ic-tasks"
+                ><svg><use href="#g-tasks" /></svg></span
+              ><b>05</b><span>Personal</span>
+            </div>
+            <h2>My Tasks</h2>
+            <p>Add your own tasks on any date.</p>
+            <div class="progress"><i id="mytasks-bar"></i></div>
+            <div class="progress-label" id="mytasks-label">No tasks yet</div>
+            <a class="card-button" href="tasks.html" aria-label="Open my tasks"
+              >Open tasks</a
+            >
+          </div>
+
+          <div class="card card-diary">
+            <div class="card-top">
+              <span class="app-icon ic-diary"
+                ><svg><use href="#g-diary" /></svg></span
+              ><b>06</b><span>Journal</span>
+            </div>
+            <h2>Daily Diary</h2>
+            <p>Write about your day and note what to do better tomorrow.</p>
+            <div class="progress"><i id="diary-bar"></i></div>
+            <div class="progress-label" id="diary-label">No entries yet</div>
+            <a
+              class="card-button"
+              href="diary.html"
+              aria-label="Open the daily diary"
+              >Open diary</a
+            >
+          </div>
+        </div>
+      </section>
+
+      <!-- Today's tasks from every plan, your own tasks and the diary -->
+      <section class="block" id="tasks">
+        <div class="sec-head">
+          <p class="eyebrow"><b>03</b><i class="rule"></i>Today</p>
+          <h2>Today's tasks</h2>
+        </div>
+        <div class="home-tasks" aria-label="Today's tasks">
+          <div class="panel-date" id="tasks-date"></div>
+          <div id="task-list"></div>
+        </div>
+      </section>
+
+      <!-- Closing band -->
+      <section class="block cta">
+        <div>
+          <p class="eyebrow"><b>04</b><i class="rule"></i>Keep going</p>
+          <h2>Small days add up.</h2>
+        </div>
+        <a class="btn" href="#tasks">Back to today</a>
+      </section>
+
+      <footer class="home-foot">
+        <span>My plan to Jan 6</span>
+        <a
+          href="#top"
+          onclick="
+            window.scrollTo({ top: 0 });
+            return false;
+          "
+          >Back to top &uarr;</a
+        >
+      </footer>
+      <div class="wordmark" aria-hidden="true">PLAN</div>
+    </main>
+
+    <!-- Right-edge ruler and section index -->
+    <div class="ruler" id="ruler" aria-hidden="true">
+      <span class="ruler-num" style="top: 0%">0</span
+      ><span class="ruler-num" style="top: 20%">20</span
+      ><span class="ruler-num" style="top: 40%">40</span
+      ><span class="ruler-num" style="top: 60%">60</span
+      ><span class="ruler-num" style="top: 80%">80</span
+      ><span class="ruler-num" style="top: 100%">100</span
+      ><i class="ruler-mark"
+        ><b><span id="scroll-pct">000</span>%</b></i
+      >
     </div>
+    <nav class="side-index" aria-label="Sections">
+      <a href="#top">Clock</a>
+      <a href="#days">The days</a>
+      <a href="#plans">The plans</a>
+      <a href="#tasks">Today</a>
+    </nav>
 
     <!-- =====================================================================
        Scripts. common.js (loaded in the head) has the shared code,
        data.js has the plan data, and the script below runs this page.
        ===================================================================== -->
+    <script>
+      /* Task layout. Measures each plan's task list, chooses 1, 2 or 3 columns, puts the
+   biggest list in column 01 and stacks the smaller ones under each other so the
+   columns end up about the same height. Runs again whenever the list is redrawn
+   or the window changes between phone, tablet and desktop widths. */
+      (() => {
+        "use strict";
+        const list = document.getElementById("task-list");
+        if (!list) return;
+        let lastMax = 0;
+
+        const maxColsFor = (width) =>
+          width >= 1000 ? 3 : width >= 680 ? 2 : 1;
+
+        function layout() {
+          const groups = [...list.querySelectorAll(".task-group")];
+          if (!groups.length) {
+            list.classList.remove("is-masonry");
+            return;
+          }
+          const width = list.clientWidth;
+          if (width <= 0) return;
+          const inner = width - 1;
+          const active = document.activeElement;
+          const maxCols = Math.min(maxColsFor(width), groups.length);
+          lastMax = maxColsFor(width);
+
+          // Height of every list if the columns were this wide.
+          const measure = (cols) => {
+            const probe = document.createElement("div");
+            probe.className = "tcol probe";
+            probe.style.width = inner / cols + "px";
+            list.appendChild(probe);
+            groups.forEach((g) => probe.appendChild(g));
+            const heights = groups.map((g) => g.offsetHeight);
+            probe.remove();
+            return heights;
+          };
+
+          // Biggest first, each into the shortest column so far.
+          const pack = (cols, heights) => {
+            const order = groups
+              .map((_, i) => i)
+              .sort((a, b) => heights[b] - heights[a]);
+            const columns = Array.from({ length: cols }, () => ({
+              items: [],
+              h: 0,
+            }));
+            order.forEach((i) => {
+              const col = columns.reduce((best, c) =>
+                c.h < best.h ? c : best,
+              );
+              col.items.push(i);
+              col.h += heights[i];
+            });
+            return {
+              cols,
+              order,
+              columns,
+              total: Math.max(...columns.map((c) => c.h)),
+            };
+          };
+
+          const plans = [];
+          for (let cols = 1; cols <= maxCols; cols++)
+            plans.push(pack(cols, measure(cols)));
+
+          // Fewest columns that are still within 8% of the shortest possible layout.
+          const shortest = Math.min(...plans.map((p) => p.total));
+          const plan = plans.find((p) => p.total <= shortest * 1.08);
+
+          const columnEls = plan.columns.map((col) => {
+            const el = document.createElement("div");
+            el.className = "tcol";
+            col.items.forEach((i) => el.appendChild(groups[i]));
+            return el;
+          });
+          plan.order.forEach((i, rank) => {
+            const title = groups[i].querySelector("h3");
+            if (title) title.dataset.n = String(rank + 1).padStart(2, "0");
+          });
+          list.style.setProperty("--cols", plan.cols);
+          list.classList.add("is-masonry");
+          list.replaceChildren(...columnEls);
+          if (active && active !== document.body && document.contains(active))
+            active.focus({ preventScroll: true });
+        }
+
+        window.layoutTasks = layout;
+
+        if ("ResizeObserver" in window) {
+          let frame = 0;
+          new ResizeObserver(() => {
+            if (frame) return;
+            frame = requestAnimationFrame(() => {
+              frame = 0;
+              if (
+                list.querySelector(".task-group") &&
+                maxColsFor(list.clientWidth) !== lastMax
+              )
+                layout();
+            });
+          }).observe(list);
+        }
+      })();
+    </script>
     <script src="data.js"></script>
     <script>
       /**
@@ -485,9 +851,9 @@
           saveState(plan.storageKey, state);
         }
 
-        // ----------------------------------------------------------------------
+        // ---------------------------------------------------------------------
         // Daily Diary: progress on its card, and yesterday's "do better" items
-        // ----------------------------------------------------------------------
+        // ---------------------------------------------------------------------
 
         const hasDiaryEntry = (entry) =>
           !!entry &&
@@ -698,6 +1064,46 @@
           return { html, total: better.length, done };
         }
 
+        /** Hero numbers and the 60-day map (how many plans are done on each day). */
+        function renderExtras() {
+          const states = PLANS.map((plan) => ({
+            plan,
+            state: loadState(plan.storageKey),
+          }));
+          const today = clampDay(todayNumber());
+          let cells = "";
+          let plansToday = 0;
+          let plansTodayTotal = 0;
+
+          for (let day = 1; day <= TOTAL_DAYS; day++) {
+            let have = 0;
+            let ok = 0;
+            states.forEach(({ plan, state }) => {
+              if (!plan.tasksFor(day)) return;
+              have++;
+              if (isDayComplete(plan, state, day)) ok++;
+            });
+            if (day === today) {
+              plansToday = ok;
+              plansTodayTotal = have;
+            }
+            cells += `<i class="${day === today ? "now" : ""}" style="--f:${have ? ok / have : 0}" title="${formatDate(day)}: ${ok} of ${have} plans done"></i>`;
+          }
+          $("day-map").innerHTML = cells;
+
+          const overall =
+            PLANS.reduce(
+              (sum, plan) =>
+                sum +
+                (loadState(plan.storageKey).completedCount || 0) /
+                  plan.totalDays,
+              0,
+            ) / PLANS.length;
+          $("ov-day").textContent = `Day ${today}`;
+          $("ov-percent").textContent = `${Math.round(overall * 100)}%`;
+          $("ov-today").textContent = `${plansToday} / ${plansTodayTotal}`;
+        }
+
         /** Draws today's tasks from every source and updates the "tasks completed" bar. */
         function renderTasks() {
           const day = shownDay;
@@ -726,12 +1132,15 @@
               input.oninput = () => saveField(input);
             });
 
+          if (window.layoutTasks) window.layoutTasks();
+
           const percent = total ? (done / total) * 100 : 0;
           $("tasks-count").textContent = `${done} / ${total}`;
           $("tasks-percent").textContent = `${percent.toFixed(0)}% done`;
           $("tasks-total").textContent = total;
           $("tasks-bar-fill").style.width = `${percent}%`;
           $("tasks-bar").setAttribute("aria-valuenow", Math.round(percent));
+          renderExtras();
           return { done, total };
         }
 
@@ -876,6 +1285,80 @@
 
         renderAll();
         tickClock();
+      })();
+    </script>
+
+    <script>
+      /* Scroll helpers: the ruler readout and marker, the section index, and (only in
+   browsers without scroll-driven CSS animations) the hero fade. Updates run at
+   most once per frame, and the numbers are set on the small elements that use
+   them, not on the whole page. */
+      (() => {
+        "use strict";
+        const ruler = document.getElementById("ruler");
+        const hero = document.getElementById("top");
+        const readout = document.getElementById("scroll-pct");
+        const root = document.documentElement;
+        const hasTimeline = !!(
+          window.CSS &&
+          CSS.supports &&
+          CSS.supports("animation-timeline", "scroll()")
+        );
+        let queued = false;
+        let lastPercent = -1;
+
+        const update = () => {
+          queued = false;
+          const y = window.scrollY;
+          const max = root.scrollHeight - window.innerHeight;
+          const progress = max > 0 ? Math.min(1, Math.max(0, y / max)) : 0;
+          if (ruler) ruler.style.setProperty("--sp", progress.toFixed(4));
+          if (!hasTimeline && hero)
+            hero.style.setProperty(
+              "--hp",
+              Math.min(1, y / Math.max(1, window.innerHeight * 0.7)).toFixed(3),
+            );
+          const percent = Math.round(progress * 100);
+          if (readout && percent !== lastPercent) {
+            lastPercent = percent;
+            readout.textContent = String(percent).padStart(3, "0");
+          }
+        };
+        window.addEventListener(
+          "scroll",
+          () => {
+            if (!queued) {
+              queued = true;
+              requestAnimationFrame(update);
+            }
+          },
+          { passive: true },
+        );
+        window.addEventListener("resize", update);
+        update();
+
+        // Enlarge the section you are in, in the index.
+        const links = [...document.querySelectorAll(".side-index a")];
+        if ("IntersectionObserver" in window && links.length) {
+          const io = new IntersectionObserver(
+            (entries) => {
+              entries.forEach((entry) => {
+                if (entry.isIntersecting)
+                  links.forEach((a) =>
+                    a.classList.toggle(
+                      "on",
+                      a.getAttribute("href") === "#" + entry.target.id,
+                    ),
+                  );
+              });
+            },
+            { rootMargin: "-40% 0px -50% 0px" },
+          );
+          links.forEach((a) => {
+            const target = document.querySelector(a.getAttribute("href"));
+            if (target) io.observe(target);
+          });
+        }
       })();
     </script>
   </body>

@@ -15,6 +15,7 @@
      11. Small screens
      12. Top bar and settings panel
      13. My Tasks page
+     14. Home page: craft-shop layout
    ========================================================================== */
 
 
@@ -930,3 +931,298 @@ html[data-accent] body { --acc: var(--user-acc); }
   border-color: var(--acc);
   color: #fff;
 }
+
+
+/* 14. HOME PAGE: ORBIT HERO ------------------------------------------------- */
+/* Deep indigo-black canvas with an amber accent. The clock sits at the centre;
+   the six plan logos travel around it on orbit rings. The hero fades and blurs
+   as you scroll, and sections blur in as they arrive. Light mode is available
+   from Settings. */
+
+html body.theme-home.theme-home.theme-home {
+  --bg: #0E0C15;  --surface: #16131F;  --ink: #F4F1FA;  --muted: #9A94AD;  --line: #292338;
+  --rust: #FF7A59;  --teal: #3FD0C9;  --health: #C79BE0;  --cube: #F0B429;  --mine: #4DD4A8;  --diary: #F27A9C;
+  --acc: #FFA65C;  --acc2: #9AA6FF;  --ok: #5CC08F;  --on-ok: #08140E;
+  --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --font: var(--sans);
+  --gut: clamp(16px, 3vw, 56px);
+  overflow-x: hidden;
+}
+html[data-theme="light"] body.theme-home.theme-home.theme-home {
+  --bg: #F6F3EE;  --surface: #FFFFFF;  --ink: #17131F;  --muted: #6B657A;  --line: #E0DAD0;
+  --rust: #C9441F;  --teal: #0E7C7B;  --health: #7B3FA0;  --cube: #A86400;  --mine: #1F8A70;  --diary: #B23A5B;
+  --acc: #D9561E;  --acc2: #3B4BB8;  --ok: #2E7D5B;  --on-ok: #FFFFFF;
+}
+
+.theme-home .home-wrap { max-width: none; margin: 0; padding: 0; }
+
+/* Top bar (added by common.js) */
+.theme-home .topbar { background: color-mix(in srgb, var(--bg) 70%, transparent); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); font-family: var(--mono); text-transform: uppercase; letter-spacing: 0.14em; font-size: 0.75rem; }
+.theme-home .topbar-name { font-size: 0.8rem; font-weight: 600; }
+.theme-home .topbar button { border-radius: 10px; font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; background: transparent; }
+
+/* Section labels: "01 —— The days" */
+.eyebrow { display: flex; align-items: center; gap: 12px; margin: 0 0 14px; font-family: var(--mono); font-size: 0.76rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+.eyebrow b { color: var(--acc); font-weight: 600; }
+.eyebrow .rule { width: 44px; height: 1px; background: linear-gradient(90deg, var(--acc), transparent); }
+.sec-head { max-width: 62ch; margin-bottom: clamp(24px, 4vw, 44px); }
+.sec-head h2, .cta h2 { margin: 0 0 12px; font-size: clamp(1.8rem, 4vw, 3rem); font-weight: 600; line-height: 1.02; letter-spacing: -0.035em; }
+.sec-head p:not(.eyebrow) { margin: 0; color: var(--muted); }
+
+.theme-home .block,
+.theme-home .home-foot,
+.theme-home .wordmark { width: min(1320px, calc(100% - 2 * var(--gut))); margin-inline: auto; }
+.theme-home .block { margin-top: clamp(56px, 8vw, 110px); padding: 0; content-visibility: auto; contain-intrinsic-size: auto 600px; }
+
+/* HERO */
+.hero {
+  position: relative; isolation: isolate; overflow: clip;
+  display: flex; align-items: center; justify-content: center;
+  min-height: calc(100svh - 52px);
+  padding: clamp(40px, 7vh, 88px) var(--gut);
+  background:
+    radial-gradient(38% 34% at 50% 46%, color-mix(in srgb, var(--acc) 11%, transparent), transparent 72%),
+    radial-gradient(70% 60% at 50% 50%, color-mix(in srgb, var(--acc2) 9%, transparent), transparent 75%);
+}
+.hero-center { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; width: min(100%, 680px); text-align: center; }
+
+/* Orbit rings. A ring turns one way; each logo turns back so it stays upright. */
+.float-icons { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+.ring {
+  position: absolute; left: 50%; top: 50%;
+  width: calc(var(--r) * 2); height: calc(var(--r) * 2);
+  translate: -50% -50%;
+  border: 1px solid color-mix(in srgb, var(--ink) 12%, transparent); border-radius: 50%;
+  animation: ring-spin var(--t, 120s) linear var(--dir, normal) infinite;
+}
+.ring::after { content: ""; position: absolute; inset: -2px; border: 2px solid transparent; border-top-color: var(--arc); border-radius: 50%; rotate: var(--arot, 0deg); opacity: 0.85; }
+.slot { position: absolute; left: 50%; top: 50%; width: 0; height: 0; transform: rotate(var(--a)) translateY(calc(var(--r) * -1)); }
+@keyframes ring-spin { to { rotate: 360deg; } }
+@keyframes icon-back { from { rotate: calc(var(--a) * -1); } to { rotate: calc(var(--a) * -1 - 360deg); } }
+
+/* Logos: round "planets" in the hero, rounded squares on the plan tiles */
+.app-icon {
+  --ic-bg: var(--ic);
+  display: grid; place-items: center; flex: none;
+  width: var(--sz, 48px); height: var(--sz, 48px);
+  border-radius: 28%; color: #fff; text-decoration: none;
+  background: linear-gradient(150deg, color-mix(in srgb, var(--ic) 72%, #fff), var(--ic));
+  box-shadow: 0 0 34px color-mix(in srgb, var(--ic) 40%, transparent), inset 0 0 0 1px rgb(255 255 255 / 0.2);
+}
+.app-icon svg { width: 58%; height: 58%; fill: none; stroke: currentColor; stroke-width: 4.5; stroke-linecap: round; stroke-linejoin: round; }
+.ic-rust { --ic: #D9531E; } .ic-marathon { --ic: #0FA3A0; } .ic-health { --ic: #8A45B5; }
+.ic-cubing { --ic: #D48A00; } .ic-tasks { --ic: #1FA882; } .ic-diary { --ic: #D6436B; }
+
+.icon {
+  --sz: calc(clamp(46px, min(5vw, 8.5vh), 82px) * var(--k, 1));
+  position: absolute; left: calc(var(--sz) / -2); top: calc(var(--sz) / -2);
+  border-radius: 50%; pointer-events: auto;
+  animation: icon-back var(--t, 120s) linear var(--dir, normal) infinite;
+  transition: box-shadow 0.2s, scale 0.2s;
+}
+.ring:nth-child(1) .icon { --t: 90s; }
+.ring:nth-child(2) .icon { --t: 140s; --dir: reverse; }
+.ring:nth-child(3) .icon { --t: 210s; }
+.icon::after {
+  content: attr(data-name); position: absolute; top: calc(100% + 8px); left: 50%; translate: -50% 0;
+  padding: 3px 9px; border: 1px solid var(--line); border-radius: 99px; background: var(--surface); color: var(--ink);
+  font-family: var(--mono); font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; white-space: nowrap;
+  opacity: 0; transition: opacity 0.2s; pointer-events: none;
+}
+.icon:hover { scale: 1.12; box-shadow: 0 0 52px color-mix(in srgb, var(--ic) 65%, transparent), inset 0 0 0 1px rgb(255 255 255 / 0.3); }
+.icon:hover::after, .icon:focus-visible::after { opacity: 1; }
+.icon:focus-visible { outline: 3px solid var(--ink); outline-offset: 4px; }
+.icon.ghost { opacity: 0.35; pointer-events: none; }
+.icon.ghost::after { display: none; }
+/* Hold still while you aim at a logo */
+.float-icons:has(.icon:hover) .ring, .float-icons:has(.icon:hover) .icon { animation-play-state: paused; }
+
+/* Clock: the big centre piece */
+.theme-home .clock { --clock-text: var(--ink); --clock-accent: var(--acc); --clock-track: color-mix(in srgb, var(--ink) 14%, transparent); width: 100%; margin: 0; padding: 0; background: none; border: 0; box-shadow: none; color: inherit; }
+.theme-home .clock-top { justify-content: center; gap: 14px; font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); opacity: 1; }
+.theme-home .clock-toggle { border-radius: 99px; border-color: var(--line); font-family: var(--mono); letter-spacing: 0.14em; text-transform: uppercase; }
+.theme-home .clock-time {
+  margin: 10px 0 20px; font-family: var(--sans); font-size: clamp(3rem, min(12vw, 17vh), 7.6rem); font-weight: 800; letter-spacing: -0.03em; line-height: 1; text-shadow: none;
+  background: linear-gradient(180deg, var(--ink) 30%, color-mix(in srgb, var(--acc2) 55%, var(--ink)));
+  -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent;
+}
+.theme-home .clock-seconds { color: var(--acc); -webkit-text-fill-color: var(--acc); }
+.theme-home .clock-period { -webkit-text-fill-color: var(--muted); }
+
+.hero h1 { margin: 0 0 12px; font-size: clamp(1.7rem, min(4.4vw, 5.6vh), 2.8rem); font-weight: 600; line-height: 1.1; letter-spacing: -0.03em; }
+.hero h1 span { display: inline; }
+.hero h1 span + span { color: var(--acc); font-family: var(--serif); font-style: italic; font-weight: 400; letter-spacing: -0.01em; }
+.hero .home-lead { max-width: 44ch; margin: 0 auto 18px; font-size: 1rem; }
+
+.hero-meta { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px 14px; margin-bottom: 24px; }
+.theme-home .home-race { margin: 0; padding: 7px 16px; border: 1px solid color-mix(in srgb, var(--acc) 45%, var(--line)); border-radius: 99px; background: color-mix(in srgb, var(--acc) 10%, transparent); color: var(--ink); font-family: var(--mono); font-size: 0.74rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; }
+.theme-home .home-race::before { content: ""; display: inline-block; width: 8px; height: 8px; margin-right: 8px; border-radius: 50%; background: var(--acc); vertical-align: middle; }
+.theme-home .home-today { margin: 0; font-size: 0.85rem; }
+
+/* Buttons */
+.btn, .card-button {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 12px 22px; border: 1px solid transparent; border-radius: 12px;
+  background: linear-gradient(135deg, var(--acc), color-mix(in srgb, var(--acc) 55%, #FF5F8F)); color: #1B1008;
+  font-family: var(--sans); font-size: 0.9rem; font-weight: 700; text-decoration: none; cursor: pointer;
+  transition: filter 0.2s, border-color 0.2s, background-color 0.2s;
+}
+.btn:hover { filter: brightness(1.1); }
+.btn.ghost { background: transparent; color: var(--ink); border-color: var(--line); }
+.btn.ghost:hover { border-color: var(--ink); filter: none; }
+.btn:focus-visible, .card-button:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+.hero-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 26px; }
+
+.facts { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 22px; max-width: none; border: 0; font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+.facts div, .facts div + div { padding: 0; border: 0; }
+.facts b { display: inline; font-size: inherit; font-weight: 600; letter-spacing: inherit; color: var(--ink); }
+.facts small { font-size: inherit; color: inherit; }
+.facts b::after { content: " "; }
+
+.hero-bars { --clock-accent: var(--acc); --clock-track: color-mix(in srgb, var(--ink) 14%, transparent); width: min(100%, 480px); margin-top: 22px; font-size: 0.82rem; }
+.theme-home .hero-bars .clock-left { letter-spacing: 0.02em; }
+.theme-home .day-bar { height: 8px; border-radius: 99px; }
+.theme-home .day-bar i { background: var(--acc2); border-radius: 99px; }
+.theme-home .day-bar.tasks-bar i { background: var(--ok); }
+
+/* Left edge: a ruler with numbers and a live scroll marker, plus a section index */
+.ruler { position: fixed; left: 0; top: 64px; bottom: 12px; z-index: 30; display: none; width: 26px; pointer-events: none;
+  background:
+    linear-gradient(color-mix(in srgb, var(--ink) 50%, transparent), color-mix(in srgb, var(--ink) 50%, transparent)) left bottom / 16px 1px no-repeat,
+    repeating-linear-gradient(to bottom, color-mix(in srgb, var(--ink) 50%, transparent) 0 1px, transparent 1px 20%) left / 16px 100% no-repeat,
+    repeating-linear-gradient(to bottom, color-mix(in srgb, var(--ink) 22%, transparent) 0 1px, transparent 1px 5%) left / 8px 100% no-repeat; }
+.ruler-num { position: absolute; left: 24px; display: none; transform: translateY(-50%); font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.08em; color: var(--muted); }
+.ruler-mark { position: absolute; left: 0; top: 0; width: 34px; height: 2px; background: var(--acc2); transform: translateY(calc(var(--sp, 0) * (100svh - 78px))); }
+.ruler-mark b { position: absolute; left: 44px; top: -8px; display: none; font-family: var(--mono); font-size: 0.66rem; font-weight: 600; letter-spacing: 0.08em; color: var(--acc2); white-space: nowrap; }
+.side-index { position: fixed; left: 92px; bottom: 32px; z-index: 30; display: none; flex-direction: column; align-items: flex-start; gap: 2px; font-family: var(--mono); letter-spacing: 0.14em; text-transform: uppercase; }
+.side-index a { font-size: 0.8rem; line-height: 1.5; color: var(--muted); text-decoration: none; transition: font-size 0.25s, color 0.25s; }
+.side-index a:hover { color: var(--ink); }
+.side-index a.on { font-size: clamp(1.6rem, 2.2vw, 2.3rem); font-weight: 700; letter-spacing: 0.02em; color: var(--ink); }
+@media (min-width: 900px) { .ruler { display: block; } }
+@media (min-width: 1360px) { .ruler { width: 64px; } .ruler-num, .ruler-mark b { display: block; } }
+@media (min-width: 1760px) { .side-index { display: flex; } }
+
+/* The 60 days */
+.map { display: grid; grid-template-columns: repeat(15, minmax(0, 1fr)); gap: 6px; }
+@media (min-width: 800px) { .map { grid-template-columns: repeat(30, minmax(0, 1fr)); } }
+.map i { height: 26px; border-radius: 6px; background: color-mix(in srgb, var(--acc) calc(var(--f) * 100%), color-mix(in srgb, var(--ink) 9%, transparent)); }
+.map i.now { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+/* Plan tiles */
+.rail { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 14px; }
+.rail .card { gap: 10px; padding: 20px; background: var(--surface); border: 1px solid var(--line); border-top: 1px solid var(--line); border-radius: 20px; transition: transform 0.2s ease, border-color 0.2s ease; }
+.rail .card:hover { transform: translateY(-4px); border-color: var(--card-color); }
+.card-top { display: flex; align-items: center; gap: 12px; font-family: var(--mono); font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.card-top .app-icon { --sz: 42px; box-shadow: none; }
+.card-top b { color: var(--card-color); font-weight: 600; }
+.card-top span:not(.app-icon) { margin-left: auto; padding: 3px 10px; border: 1px solid var(--line); border-radius: 99px; }
+.rail .card h2 { margin: 12px 0 0; font-size: 1.6rem; font-weight: 600; letter-spacing: -0.03em; }
+.rail .card p { min-height: 3.2em; }
+.rail .progress { height: 6px; background: color-mix(in srgb, var(--ink) 12%, transparent); border-radius: 99px; }
+.rail .progress i { border-radius: 99px; }
+.rail .progress-label { color: var(--ink); font-size: 0.85rem; }
+.rail .card-button { width: 100%; margin-top: 8px; background: transparent; border-color: var(--line); color: var(--ink); }
+.rail .card-button:hover { background: var(--card-color); border-color: var(--card-color); color: #120C06; filter: none; }
+
+/* Today's tasks */
+.theme-home .home-tasks { margin: 0; padding: clamp(18px, 3vw, 40px); background: var(--surface); border: 1px solid var(--line); border-radius: 24px; }
+.theme-home .check-item input[type="checkbox"] { border-radius: 8px; }
+
+/* Closing band, footer, giant wordmark */
+.cta { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 24px; padding: clamp(32px, 5vw, 56px) 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.cta h2 { margin: 0; }
+.home-foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; padding: 28px 0 0; color: var(--muted); font-family: var(--mono); font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; }
+.home-foot a { color: inherit; }
+.home-foot a:hover { color: var(--ink); }
+.wordmark { height: 0.62em; margin-top: 24px; overflow: hidden; font-family: var(--serif); font-style: italic; font-size: clamp(7rem, 30vw, 26rem); font-weight: 700; letter-spacing: -0.04em; line-height: 0.8; text-align: center; color: color-mix(in srgb, var(--ink) 8%, transparent); user-select: none; pointer-events: none; }
+
+/* SCROLL EFFECTS ------------------------------------------------------------
+   Modern browsers run these as scroll-driven animations off the main thread, so
+   the blur costs no JavaScript. Only the centre block is blurred (a small
+   area); the big orbit layer just fades. */
+@keyframes hero-out { to { opacity: 0; filter: blur(16px); transform: translateY(-5svh) scale(0.97); } }
+@keyframes hero-fade { to { opacity: 0; transform: translateY(-8svh); } }
+@keyframes reveal-in { from { opacity: 0; filter: blur(12px); transform: translateY(24px); } }
+
+@supports (animation-timeline: scroll()) {
+  .hero-center { animation: hero-out linear both; animation-timeline: scroll(root); animation-range: 0 70svh; }
+  .float-icons { animation: hero-fade linear both; animation-timeline: scroll(root); animation-range: 0 80svh; }
+}
+@supports (animation-timeline: view()) {
+  .sec-head, .rail .card, .cta { animation: reveal-in linear backwards; animation-timeline: view(); animation-range: entry 0% entry 45%; }
+}
+/* Older browsers: a tiny script sets --hp (hero progress) on the hero. */
+@supports not (animation-timeline: scroll()) {
+  .hero-center { opacity: calc(1 - var(--hp, 0)); filter: blur(calc(var(--hp, 0) * 14px)); }
+  .float-icons { opacity: calc(1 - var(--hp, 0)); }
+}
+
+/* Phones: no rings; the logos sit in a row above the clock */
+@media (max-width: 759px) {
+  .hero { flex-direction: column; justify-content: center; gap: 22px; }
+  .float-icons { position: relative; inset: auto; z-index: 2; display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; pointer-events: auto; animation: none; }
+  .ring { display: contents; animation: none; }
+  .ring::after { display: none; }
+  .slot { position: static; width: auto; height: auto; transform: none; }
+  .icon { position: static; --sz: 52px; animation: none; rotate: none; }
+  .icon.ghost { display: none; }
+  .theme-home .clock-time { font-size: clamp(2.8rem, 15vw, 5rem); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ring, .icon { animation: none; }
+  .icon { rotate: calc(var(--a) * -1); }
+  .hero-center, .float-icons, .sec-head, .rail .card, .cta { animation: none !important; opacity: 1 !important; filter: none !important; transform: none !important; }
+  .rail .card, .btn, .card-button, .icon { transition: none; }
+  .rail .card:hover { transform: none; }
+}
+
+/* 15. TODAY'S TASKS: LINEUP-STYLE GRID -------------------------------------- */
+/* Each plan's tasks sit in their own bordered cell, 3 across on wide screens,
+   2 on medium and 1 on phones. Cells grow to fit their text, so no sentence is
+   ever cut, clipped or shortened with "...". */
+
+.theme-home .home-tasks { padding: 0; background: none; border: 0; border-radius: 0; }
+.theme-home .home-tasks .panel-date { margin: 0 0 14px; font-family: var(--mono); font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+
+#task-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+  align-items: stretch;
+  counter-reset: grp;
+  background: var(--surface);
+  border-top: 1px solid var(--line);
+  border-left: 1px solid var(--line);
+}
+#task-list .task-group {
+  counter-increment: grp;
+  min-width: 0; margin: 0; padding: 18px 20px 22px;
+  border-left: 0; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line);
+  transition: box-shadow 0.2s;
+}
+#task-list .task-group:hover { box-shadow: inset 0 2px 0 var(--g, var(--acc)); }
+
+#task-list .task-group h3 { display: flex; align-items: center; gap: 10px; margin: 0 0 8px; font-size: 1.2rem; font-weight: 700; line-height: 1.25; letter-spacing: -0.01em; }
+#task-list .task-group h3::before {
+  content: counter(grp, decimal-leading-zero); flex: none;
+  padding: 3px 9px; background: var(--g, var(--acc)); color: var(--bg);
+  font-family: var(--mono); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em;
+}
+#task-list .task-group h3 span { min-width: 0; margin-left: auto; padding-left: 8px; text-align: right; font-family: var(--mono); font-size: 0.68rem; font-weight: 400; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+
+/* Full sentences: text wraps onto more lines, never truncated */
+#task-list .check-item label { overflow-wrap: break-word; }
+#task-list .check-item b { font-weight: 600; }
+#task-list .muted-line { grid-column: 1 / -1; margin: 0; padding: 24px 20px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+
+/* Smart columns: index.html measures each plan's list, picks 1 to 3 columns, puts
+   the biggest list in 01 and stacks smaller ones under each other. The last cell
+   in each column stretches so the columns finish level, with no gaps. */
+#task-list { position: relative; }
+#task-list.is-masonry { grid-template-columns: repeat(var(--cols, 1), minmax(0, 1fr)); }
+.tcol { display: flex; flex-direction: column; min-width: 0; }
+.tcol > .task-group:last-child { flex: 1 1 auto; }
+.tcol.probe { position: absolute; left: 0; top: 0; visibility: hidden; pointer-events: none; }
+#task-list.is-masonry .task-group h3::before { content: attr(data-n); }
