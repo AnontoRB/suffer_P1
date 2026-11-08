@@ -9,6 +9,7 @@
 </head>
 <body class="theme-diary">
 
+  <!-- Page header -->
   <header class="site-header">
     <div class="wrap wide">
       <a class="home-link" href="index.html">&larr; Home</a>
@@ -23,6 +24,7 @@
 
   <main class="wrap wide">
 
+    <!-- Progress numbers, calendar and the selected day -->
     <section>
       <div class="stats">
         <div class="stat"><b id="stat-streak">0</b><span>day streak &#128293;</span></div>
@@ -33,6 +35,7 @@
       <p class="sub" id="next-up" style="margin-top:12px"></p>
     </section>
 
+    <!-- Calendar and entry list on the left, the diary page on the right -->
     <section class="diary-grid">
 
       <aside class="diary-side">
@@ -55,10 +58,15 @@
 
   </main>
 
+  <!-- Footer -->
   <footer>
     <div class="wrap wide">Saved in this browser only. Use Settings to export a backup.</div>
   </footer>
 
+  <!-- =====================================================================
+       Script. common.js (loaded in the head) has the shared code,
+       and the script below runs this page.
+       ===================================================================== -->
 <script>
 /**
  * Daily Diary page. Needs: common.js (App).
@@ -75,7 +83,7 @@
   "use strict";
 
   const {
-    $, TOTAL_DAYS,
+    $, TOTAL_DAYS, esc,
     loadState, saveState, todayNumber, clampDay, formatDate, shortDate, dayDate,
     renderCalendar, renderDayNav,
   } = App;
@@ -104,7 +112,6 @@
   let saveTimer = 0;
   let dirty = false;
 
-  const esc = (text) => String(text == null ? "" : text).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
   const newId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
   const wordsIn = (text) => (text && text.trim() ? text.trim().split(/\s+/).length : 0);
 
@@ -430,5 +437,6 @@
   renderPage();
 })();
 </script>
+
 </body>
 </html>

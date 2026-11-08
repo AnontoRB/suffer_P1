@@ -271,6 +271,29 @@ const RUST_DAYS = [
 ];
 
 
+/**
+ * Checklist for one plan day: { heading, items: [{ id, label, detail, optional? }] }.
+ * Returns null outside the 60 days. Used by the Rust page and the home page.
+ */
+function rustTasksFor(day) {
+  const lesson = RUST_DAYS[day - 1];
+  if (!lesson) return null;
+
+  const [learnMin, practiceMin, buildMin] = lesson.minutes || [45, 45, 30];
+  const label = (name, minutes, optional) =>
+    `${name}${minutes ? ` (${minutes} min)` : ""}${optional ? " (optional)" : ""}`;
+
+  return {
+    heading: lesson.title,
+    items: [
+      { id: "learn",    label: label("1. Learn", learnMin),                                   detail: lesson.learn },
+      { id: "practice", label: label("2. Practice", practiceMin, lesson.practiceOptional),    detail: lesson.practice, optional: !!lesson.practiceOptional },
+      { id: "build",    label: label("3. Build/Review", buildMin),                            detail: lesson.build },
+    ],
+  };
+}
+
+
 // ======================================================================
 // MARATHON DATA
 // ======================================================================
@@ -372,6 +395,47 @@ const MARATHON = {
       note: "Drink plenty of water, eat a carb-rich dinner, sleep early, and lay out your gear." },                                               // Jan 5
     { kind: "race", text: "RACE DAY: 7.5 km" },                                                                                                  // Jan 6
   ],
+};
+
+
+/**
+ * Checklist for one plan day: { heading, items: [{ id, label, detail, optional? }] }.
+ * Returns null on days with no session (Nov 8). Used by the Marathon page and the home page.
+ */
+MARATHON.tasksFor = (day) => {
+  const entry = MARATHON.SCHEDULE[day - MARATHON.FIRST_PLAN_DAY];
+  if (!entry) return null;
+  const { WARM_UP, COOL_DOWN, JOG_PACE, STRENGTH_MOVES } = MARATHON;
+
+  if (entry.kind === "race") {
+    return { heading: "Race day", items: [{ id: "race", label: entry.text, detail: "" }] };
+  }
+
+  if (entry.kind === "run") {
+    return {
+      heading: "Run day",
+      items: [
+        { id: "warmup",   label: "Warm-up",            detail: WARM_UP },
+        { id: "run",      label: `RUN: ${entry.text}`, detail: `Jog pace: ${JOG_PACE}` },
+        { id: "cooldown", label: "Cool-down",          detail: COOL_DOWN },
+      ],
+    };
+  }
+
+  // Rest day: one required tick, plus any optional extras.
+  const items = [{ id: "rest", label: entry.label || "Rest day", detail: entry.note || "" }];
+  (entry.optional || []).forEach((text, index) => {
+    items.push({ id: `optional-${index}`, label: `${text} (optional)`, detail: "", optional: true });
+  });
+  if (entry.strengthRounds) {
+    items.push({
+      id: "strength",
+      label: "Light strength (optional)",
+      detail: `${STRENGTH_MOVES}, ${entry.strengthRounds} rounds`,
+      optional: true,
+    });
+  }
+  return { heading: "Rest day", items };
 };
 
 
@@ -487,6 +551,102 @@ const HEALTH = {
     ["Dinner", "Roti or rice, a protein, vegetables"],
   ],
 };
+
+
+(() => {
+  const FIRST_DAY = 1;
+  const RACE_DAY = 60;
+  const WATER_STEP_UP_DAY = 18; // Nov 25: the water goals go up
+
+  const sessionByDay = new Map(HEALTH.SESSIONS.map((session) => [session.day, session]));
+
+  /** The strength-side session on a plan day (undefined on run days). */
+  HEALTH.sessionOn = (day) => sessionByDay.get(day);
+
+  /** "baseline", "race", a session kind (strength, test, mobility, rest) or "run". */
+  HEALTH.kindOf = (day) => {
+    if (day === FIRST_DAY) return "baseline";
+    if (day === RACE_DAY) return "race";
+    const session = sessionByDay.get(day);
+    return session ? session.kind : "run";
+  };
+
+  /** Water goal in litres, or null on race day. */
+  HEALTH.waterGoal = (day) => {
+    const kind = HEALTH.kindOf(day);
+    if (kind === "race") return null;
+    const higher = day >= WATER_STEP_UP_DAY;
+    if (kind === "run") return higher ? 3.5 : 3.0;
+    return higher ? 3.0 : 2.5;
+  };
+
+  function waterItem(day) {
+    const goal = HEALTH.waterGoal(day);
+    if (goal === null) {
+      return {
+        id: "water",
+        label: "Water: about 500 ml, 2 to 3 hours before the start, then sip",
+        detail: "Drink steadily, don't gulp.",
+      };
+    }
+
+    let detail = "One glass is 250 ml. Pale yellow urine means you are drinking enough.";
+    if (HEALTH.kindOf(day) === "run") {
+      detail = "Drink 300 to 500 ml in the 2 hours before the run, and sip after it. " + detail;
+    }
+    if (day === RACE_DAY - 1) detail = "Drink steadily, don't gulp. " + detail;
+    return { id: "water", label: `Drink ${goal.toFixed(1)} L of water`, detail };
+  }
+
+  const HEADINGS = {
+    baseline: "Baseline day", run: "Run day", race: "Race day",
+    test: "Test day", mobility: "Mobility day", rest: "Full rest",
+  };
+
+  /**
+   * Checklist for one plan day: { heading, items: [{ id, label, detail, optional? }] }.
+   * Used by the Health page and the home page.
+   */
+  HEALTH.tasksFor = (day) => {
+    const { WARM_UP, COOL_DOWN, FOOD_TICK, HABITS } = HEALTH;
+    const kind = HEALTH.kindOf(day);
+    const session = HEALTH.sessionOn(day);
+    const items = [...HABITS.morning];
+    let heading = HEADINGS[kind];
+
+    if (kind === "baseline") {
+      items.push(
+        { id: "weigh",  label: "Weigh yourself", detail: "First thing in the morning, after the toilet, before eating." },
+        { id: "tape",   label: "Measure with a tape", detail: "Waist (at the belly button), chest, upper arm and thigh. Write the numbers in the measurements table." },
+        { id: "photos", label: "Take front, side and back photos", detail: "Same clothes and lighting. Repeat on Dec 10 and Jan 7." },
+        { id: "tests",  label: "Test: plank hold and dead hang", detail: "Max time for each (dead hang only if you have a bar). Write the numbers down." },
+        { id: "guide",  label: "Read the exercise guide", detail: "So you know the movements before tomorrow." },
+      );
+    } else if (kind === "strength") {
+      heading = `Strength day: ${session.code}`;
+      items.push({ id: "warmup", label: "Warm-up", detail: WARM_UP });
+      if (session.test === "full") {
+        items.push({
+          id: "tests",
+          label: "Checkpoint tests first",
+          detail: "Push-ups, squats, sit-ups, plank and dead hang, max each, 3 minutes of rest between them, strict form (chest near floor, squats to parallel). Write your results in the checkpoint tests table.",
+        });
+      }
+      items.push(
+        { id: "main",     label: `Session ${session.code}`, detail: session.workout },
+        { id: "cooldown", label: "Cool-down", detail: COOL_DOWN },
+      );
+    } else if (session) {
+      // Mini test, mobility day or full rest: one main item.
+      items.push({ id: "main", label: session.code, detail: session.workout });
+    }
+
+    items.push(waterItem(day));
+    items.push({ id: "food", label: "Followed the food plan (optional)", detail: FOOD_TICK, optional: true });
+    items.push(...HABITS.evening);
+    return { heading, items };
+  };
+})();
 
 
 // ======================================================================

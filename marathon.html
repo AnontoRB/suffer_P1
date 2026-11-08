@@ -9,6 +9,7 @@
 </head>
 <body class="theme-marathon">
 
+  <!-- Page header -->
   <header class="site-header">
     <div class="wrap">
       <a class="home-link" href="index.html">&larr; Home</a>
@@ -23,6 +24,7 @@
 
   <main class="wrap">
 
+    <!-- Progress numbers, calendar and the selected day -->
     <section>
       <div class="stats">
         <div class="stat"><b id="stat-streak">0</b><span>day streak &#128293;</span></div>
@@ -42,6 +44,7 @@
       <div class="panel" id="panel"></div>
     </section>
 
+    <!-- Every training day -->
     <section>
       <h2>Every training day</h2>
       <ol>
@@ -53,11 +56,13 @@
       <p><b>Rest days:</b> either full rest, or an easy 20 to 30 minute walk. Some rest days also suggest light strength work.</p>
     </section>
 
+    <!-- Full plan -->
     <section>
       <h2>Full plan</h2>
       <div id="plan-tables"></div>
     </section>
 
+    <!-- Race day tips -->
     <section>
       <h2>Race day tips</h2>
       <ul>
@@ -68,6 +73,7 @@
       </ul>
     </section>
 
+    <!-- Adjustments -->
     <section>
       <h2>Adjustments</h2>
       <ul>
@@ -80,10 +86,15 @@
 
   </main>
 
+  <!-- Footer -->
   <footer>
     <div class="wrap">General guidance, not medical advice.</div>
   </footer>
 
+  <!-- =====================================================================
+       Scripts. common.js (loaded in the head) has the shared code,
+       data.js has the plan data, and the script below runs this page.
+       ===================================================================== -->
 <script src="data.js"></script>
 <script>
 /**
@@ -103,7 +114,7 @@
     renderCalendar, renderDayNav, dayTag, burstConfetti, showToast,
   } = App;
 
-  const { FIRST_PLAN_DAY, PHASES, SCHEDULE, WARM_UP, COOL_DOWN, JOG_PACE, STRENGTH_MOVES } = MARATHON;
+  const { FIRST_PLAN_DAY, PHASES, SCHEDULE } = MARATHON;
 
   const STORAGE_KEY = "marathon-plan-v1";
   const RACE_DAY = TOTAL_DAYS;
@@ -133,40 +144,10 @@
     return PHASES.find((phase) => day >= phase.firstDay && day <= phase.lastDay).name;
   }
 
-  /** The checklist for one entry: [{ id, label, detail, optional? }]. */
-  function buildItems(entry) {
-    if (entry.kind === "race") {
-      return [{ id: "race", label: entry.text, detail: "" }];
-    }
-
-    if (entry.kind === "run") {
-      return [
-        { id: "warmup", label: "Warm-up", detail: WARM_UP },
-        { id: "run", label: `RUN: ${entry.text}`, detail: `Jog pace: ${JOG_PACE}` },
-        { id: "cooldown", label: "Cool-down", detail: COOL_DOWN },
-      ];
-    }
-
-    // Rest day: one required tick, plus any optional extras.
-    const items = [{ id: "rest", label: entry.label || "Rest day", detail: entry.note || "" }];
-    (entry.optional || []).forEach((text, index) => {
-      items.push({ id: `optional-${index}`, label: `${text} (optional)`, detail: "", optional: true });
-    });
-    if (entry.strengthRounds) {
-      items.push({
-        id: "strength",
-        label: "Light strength (optional)",
-        detail: `${STRENGTH_MOVES}, ${entry.strengthRounds} rounds`,
-        optional: true,
-      });
-    }
-    return items;
-  }
-
   function isDayComplete(day) {
     if (!hasPlan(day)) return false;
     const { checked } = getDayData(day);
-    return buildItems(entryFor(day))
+    return MARATHON.tasksFor(day).items
       .filter((item) => !item.optional)
       .every((item) => checked[item.id]);
   }
@@ -196,7 +177,7 @@
 
     const entry = entryFor(day);
     const { checked } = getDayData(day);
-    const items = buildItems(entry);
+    const { items } = MARATHON.tasksFor(day);
     const titles = { run: "Run day", rest: "Rest day", race: "RACE DAY" };
 
     const rows = items.map((item) => `
@@ -364,5 +345,6 @@
   render();
 })();
 </script>
+
 </body>
 </html>

@@ -9,6 +9,7 @@
 </head>
 <body class="theme-health">
 
+  <!-- Page header -->
   <header class="site-header">
     <div class="wrap">
       <a class="home-link" href="index.html">&larr; Home</a>
@@ -25,6 +26,7 @@
 
   <main class="wrap">
 
+    <!-- Progress numbers, calendar and the selected day -->
     <section>
       <div class="stats">
         <div class="stat"><b id="stat-streak">0</b><span>day streak &#128293;</span></div>
@@ -44,6 +46,7 @@
       <div class="panel" id="panel"></div>
     </section>
 
+    <!-- What to expect (honest version) -->
     <section>
       <h2>What to expect (honest version)</h2>
       <p>
@@ -56,11 +59,13 @@
       </p>
     </section>
 
+    <!-- The four blocks -->
     <section>
       <h2>The four blocks</h2>
       <div id="block-table"></div>
     </section>
 
+    <!-- Day 0 (today, Nov 8): baseline -->
     <section>
       <h2>Day 0 (today, Nov 8): baseline</h2>
       <ul>
@@ -72,6 +77,7 @@
       </ul>
     </section>
 
+    <!-- Session structure (about 35 to 45 minutes) -->
     <section>
       <h2>Session structure (about 35 to 45 minutes)</h2>
       <ol>
@@ -81,6 +87,7 @@
       </ol>
     </section>
 
+    <!-- Daily habits -->
     <section>
       <h2>Daily habits</h2>
       <ul>
@@ -90,6 +97,7 @@
       <p class="sub">All three are on every day's checklist, so they count towards finishing the day.</p>
     </section>
 
+    <!-- Rules -->
     <section>
       <h2>Rules</h2>
       <ul>
@@ -102,17 +110,20 @@
       </ul>
     </section>
 
+    <!-- Exercise guide -->
     <section>
       <h2>Exercise guide</h2>
       <div id="exercise-guide"></div>
     </section>
 
+    <!-- Day-by-day strength schedule -->
     <section>
       <h2>Day-by-day strength schedule</h2>
-      <p>A days focus on pushing, legs and core. B days focus on pulling, glutes and core. Test days are explained below.</p>
+      <p>On A days you focus on pushing, legs and core. On B days you focus on pulling, glutes and core. Test days are explained below.</p>
       <div id="schedule-tables"></div>
     </section>
 
+    <!-- Checkpoint tests -->
     <section>
       <h2>Checkpoint tests</h2>
       <p>
@@ -122,6 +133,7 @@
       <div id="test-table"></div>
     </section>
 
+    <!-- Body measurements -->
     <section>
       <h2>Body measurements</h2>
       <div id="measure-table"></div>
@@ -132,6 +144,7 @@
       <p id="weights"></p>
     </section>
 
+    <!-- Water plan -->
     <section>
       <h2>Water plan</h2>
       <ul>
@@ -143,6 +156,7 @@
       </ul>
     </section>
 
+    <!-- Food plan -->
     <section>
       <h2>Food plan</h2>
       <p>
@@ -163,6 +177,7 @@
       <div id="sample-day"></div>
     </section>
 
+    <!-- Daily log (water and food) -->
     <section>
       <h2>Daily log (water and food)</h2>
       <p class="sub">
@@ -172,6 +187,7 @@
       <div id="log-table"></div>
     </section>
 
+    <!-- After the race -->
     <section>
       <h2>After the race</h2>
       <p>
@@ -182,10 +198,15 @@
 
   </main>
 
+  <!-- Footer -->
   <footer>
     <div class="wrap">General guidance, not medical advice.</div>
   </footer>
 
+  <!-- =====================================================================
+       Scripts. common.js (loaded in the head) has the shared code,
+       data.js has the plan data, and the script below runs this page.
+       ===================================================================== -->
 <script src="data.js"></script>
 <script>
 /**
@@ -201,17 +222,16 @@
   "use strict";
 
   const {
-    $, TOTAL_DAYS,
+    $, TOTAL_DAYS, esc,
     loadState, saveState, todayNumber, daysUntilRace, clampDay, formatDate, shortDate, dayDate,
     renderCalendar, renderDayNav, dayTag, burstConfetti, showToast,
   } = App;
 
-  const { WARM_UP, COOL_DOWN, FOOD_TICK, RUN_LABELS, BLOCKS, EXERCISES, SESSIONS,
+  const { RUN_LABELS, BLOCKS, EXERCISES, SESSIONS,
           TEST_DATES, TESTS, MEASURE_ROWS, MEASURE_COLS, SAMPLE_DAY } = HEALTH;
 
   const STORAGE_KEY = "health-plan-v1";
   const RACE_DAY = TOTAL_DAYS;
-  const WATER_STEP_UP_DAY = 18; // Nov 25: water goals go up
 
   // ---------------------------------------------------------------------
   // State
@@ -231,34 +251,17 @@
     return data;
   }
 
-  const esc = (text) => String(text == null ? "" : text).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
-
   // ---------------------------------------------------------------------
   // The plan for a day
   // ---------------------------------------------------------------------
 
-  const SESSION_BY_DAY = new Map(SESSIONS.map((session) => [session.day, session]));
-
-  function kindOf(day) {
-    if (day === 1) return "baseline";
-    if (day === RACE_DAY) return "race";
-    const session = SESSION_BY_DAY.get(day);
-    return session ? session.kind : "run";
-  }
+  // The day-by-day rules live in data.js (HEALTH.kindOf, waterGoal, tasksFor).
+  const { kindOf, waterGoal, sessionOn } = HEALTH;
 
   const isSessionDay = (day) => ["strength", "mobility", "test"].includes(kindOf(day));
 
   function blockOf(day) {
     return BLOCKS.find((block) => day >= block.firstDay && day <= block.lastDay);
-  }
-
-  /** Water goal in litres, or null on race day. */
-  function waterGoal(day) {
-    const kind = kindOf(day);
-    if (kind === "race") return null;
-    const higher = day >= WATER_STEP_UP_DAY;
-    if (kind === "run") return higher ? 3.5 : 3.0;
-    return higher ? 3.0 : 2.5;
   }
 
   function waterText(day) {
@@ -271,64 +274,13 @@
     if (kind === "baseline") return "Baseline day";
     if (kind === "race") return "RACE DAY (7.5 km)";
     if (kind === "run") return RUN_LABELS[day] || "Run";
-    const session = SESSION_BY_DAY.get(day);
+    const session = sessionOn(day);
     return kind === "strength" ? `Strength ${session.code}` : session.code;
-  }
-
-  function waterItem(day) {
-    const goal = waterGoal(day);
-    if (goal === null) {
-      return { id: "water", label: "Water: about 500 ml, 2 to 3 hours before the start, then sip",
-               detail: "Drink steadily, don't gulp." };
-    }
-    const kind = kindOf(day);
-    let detail = "One glass is 250 ml. Pale yellow urine means you are drinking enough.";
-    if (kind === "run") detail = "Drink 300 to 500 ml in the 2 hours before the run, and sip after it. " + detail;
-    if (day === 59) detail = "Drink steadily, don't gulp. " + detail;
-    return { id: "water", label: `Drink ${goal.toFixed(1)} L of water`, detail };
-  }
-
-  /** The checklist for a day: [{ id, label, detail, optional? }]. */
-  function buildItems(day) {
-    const kind = kindOf(day);
-    const session = SESSION_BY_DAY.get(day);
-    const items = [...HEALTH.HABITS.morning];
-
-    if (kind === "baseline") {
-      items.push(
-        { id: "weigh", label: "Weigh yourself", detail: "First thing in the morning, after the toilet, before eating." },
-        { id: "tape", label: "Measure with a tape", detail: "Waist (at the belly button), chest, upper arm and thigh. Write the numbers in the measurements table." },
-        { id: "photos", label: "Take front, side and back photos", detail: "Same clothes and lighting. Repeat on Dec 10 and Jan 7." },
-        { id: "tests", label: "Test: plank hold and dead hang", detail: "Max time for each (dead hang only if you have a bar). Write the numbers down." },
-        { id: "guide", label: "Read the exercise guide", detail: "So you know the movements before tomorrow." },
-      );
-    } else if (kind === "strength") {
-      items.push({ id: "warmup", label: "Warm-up", detail: WARM_UP });
-      if (session.test === "full") {
-        items.push({ id: "tests", label: "Checkpoint tests first",
-          detail: "Push-ups, squats, sit-ups, plank and dead hang, max each, 3 minutes of rest between them, strict form (chest near floor, squats to parallel). Write your results in the table." });
-      }
-      items.push(
-        { id: "main", label: `Session ${session.code}`, detail: session.workout },
-        { id: "cooldown", label: "Cool-down", detail: COOL_DOWN },
-      );
-    } else if (kind === "test") {
-      items.push({ id: "main", label: session.code, detail: session.workout });
-    } else if (kind === "mobility") {
-      items.push({ id: "main", label: session.code, detail: session.workout });
-    } else if (kind === "rest") {
-      items.push({ id: "main", label: session.code, detail: session.workout });
-    }
-
-    items.push(waterItem(day));
-    items.push({ id: "food", label: "Followed the food plan (optional)", detail: FOOD_TICK, optional: true });
-    items.push(...HEALTH.HABITS.evening);
-    return items;
   }
 
   function isDayComplete(day) {
     const { checked } = getDayData(day);
-    return buildItems(day).filter((item) => !item.optional).every((item) => checked[item.id]);
+    return HEALTH.tasksFor(day).items.filter((item) => !item.optional).every((item) => checked[item.id]);
   }
 
   // ---------------------------------------------------------------------
@@ -347,7 +299,7 @@
     const day = selectedDay;
     const kind = kindOf(day);
     const { checked, log } = getDayData(day);
-    const items = buildItems(day);
+    const { items } = HEALTH.tasksFor(day);
     const titles = { baseline: "Baseline day", run: "Run day", strength: "Strength day", test: "Test day", mobility: "Mobility day", rest: "Full rest", race: "RACE DAY" };
 
     const rows = items.map((item) => `
@@ -371,7 +323,7 @@
 
     const block = blockOf(day);
     $("panel").innerHTML = `
-      <h2>${titles[kind]}${isSessionDay(day) && SESSION_BY_DAY.get(day).kind === "strength" ? `: ${SESSION_BY_DAY.get(day).code}` : ""}</h2>
+      <h2>${titles[kind]}${isSessionDay(day) && sessionOn(day).kind === "strength" ? `: ${sessionOn(day).code}` : ""}</h2>
       <div class="panel-date">Day ${day} &middot; ${formatDate(day)} &middot; ${block.name}${dayTag(day, isDayComplete(day))}</div>
       <p class="muted-line">Water goal: <b>${waterText(day)}</b></p>
       ${runNote}
@@ -611,5 +563,6 @@
   render();
 })();
 </script>
+
 </body>
 </html>

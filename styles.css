@@ -1,15 +1,20 @@
 /* ==========================================================================
    Shared styles for all pages.
-   Sections:
-     1. Themes (colour variables per page, light + dark)
-     2. Base and layout
-     3. Header and stats
-     4. Calendar and day navigation
-     5. Day panel and checklists
-     6. Tables, lists, badges, notices
-     7. Effects (confetti canvas, toast)
-     8. Home page (including the digital clock)
-     9. Small screens
+
+   Contents:
+      1. Themes (colour variables per page, light + dark)
+      2. Base and layout
+      3. Header and stats
+      4. Calendar and day navigation
+      5. Day panel and checklists
+      6. Tables, lists, badges, notices
+      7. Effects (confetti canvas, toast)
+      8. Home page (cards, today's tasks)
+      9. Daily Diary page
+     10. Digital clock (home page)
+     11. Small screens
+     12. Top bar and settings panel
+     13. My Tasks page
    ========================================================================== */
 
 
@@ -61,6 +66,10 @@
   --font: "Charter", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
 }
 
+/* Dark colours, used when the device is in dark mode and the user hasn't forced Light.
+   The same values are repeated below for when the user forces Dark in Settings.
+   (CSS can't share one block between a media query and an attribute selector.) */
+
 @media (prefers-color-scheme: dark) {
   html:not([data-theme="light"]) .theme-health {
     --bg: #15131F;  --surface: #1F1C2E;  --ink: #ECE9F7;  --muted: #A29EBB;  --line: #34304A;
@@ -93,38 +102,40 @@
   }
 }
 
-  html[data-theme="dark"] .theme-health {
-    --bg: #15131F;  --surface: #1F1C2E;  --ink: #ECE9F7;  --muted: #A29EBB;  --line: #34304A;
-    --acc: #C79BE0;  --acc2: #6FB3E0;  --ok: #5CC08F;  --on-ok: #0B1F16;  --bad: #F28B82;
-  }
-  html[data-theme="dark"] .theme-rust {
-    --bg: #15131F;  --surface: #1F1C2E;  --ink: #ECE9F7;  --muted: #A29EBB;  --line: #34304A;
-    --acc: #E08A63;  --acc2: #8FB0CF;  --ok: #5CC08F;  --on-ok: #0B1F16;  --bad: #F28B82;
-  }
-  html[data-theme="dark"] .theme-marathon {
-    --bg: #15131F;  --surface: #1F1C2E;  --ink: #ECE9F7;  --muted: #A29EBB;  --line: #34304A;
-    --acc: #F08A5D;  --acc2: #4FC3C1;  --ok: #5CC08F;  --on-ok: #0B1F16;  --bad: #F28B82;
-  }
-  html[data-theme="dark"] .theme-cubing {
-    --bg: #15131F;  --surface: #1F1C2E;  --ink: #ECE9F7;  --muted: #A29EBB;  --line: #34304A;
-    --acc: #E8A92E;  --acc2: #7FA6F5;  --ok: #5CC08F;  --on-ok: #0B1F16;  --bad: #F28B82;
-  }
-  html[data-theme="dark"] .theme-diary {
-    --bg: #17131A;  --surface: #211B26;  --ink: #F0E9F2;  --muted: #B0A3B5;  --line: #3A3040;
-    --acc: #E58BA5;  --acc2: #6FB3E0;  --ok: #5CC08F;  --on-ok: #0B1F16;  --bad: #F28B82;
-  }
-  html[data-theme="dark"] .theme-tasks {
-    --bg: #15131F;  --surface: #1F1C2E;  --ink: #ECE9F7;  --muted: #A29EBB;  --line: #34304A;
-    --acc: #4DC4A0;  --acc2: #6FB3E0;  --ok: #5CC08F;  --on-ok: #0B1F16;  --bad: #F28B82;
-  }
-  html[data-theme="dark"] .theme-home {
-    --bg: #15131F;  --surface: #1F1C2E;  --ink: #ECE9F7;  --muted: #A29EBB;  --line: #34304A;
-    --rust: #E08A63;  --teal: #4FC3C1;  --health: #C79BE0;  --cube: #B26A00;  --mine: #1F8A70;  --diary: #E58BA5;
-    --acc: #C79BE0;  --acc2: #6FB3E0;  --ok: #5CC08F;  --on-ok: #0B1F16;
-  }
+/* Dark colours when the user forces Dark in Settings. */
+
+html[data-theme="dark"] .theme-health {
+  --bg: #15131F;  --surface: #1F1C2E;  --ink: #ECE9F7;  --muted: #A29EBB;  --line: #34304A;
+  --acc: #C79BE0;  --acc2: #6FB3E0;  --ok: #5CC08F;  --on-ok: #0B1F16;  --bad: #F28B82;
+}
+html[data-theme="dark"] .theme-rust {
+  --bg: #15131F;  --surface: #1F1C2E;  --ink: #ECE9F7;  --muted: #A29EBB;  --line: #34304A;
+  --acc: #E08A63;  --acc2: #8FB0CF;  --ok: #5CC08F;  --on-ok: #0B1F16;  --bad: #F28B82;
+}
+html[data-theme="dark"] .theme-marathon {
+  --bg: #15131F;  --surface: #1F1C2E;  --ink: #ECE9F7;  --muted: #A29EBB;  --line: #34304A;
+  --acc: #F08A5D;  --acc2: #4FC3C1;  --ok: #5CC08F;  --on-ok: #0B1F16;  --bad: #F28B82;
+}
+html[data-theme="dark"] .theme-cubing {
+  --bg: #15131F;  --surface: #1F1C2E;  --ink: #ECE9F7;  --muted: #A29EBB;  --line: #34304A;
+  --acc: #E8A92E;  --acc2: #7FA6F5;  --ok: #5CC08F;  --on-ok: #0B1F16;  --bad: #F28B82;
+}
+html[data-theme="dark"] .theme-diary {
+  --bg: #17131A;  --surface: #211B26;  --ink: #F0E9F2;  --muted: #B0A3B5;  --line: #3A3040;
+  --acc: #E58BA5;  --acc2: #6FB3E0;  --ok: #5CC08F;  --on-ok: #0B1F16;  --bad: #F28B82;
+}
+html[data-theme="dark"] .theme-tasks {
+  --bg: #15131F;  --surface: #1F1C2E;  --ink: #ECE9F7;  --muted: #A29EBB;  --line: #34304A;
+  --acc: #4DC4A0;  --acc2: #6FB3E0;  --ok: #5CC08F;  --on-ok: #0B1F16;  --bad: #F28B82;
+}
+html[data-theme="dark"] .theme-home {
+  --bg: #15131F;  --surface: #1F1C2E;  --ink: #ECE9F7;  --muted: #A29EBB;  --line: #34304A;
+  --rust: #E08A63;  --teal: #4FC3C1;  --health: #C79BE0;  --cube: #B26A00;  --mine: #1F8A70;  --diary: #E58BA5;
+  --acc: #C79BE0;  --acc2: #6FB3E0;  --ok: #5CC08F;  --on-ok: #0B1F16;
+}
 
 
-/* 2. BASE AND LAYOUT ------------------------------------------------------ */
+/* 2. BASE AND LAYOUT -------------------------------------------------------- */
 
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
@@ -154,7 +165,7 @@ input:focus-visible { outline: 3px solid var(--acc); outline-offset: 2px; }
 footer { padding: 34px 0 60px; color: var(--muted); font-size: 0.9rem; }
 
 
-/* 3. HEADER AND STATS ----------------------------------------------------- */
+/* 3. HEADER AND STATS ------------------------------------------------------- */
 
 .site-header { padding: 26px 0 24px; border-bottom: 5px solid var(--acc); }
 .site-header p { margin: 0; max-width: 62ch; color: var(--muted); }
@@ -180,7 +191,7 @@ footer { padding: 34px 0 60px; color: var(--muted); font-size: 0.9rem; }
 .xp-bar i { display: block; width: 0; height: 100%; background: var(--acc); transition: width 0.4s; }
 
 
-/* 4. CALENDAR AND DAY NAVIGATION ------------------------------------------ */
+/* 4. CALENDAR AND DAY NAVIGATION -------------------------------------------- */
 
 .legend { margin-top: 8px; font-size: 0.85rem; color: var(--muted); }
 
@@ -221,17 +232,41 @@ footer { padding: 34px 0 60px; color: var(--muted); font-size: 0.9rem; }
 .btn-outline:hover { background: var(--acc2); color: var(--surface); }
 
 
+/* 5. DAY PANEL AND CHECKLISTS ----------------------------------------------- */
+
+/* Wide screens: the day panel sits beside the calendar. */
 @media (min-width: 1000px) {
-  main.wrap > section:first-of-type { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); column-gap: 36px; align-items: start; }
+  main.wrap > section:first-of-type {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+    column-gap: 36px;
+    align-items: start;
+  }
   main.wrap > section:first-of-type > #panel { grid-column: 2; grid-row: 1 / span 12; margin-top: 0; }
 }
 
-/* 5. DAY PANEL AND CHECKLISTS --------------------------------------------- */
+.panel {
+  margin-top: 14px;
+  padding: 20px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-top: 5px solid var(--acc2);
+}
+.panel-date {
+  margin-bottom: 12px;
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  font-size: 0.88rem;
+  color: var(--muted);
+}
 
-.panel { margin-top: 14px; padding: 20px; background: var(--surface); border: 1px solid var(--line); border-top: 5px solid var(--acc2); }
-.panel-date { margin-bottom: 12px; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 0.88rem; color: var(--muted); }
-
-.tag { display: inline-block; margin-left: 6px; padding: 1px 8px; font-size: 0.8rem; color: #fff; background: var(--acc2); }
+.tag {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 8px;
+  font-size: 0.8rem;
+  color: #fff;
+  background: var(--acc2);
+}
 .tag.ok       { background: var(--ok); color: var(--on-ok); }
 .tag.missed   { background: var(--bad); }
 .tag.upcoming { background: var(--muted); }
@@ -270,18 +305,36 @@ footer { padding: 34px 0 60px; color: var(--muted); font-size: 0.9rem; }
 .check-item small { display: block; color: var(--muted); }
 .check-item.checked b { text-decoration: line-through; opacity: 0.6; }
 
-.tip { margin-top: 12px; padding: 10px 14px; background: var(--bg); border-left: 4px solid var(--acc); font-size: 0.95rem; }
+.tip {
+  margin-top: 12px;
+  padding: 10px 14px;
+  background: var(--bg);
+  border-left: 4px solid var(--acc);
+  font-size: 0.95rem;
+}
 
 input[type="time"],
-input[type="number"] { padding: 6px 8px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font: inherit; }
+input[type="number"] {
+  padding: 6px 8px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+}
 input[type="number"] { width: 70px; }
 
 
-/* 6. TABLES, LISTS, BADGES, NOTICES --------------------------------------- */
+/* 6. TABLES, LISTS, BADGES, NOTICES ----------------------------------------- */
 
 .scroll { overflow-x: auto; }
 
-table { width: 100%; border-collapse: collapse; background: var(--surface); border: 1px solid var(--line); font-size: 0.92rem; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  font-size: 0.92rem;
+}
 th, td { padding: 9px 11px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
 th { background: var(--bg); }
 
@@ -289,7 +342,13 @@ ul { padding-left: 1.2em; }
 li { margin-bottom: 6px; }
 
 .badges { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
-.badge { padding: 10px; background: var(--surface); border: 1px solid var(--line); font-size: 0.85rem; text-align: center; }
+.badge {
+  padding: 10px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  font-size: 0.85rem;
+  text-align: center;
+}
 .badge i { display: block; font-style: normal; font-size: 1.5rem; }
 .badge.locked { opacity: 0.4; filter: grayscale(1); }
 .badge.earned { border-color: var(--acc); }
@@ -302,7 +361,15 @@ li { margin-bottom: 6px; }
 .log-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px; }
 .field { display: flex; flex-direction: column; gap: 4px; font-size: 0.85rem; color: var(--muted); }
 .field input,
-.cell-input { width: 100%; padding: 7px 8px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font: inherit; font-size: 0.95rem; }
+.cell-input {
+  width: 100%;
+  padding: 7px 8px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.95rem;
+}
 .cell-input { min-width: 70px; margin-top: 4px; }
 table small { display: block; }
 
@@ -312,7 +379,7 @@ table small { display: block; }
 .theme-cubing .race-badge { color: var(--bg); }
 
 
-/* 7. EFFECTS -------------------------------------------------------------- */
+/* 7. EFFECTS ---------------------------------------------------------------- */
 
 .confetti-canvas { position: fixed; inset: 0; z-index: 50; width: 100%; height: 100%; pointer-events: none; }
 
@@ -330,18 +397,37 @@ table small { display: block; }
 }
 
 
-/* 8. HOME PAGE ------------------------------------------------------------ */
+/* 8. HOME PAGE -------------------------------------------------------------- */
 
-.home-wrap { width: 100%; margin: 0; padding: clamp(20px, 3.5vw, 56px) clamp(16px, 3vw, 56px); font-size: clamp(16px, 0.35vw + 12px, 19px); }
+.home-wrap {
+  width: 100%;
+  margin: 0;
+  padding: clamp(20px, 3.5vw, 56px) clamp(16px, 3vw, 56px);
+  font-size: clamp(16px, 0.35vw + 12px, 19px);
+}
 .home-wrap h1 { font-size: clamp(2.4rem, 8vw, 4.6rem); letter-spacing: -0.03em; line-height: 1.02; }
 .home-lead { max-width: 56ch; margin: 0 0 20px; color: var(--muted); }
 
-.home-race { display: inline-block; margin-bottom: 10px; padding: 8px 14px; background: var(--ink); color: var(--bg); font-weight: 700; }
+.home-race {
+  display: inline-block;
+  margin-bottom: 10px;
+  padding: 8px 14px;
+  background: var(--ink);
+  color: var(--bg);
+  font-weight: 700;
+}
 .home-today { margin-bottom: 28px; color: var(--muted); font-size: 0.9rem; }
 
 .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 18px; }
 
-.card { display: flex; flex-direction: column; gap: 12px; padding: 26px; background: var(--surface); border: 1px solid var(--line); }
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 26px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
 .card h2 { margin: 0; font-size: 1.7rem; }
 .card p { margin: 0; color: var(--muted); }
 .card-rust    { border-top: 8px solid var(--rust); --card-color: var(--rust); }
@@ -355,7 +441,16 @@ table small { display: block; }
 .progress i { display: block; width: 0; height: 100%; background: var(--card-color); }
 .progress-label { font-size: 0.9rem; color: var(--muted); }
 
-.card-button { display: inline-block; margin-top: auto; padding: 13px 18px; background: var(--card-color); color: #fff; font-weight: 700; text-align: center; text-decoration: none; }
+.card-button {
+  display: inline-block;
+  margin-top: auto;
+  padding: 13px 18px;
+  background: var(--card-color);
+  color: #fff;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+}
 .card-button:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
 
 
@@ -379,7 +474,13 @@ table small { display: block; }
   .home-right .card h2 { font-size: clamp(1.05rem, 1.6vw, 1.4rem); }
 }
 
-.home-tasks { margin-top: 18px; padding: 18px 20px; background: var(--surface); border: 1px solid var(--line); border-top: 5px solid var(--acc2); }
+.home-tasks {
+  margin-top: 18px;
+  padding: 18px 20px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-top: 5px solid var(--acc2);
+}
 .home-tasks h2 { margin: 0 0 4px; font-size: 1.4rem; }
 .home-tasks .panel-date { margin-bottom: 6px; }
 .home-tasks section { padding: 0; }
@@ -387,8 +488,23 @@ table small { display: block; }
 .task-group { margin-top: 14px; padding-left: 12px; border-left: 5px solid var(--g, var(--acc)); }
 .task-group h3 { margin: 0; font-size: 1.05rem; }
 .task-group h3 span { margin-left: 6px; font-size: 0.85rem; font-weight: 400; color: var(--muted); }
-.task-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px 10px; margin: 0 0 10px 40px; padding: 8px 10px; background: color-mix(in srgb, var(--g, var(--acc)) 9%, var(--surface)); border-left: 3px solid var(--g, var(--acc)); }
-.task-fields label { display: flex; flex-direction: column; gap: 3px; min-width: 0; font-size: 0.78rem; color: var(--muted); }
+.task-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 8px 10px;
+  margin: 0 0 10px 40px;
+  padding: 8px 10px;
+  background: color-mix(in srgb, var(--g, var(--acc)) 9%, var(--surface));
+  border-left: 3px solid var(--g, var(--acc));
+}
+.task-fields label {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
 .task-fields .cell-input { margin-top: 0; min-width: 0; }
 .task-rust     { --g: var(--rust); }
 .task-marathon { --g: var(--teal); }
@@ -398,33 +514,87 @@ table small { display: block; }
 .task-diary    { --g: var(--diary); }
 
 
-/* Daily Diary page: a notebook-style layout (calendar and entries beside a lined page). */
+/* 9. DAILY DIARY PAGE ------------------------------------------------------- */
+/* A notebook-style layout: calendar and entries beside a lined page. */
 
 .wrap.wide { max-width: 1200px; }
 
 .diary-grid { display: grid; grid-template-columns: 1fr; gap: 28px; align-items: start; }
 @media (min-width: 960px) {
   .diary-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.8fr); gap: 36px; }
-  .diary-side { position: sticky; top: 16px; max-height: calc(100vh - 32px); overflow-y: auto; padding-right: 4px; }
+  .diary-side {
+    position: sticky;
+    top: 16px;
+    max-height: calc(100vh - 32px);
+    overflow-y: auto;
+    padding-right: 4px;
+  }
 }
 .side-title { margin-top: 26px; }
 
-.entry-list { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; max-height: 340px; overflow-y: auto; }
-.entry { display: block; width: 100%; padding: 9px 12px; background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--line); color: var(--ink); font: inherit; text-align: left; cursor: pointer; }
+.entry-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 10px;
+  max-height: 340px;
+  overflow-y: auto;
+}
+.entry {
+  display: block;
+  width: 100%;
+  padding: 9px 12px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--line);
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
 .entry:hover { border-left-color: var(--acc); }
 .entry.selected { border-color: var(--acc); border-left-width: 6px; }
 .entry b { display: block; font-size: 0.95rem; }
-.entry small { display: block; color: var(--muted); font-size: 0.82rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.entry small {
+  display: block;
+  color: var(--muted);
+  font-size: 0.82rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
-.diary-page { padding: 24px 28px 22px; background: var(--surface); border: 1px solid var(--line); border-left: 8px solid var(--acc); box-shadow: 0 10px 28px rgba(0, 0, 0, 0.08); }
+.diary-page {
+  padding: 24px 28px 22px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-left: 8px solid var(--acc);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.08);
+}
 .diary-head h2 { margin: 0; font-size: clamp(1.6rem, 3vw, 2.2rem); }
 .diary-label { display: block; margin: 20px 0 6px; font-weight: 700; }
 .diary-prompt { margin: 0 0 6px; color: var(--muted); font-style: italic; font-size: 0.92rem; }
 
 .mood { display: flex; flex-wrap: wrap; gap: 8px; }
-.mood button { width: 2.7em; height: 2.7em; border: 2px solid var(--line); border-radius: 50%; background: none; font-size: 1.5rem; line-height: 1; cursor: pointer; opacity: 0.6; transition: transform 0.15s, opacity 0.15s; }
+.mood button {
+  width: 2.7em;
+  height: 2.7em;
+  border: 2px solid var(--line);
+  border-radius: 50%;
+  background: none;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: transform 0.15s, opacity 0.15s;
+}
 .mood button:hover { opacity: 1; transform: scale(1.08); }
-.mood button[aria-pressed="true"] { opacity: 1; border-color: var(--acc); background: color-mix(in srgb, var(--acc) 16%, transparent); transform: scale(1.12); }
+.mood button[aria-pressed="true"] {
+  opacity: 1;
+  border-color: var(--acc);
+  background: color-mix(in srgb, var(--acc) 16%, transparent);
+  transform: scale(1.12);
+}
 
 /* Lined paper: the ruled lines follow the text lines. */
 .paper {
@@ -447,17 +617,44 @@ table small { display: block; }
 .paper:focus-visible { outline: 3px solid var(--acc); outline-offset: 3px; }
 .paper::placeholder { color: var(--muted); opacity: 0.7; }
 
-.carry { margin-top: 18px; padding: 10px 14px; background: color-mix(in srgb, var(--acc) 9%, var(--surface)); border-left: 4px solid var(--acc); }
+.carry {
+  margin-top: 18px;
+  padding: 10px 14px;
+  background: color-mix(in srgb, var(--acc) 9%, var(--surface));
+  border-left: 4px solid var(--acc);
+}
 .carry h3 { margin: 0 0 2px; font-size: 1rem; }
 
 #better .check-item label { padding-top: 2px; }
-.icon-btn { flex: none; align-self: flex-start; width: 1.9rem; height: 1.9rem; border: 1px solid var(--line); background: none; color: var(--muted); font-size: 1.2rem; line-height: 1; cursor: pointer; }
+.icon-btn {
+  flex: none;
+  align-self: flex-start;
+  width: 1.9rem;
+  height: 1.9rem;
+  border: 1px solid var(--line);
+  background: none;
+  color: var(--muted);
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+}
 .icon-btn:hover { border-color: var(--bad); color: var(--bad); }
 
-.diary-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; margin-top: 20px; padding-top: 12px; border-top: 1px solid var(--line); color: var(--muted); font-size: 0.88rem; }
+.diary-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 18px;
+  margin-top: 20px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.88rem;
+}
 .diary-foot .btn-outline { margin-left: auto; padding: 6px 12px; font-size: 0.85rem; }
 
-/* Digital clock (home page). Always dark, in both light and dark mode. */
+/* 10. DIGITAL CLOCK (HOME PAGE) --------------------------------------------- */
+/* Always dark, in both light and dark mode. */
 
 .clock {
   --clock-bg: #171428;
@@ -474,7 +671,15 @@ table small { display: block; }
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.22);
 }
 
-.clock-top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; font-size: 0.95rem; opacity: 0.8; }
+.clock-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 0.95rem;
+  opacity: 0.8;
+}
 
 .clock-toggle {
   padding: 4px 12px;
@@ -509,12 +714,30 @@ table small { display: block; }
 
 .tasks-head { margin-top: 20px; }
 .day-bar.tasks-bar i { width: 0; background: #7BD9A3; }
-.bar-ends { display: flex; justify-content: space-between; margin-top: 4px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.85rem; opacity: 0.75; }
+.bar-ends {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 4px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.85rem;
+  opacity: 0.75;
+}
 
 @keyframes clock-blink { 50% { opacity: 0.12; } }
 
-.clock-left { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px; margin-bottom: 8px; font-size: 0.95rem; }
-.clock-left b { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 1.1rem; color: var(--clock-accent); }
+.clock-left {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 6px;
+  margin-bottom: 8px;
+  font-size: 0.95rem;
+}
+.clock-left b {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 1.1rem;
+  color: var(--clock-accent);
+}
 .clock-left span:last-child { opacity: 0.7; }
 
 .day-bar { height: 14px; background: var(--clock-track); overflow: hidden; }
@@ -532,17 +755,23 @@ table small { display: block; }
 }
 
 
-/* 9. SMALL SCREENS ------------------------------------------------------- */
+/* 11. SMALL SCREENS --------------------------------------------------------- */
 
 @media (max-width: 560px) {
   .stats { grid-template-columns: repeat(2, 1fr); }
 }
 
 
-/* 10. TOP BAR AND SETTINGS ------------------------------------------------ */
+/* 12. TOP BAR AND SETTINGS PANEL -------------------------------------------- */
 
-html[data-size="small"] body, html[data-size="small"] .home-wrap { font-size: clamp(14px, 0.3vw + 11px, 17px); }
-html[data-size="large"] body, html[data-size="large"] .home-wrap { font-size: clamp(18px, 0.4vw + 14px, 22px); }
+html[data-size="small"] body,
+html[data-size="small"] .home-wrap {
+  font-size: clamp(14px, 0.3vw + 11px, 17px);
+}
+html[data-size="large"] body,
+html[data-size="large"] .home-wrap {
+  font-size: clamp(18px, 0.4vw + 14px, 22px);
+}
 html[data-accent] body { --acc: var(--user-acc); }
 
 .topbar {
@@ -552,28 +781,77 @@ html[data-accent] body { --acc: var(--user-acc); }
   background: var(--surface); color: var(--ink);
   border-bottom: 1px solid var(--line);
 }
-.topbar-name { font-weight: 700; font-size: 1.05rem; color: var(--ink); text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.topbar-name {
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--ink);
+  text-decoration: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .topbar-name:hover { color: var(--acc); }
 .topbar button, .settings-box button, .settings-file {
   font: inherit; font-size: 0.92rem; padding: 7px 14px; cursor: pointer;
   background: var(--bg); color: var(--ink); border: 1px solid var(--line);
 }
 .topbar button:hover, .settings-box button:hover, .settings-file:hover { border-color: var(--acc); }
-.topbar button:focus-visible, .settings-box :focus-visible { outline: 3px solid var(--acc2); outline-offset: 2px; }
+.topbar button:focus-visible,
+.settings-box :focus-visible {
+  outline: 3px solid var(--acc2);
+  outline-offset: 2px;
+}
 
-.settings-overlay { position: fixed; inset: 0; z-index: 100; display: flex; align-items: flex-start; justify-content: center; padding: 5vh 16px; overflow-y: auto; background: rgba(0, 0, 0, 0.55); }
-.settings-box { width: 100%; max-width: 540px; padding: 22px; background: var(--surface); color: var(--ink); border: 1px solid var(--line); font-family: var(--font); }
+.settings-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 5vh 16px;
+  overflow-y: auto;
+  background: rgba(0, 0, 0, 0.55);
+}
+.settings-box {
+  width: 100%;
+  max-width: 540px;
+  padding: 22px;
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  font-family: var(--font);
+}
 .settings-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
 .settings-box h2 { margin: 0; font-size: 1.4rem; }
 .settings-box h3 { margin: 22px 0 8px; font-size: 1rem; color: var(--acc); }
 .settings-row { margin: 12px 0; }
-.settings-row > label, .settings-row > span { display: block; margin-bottom: 5px; font-size: 0.85rem; color: var(--muted); }
-.settings-box input[type=text] { width: 100%; padding: 8px 10px; font: inherit; background: var(--bg); color: var(--ink); border: 1px solid var(--line); }
+.settings-row > label,
+.settings-row > span {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+.settings-box input[type=text] {
+  width: 100%;
+  padding: 8px 10px;
+  font: inherit;
+  background: var(--bg);
+  color: var(--ink);
+  border: 1px solid var(--line);
+}
 .seg { display: flex; flex-wrap: wrap; gap: 6px; }
 .seg button[aria-pressed="true"] { background: var(--acc); border-color: var(--acc); color: #fff; }
 .swatch { width: 32px; height: 32px; padding: 0 !important; border-radius: 50%; }
 .swatch[aria-pressed="true"] { outline: 3px solid var(--ink); outline-offset: 2px; }
-.settings-check { display: flex; align-items: center; gap: 8px; font-size: 0.95rem; color: var(--ink) !important; }
+.settings-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.95rem;
+  color: var(--ink) !important;
+}
 .settings-note { margin: 0 0 10px; font-size: 0.85rem; color: var(--muted); }
 .settings-file { position: relative; display: inline-block; }
 .settings-file input { position: absolute; width: 1px; height: 1px; opacity: 0; }
@@ -583,7 +861,7 @@ html[data-accent] body { --acc: var(--user-acc); }
 .danger { color: var(--bad, #B3261E) !important; }
 
 
-/* 11. MY TASKS PAGE -------------------------------------------------------- */
+/* 13. MY TASKS PAGE --------------------------------------------------------- */
 
 .calendar .has-tasks { border-color: var(--acc); border-width: 2px; }
 .month-title { display: inline-flex; align-items: center; padding: 0 6px; }
@@ -594,7 +872,15 @@ html[data-accent] body { --acc: var(--user-acc); }
 .check-item label { min-width: 0; overflow-wrap: anywhere; }
 .check-item .cell-input { flex: 1; margin-top: 0; }
 .task-actions { display: flex; flex: none; gap: 6px; margin-left: auto; align-self: flex-start; }
-.task-actions button { padding: 4px 10px; font: inherit; font-size: 0.82rem; cursor: pointer; background: none; color: var(--ink); border: 1px solid var(--line); }
+.task-actions button {
+  padding: 4px 10px;
+  font: inherit;
+  font-size: 0.82rem;
+  cursor: pointer;
+  background: none;
+  color: var(--ink);
+  border: 1px solid var(--line);
+}
 .task-actions button:hover { border-color: var(--acc); }
 .task-actions .danger { color: var(--bad); }
 
@@ -613,7 +899,13 @@ html[data-accent] body { --acc: var(--user-acc); }
 .check-item > .btn-outline { flex: none; align-self: flex-start; padding: 4px 10px; font-size: 0.82rem; }
 .cat-heading { margin: 16px 0 2px; font-size: 1rem; color: var(--acc); }
 .cat-heading:first-child { margin-top: 0; }
-.cat-heading span, .cat-head h3 span { margin-left: 6px; font-size: 0.85rem; font-weight: 400; color: var(--muted); }
+.cat-heading span,
+.cat-head h3 span {
+  margin-left: 6px;
+  font-size: 0.85rem;
+  font-weight: 400;
+  color: var(--muted);
+}
 .cat-box { margin-bottom: 14px; border-left: 5px solid var(--acc); }
 .cat-head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 8px; }
 .cat-head h3 { flex: 1; margin: 0; font-size: 1.15rem; }
@@ -623,7 +915,18 @@ html[data-accent] body { --acc: var(--user-acc); }
 
 /* Task / Category switch next to the main input */
 .mode-toggle { display: inline-flex; flex: none; }
-.add-form .mode-toggle button { padding: 8px 14px; font: inherit; cursor: pointer; background: none; color: var(--ink); border: 1px solid var(--line); }
+.add-form .mode-toggle button {
+  padding: 8px 14px;
+  font: inherit;
+  cursor: pointer;
+  background: none;
+  color: var(--ink);
+  border: 1px solid var(--line);
+}
 .add-form .mode-toggle button + button { border-left: 0; }
 .add-form .mode-toggle button:hover { border-color: var(--acc); }
-.add-form .mode-toggle button[aria-pressed="true"] { background: var(--acc); border-color: var(--acc); color: #fff; }
+.add-form .mode-toggle button[aria-pressed="true"] {
+  background: var(--acc);
+  border-color: var(--acc);
+  color: #fff;
+}

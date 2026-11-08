@@ -9,6 +9,7 @@
 </head>
 <body class="theme-cubing">
 
+  <!-- Page header -->
   <header class="site-header">
     <div class="wrap">
       <a class="home-link" href="index.html">&larr; Home</a>
@@ -23,6 +24,7 @@
 
   <main class="wrap">
 
+    <!-- Progress numbers, calendar and the selected day -->
     <section>
       <div class="stats">
         <div class="stat"><b id="stat-streak">0</b><span>day streak &#128293;</span></div>
@@ -46,10 +48,15 @@
 
   </main>
 
+  <!-- Footer -->
   <footer>
     <div class="wrap">General guidance. Stop if your wrists or fingers hurt.</div>
   </footer>
 
+  <!-- =====================================================================
+       Scripts. common.js (loaded in the head) has the shared code,
+       data.js has the plan data, and the script below runs this page.
+       ===================================================================== -->
 <script src="data.js"></script>
 <script>
 /**
@@ -63,7 +70,7 @@
   "use strict";
 
   const {
-    $, TOTAL_DAYS,
+    $, TOTAL_DAYS, esc, daysUntil,
     loadState, saveState, todayNumber, clampDay, formatDate, shortDate, dayDate,
     renderCalendar, renderDayNav, dayTag, burstConfetti, showToast,
   } = App;
@@ -78,7 +85,6 @@
   state.sundays = state.sundays || {};
   let selectedDay = clampDay(todayNumber());
 
-  const esc = (text) => String(text == null ? "" : text).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
   const weekdayOf = (day) => dayDate(day).toLocaleDateString(undefined, { weekday: "short" });
   const blockOf = (day) => BLOCKS.find((block) => day >= block.firstDay && day <= block.lastDay);
 
@@ -194,8 +200,11 @@
   }
 
   function renderCountdown() {
-    const left = Math.round((dayDate(FINAL_TEST_DAY) - new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate())) / 86400000);
-    $("race-countdown").textContent = left > 0 ? `Final test on Jan 3: ${left} days to go` : left === 0 ? "Final test today. Good luck!" : "The final test is done.";
+    const daysLeft = daysUntil(FINAL_TEST_DAY);
+    let text = "The final test is done.";
+    if (daysLeft > 0) text = `Final test on Jan 3: ${daysLeft} days to go`;
+    else if (daysLeft === 0) text = "Final test today. Good luck!";
+    $("race-countdown").textContent = text;
   }
 
   // ---------------------------------------------------------------------
@@ -306,5 +315,6 @@
   render();
 })();
 </script>
+
 </body>
 </html>

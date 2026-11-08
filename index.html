@@ -1,168 +1,131 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>My plan to Jan 6</title>
-    <link rel="stylesheet" href="styles.css" />
-    <script src="common.js"></script>
-  </head>
-  <body class="theme-home">
-    <div class="home-wrap">
-      <div class="home-grid">
-        <!-- Left: title, countdown, clock and progress bars -->
-        <div class="home-left">
-          <h1>Nov 8 to Jan 6</h1>
-          <p class="home-lead">
-            Four plans, your own tasks and a daily diary, one finish line: January 6, the day
-            of your 7.5 km race. Tick off today's tasks on the right, or open a
-            plan to pick any date.
-          </p>
-          <div class="home-race" id="race-countdown"></div>
-          <div class="home-today" id="today-label"></div>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>My plan to Jan 6</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="common.js"></script>
+</head>
+<body class="theme-home">
 
-          <section class="clock" aria-label="Clock">
-            <div class="clock-top">
-              <span id="clock-date"></span>
-              <button class="clock-toggle" id="clock-format" type="button">
-                24h
-              </button>
-            </div>
+  <div class="home-wrap">
+    <div class="home-grid">
 
-            <div class="clock-time" role="timer" aria-live="off">
-              <span id="clock-hours">00</span><span class="clock-colon">:</span
-              ><span id="clock-minutes">00</span
-              ><span class="clock-colon">:</span
-              ><span class="clock-seconds" id="clock-seconds">00</span
-              ><span class="clock-period" id="clock-period"></span>
-            </div>
+      <!-- ===== Left column: title, race countdown, clock and progress bars ===== -->
+      <div class="home-left">
+        <h1>Nov 8 to Jan 6</h1>
+        <p class="home-lead">
+          Four plans, your own tasks and a daily diary, one finish line: January 6, the day
+          of your 7.5 km race. Tick off today's tasks on the right, or open a
+          plan to pick any date.
+        </p>
+        <div class="home-race" id="race-countdown"></div>
+        <div class="home-today" id="today-label"></div>
 
-            <div class="clock-left">
-              <span>Left today: <b id="clock-remaining">--</b></span>
-              <span id="clock-percent"></span>
-            </div>
-            <div
-              class="day-bar"
-              id="day-bar"
-              role="progressbar"
-              aria-label="Time left in the day"
-              aria-valuemin="0"
-              aria-valuemax="100"
-            >
-              <i id="day-bar-fill"></i>
-            </div>
-
-            <div class="clock-left tasks-head">
-              <span>Tasks completed: <b id="tasks-count">0 / 0</b></span>
-              <span id="tasks-percent"></span>
-            </div>
-            <div
-              class="day-bar tasks-bar"
-              id="tasks-bar"
-              role="progressbar"
-              aria-label="Tasks completed today"
-              aria-valuemin="0"
-              aria-valuemax="100"
-            >
-              <i id="tasks-bar-fill"></i>
-            </div>
-            <div class="bar-ends">
-              <span>0</span><span id="tasks-total">0</span>
-            </div>
-          </section>
-        </div>
-
-        <!-- Right: the three plan buttons, then all of today's tasks -->
-        <aside class="home-right">
-          <div class="cards">
-            <div class="card card-rust">
-              <h2>Learn Rust</h2>
-              <p>2 hours a day, ending with 4 finished projects.</p>
-              <div class="progress"><i id="rust-bar"></i></div>
-              <div class="progress-label" id="rust-label">0 / 60 days</div>
-              <a
-                class="card-button"
-                href="rust.html"
-                aria-label="Open the Rust plan"
-                >Open plan</a
-              >
-            </div>
-
-            <div class="card card-marathon">
-              <h2>Marathon</h2>
-              <p>Jog/walk plan from Nov 9 to your 7.5 km race.</p>
-              <div class="progress"><i id="marathon-bar"></i></div>
-              <div class="progress-label" id="marathon-label">0 / 59 days</div>
-              <a
-                class="card-button"
-                href="marathon.html"
-                aria-label="Open the marathon plan"
-                >Open plan</a
-              >
-            </div>
-
-            <div class="card card-health">
-              <h2>Health</h2>
-              <p>Strength, water and food, with a daily log.</p>
-              <div class="progress"><i id="health-bar"></i></div>
-              <div class="progress-label" id="health-label">0 / 60 days</div>
-              <a
-                class="card-button"
-                href="health.html"
-                aria-label="Open the health plan"
-                >Open plan</a
-              >
-            </div>
-
-            <div class="card card-cubing">
-              <h2>Speedcubing</h2>
-              <p>One hour a day, from a 26 s to a sub-20 average.</p>
-              <div class="progress"><i id="cubing-bar"></i></div>
-              <div class="progress-label" id="cubing-label">0 / 60 days</div>
-              <a
-                class="card-button"
-                href="cubing.html"
-                aria-label="Open the speedcubing plan"
-                >Open plan</a
-              >
-            </div>
-
-            <div class="card card-tasks">
-              <h2>My Tasks</h2>
-              <p>Add your own tasks on any date.</p>
-              <div class="progress"><i id="mytasks-bar"></i></div>
-              <div class="progress-label" id="mytasks-label">No tasks yet</div>
-              <a
-                class="card-button"
-                href="tasks.html"
-                aria-label="Open my tasks"
-                >Open tasks</a
-              >
-            </div>
-            <div class="card card-diary">
-              <h2>Daily Diary</h2>
-              <p>Write about your day and note what to do better tomorrow.</p>
-              <div class="progress"><i id="diary-bar"></i></div>
-              <div class="progress-label" id="diary-label">No entries yet</div>
-              <a
-                class="card-button"
-                href="diary.html"
-                aria-label="Open the daily diary"
-                >Open diary</a
-              >
-            </div>
+        <!-- Digital clock, "time left today" bar and "tasks completed" bar -->
+        <section class="clock" aria-label="Clock">
+          <div class="clock-top">
+            <span id="clock-date"></span>
+            <button class="clock-toggle" id="clock-format" type="button">24h</button>
           </div>
 
-          <section class="home-tasks" aria-label="Today's tasks">
-            <h2>Today's tasks</h2>
-            <div class="panel-date" id="tasks-date"></div>
-            <div id="task-list"></div>
-          </section>
-        </aside>
-      </div>
-    </div>
+          <div class="clock-time" role="timer" aria-live="off">
+            <span id="clock-hours">00</span><span class="clock-colon">:</span><span id="clock-minutes">00</span><span class="clock-colon">:</span><span class="clock-seconds" id="clock-seconds">00</span><span class="clock-period" id="clock-period"></span>
+          </div>
 
-  <script src="data.js"></script>
+          <div class="clock-left">
+            <span>Left today: <b id="clock-remaining">--</b></span>
+            <span id="clock-percent"></span>
+          </div>
+          <div class="day-bar" id="day-bar" role="progressbar" aria-label="Time left in the day"
+               aria-valuemin="0" aria-valuemax="100">
+            <i id="day-bar-fill"></i>
+          </div>
+
+          <div class="clock-left tasks-head">
+            <span>Tasks completed: <b id="tasks-count">0 / 0</b></span>
+            <span id="tasks-percent"></span>
+          </div>
+          <div class="day-bar tasks-bar" id="tasks-bar" role="progressbar" aria-label="Tasks completed today"
+               aria-valuemin="0" aria-valuemax="100">
+            <i id="tasks-bar-fill"></i>
+          </div>
+          <div class="bar-ends">
+            <span>0</span><span id="tasks-total">0</span>
+          </div>
+        </section>
+      </div>
+
+      <!-- ===== Right column: one card per plan, then all of today's tasks ===== -->
+      <aside class="home-right">
+        <div class="cards">
+
+        <div class="card card-rust">
+          <h2>Learn Rust</h2>
+          <p>2 hours a day, ending with 4 finished projects.</p>
+          <div class="progress"><i id="rust-bar"></i></div>
+          <div class="progress-label" id="rust-label">0 / 60 days</div>
+          <a class="card-button" href="rust.html" aria-label="Open the Rust plan">Open plan</a>
+        </div>
+
+        <div class="card card-marathon">
+          <h2>Marathon</h2>
+          <p>Jog/walk plan from Nov 9 to your 7.5 km race.</p>
+          <div class="progress"><i id="marathon-bar"></i></div>
+          <div class="progress-label" id="marathon-label">0 / 59 days</div>
+          <a class="card-button" href="marathon.html" aria-label="Open the marathon plan">Open plan</a>
+        </div>
+
+        <div class="card card-health">
+          <h2>Health</h2>
+          <p>Strength, water and food, with a daily log.</p>
+          <div class="progress"><i id="health-bar"></i></div>
+          <div class="progress-label" id="health-label">0 / 60 days</div>
+          <a class="card-button" href="health.html" aria-label="Open the health plan">Open plan</a>
+        </div>
+
+        <div class="card card-cubing">
+          <h2>Speedcubing</h2>
+          <p>One hour a day, from a 26 s to a sub-20 average.</p>
+          <div class="progress"><i id="cubing-bar"></i></div>
+          <div class="progress-label" id="cubing-label">0 / 60 days</div>
+          <a class="card-button" href="cubing.html" aria-label="Open the speedcubing plan">Open plan</a>
+        </div>
+
+        <div class="card card-tasks">
+          <h2>My Tasks</h2>
+          <p>Add your own tasks on any date.</p>
+          <div class="progress"><i id="mytasks-bar"></i></div>
+          <div class="progress-label" id="mytasks-label">No tasks yet</div>
+          <a class="card-button" href="tasks.html" aria-label="Open my tasks">Open tasks</a>
+        </div>
+
+        <div class="card card-diary">
+          <h2>Daily Diary</h2>
+          <p>Write about your day and note what to do better tomorrow.</p>
+          <div class="progress"><i id="diary-bar"></i></div>
+          <div class="progress-label" id="diary-label">No entries yet</div>
+          <a class="card-button" href="diary.html" aria-label="Open the daily diary">Open diary</a>
+        </div>
+        </div>
+
+        <!-- Today's tasks from every plan, your own tasks and the diary -->
+        <section class="home-tasks" aria-label="Today's tasks">
+          <h2>Today's tasks</h2>
+          <div class="panel-date" id="tasks-date"></div>
+          <div id="task-list"></div>
+        </section>
+      </aside>
+
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       Scripts. common.js (loaded in the head) has the shared code,
+       data.js has the plan data, and the script below runs this page.
+       ===================================================================== -->
+<script src="data.js"></script>
 <script>
 /**
  * Home page: digital clock with a "time left today" bar, a "tasks completed"
@@ -179,127 +142,18 @@
 (() => {
   "use strict";
 
-  const { $, TOTAL_DAYS, loadState, saveState, todayNumber, daysUntilRace, clampDay,
+  const { $, esc, TOTAL_DAYS, loadState, saveState, todayNumber, daysUntilRace, clampDay,
           formatDate, dayDate, burstConfetti, isoDate } = App;
 
   // ---------------------------------------------------------------------
-  // Tasks for one day, per plan: { heading, items: [{ id, label, detail, optional? }] }
-  // (returns null when the plan has nothing on that day)
+  // The plans. Each plan's tasksFor(day) comes from data.js and returns
+  // { heading, items: [{ id, label, detail, optional? }] } (null when there is nothing that day).
   // ---------------------------------------------------------------------
 
-  function rustTasks(day) {
-    const lesson = RUST_DAYS[day - 1];
-    if (!lesson) return null;
-    const [learnMin, practiceMin, buildMin] = lesson.minutes || [45, 45, 30];
-    const title = (name, min, optional) => `${name}${min ? ` (${min} min)` : ""}${optional ? " (optional)" : ""}`;
-    return {
-      heading: lesson.title,
-      items: [
-        { id: "learn",    label: title("1. Learn", learnMin),                           detail: lesson.learn },
-        { id: "practice", label: title("2. Practice", practiceMin, lesson.practiceOptional), detail: lesson.practice, optional: !!lesson.practiceOptional },
-        { id: "build",    label: title("3. Build/Review", buildMin),                    detail: lesson.build },
-      ],
-    };
-  }
-
-  function marathonTasks(day) {
-    const { FIRST_PLAN_DAY, SCHEDULE, WARM_UP, COOL_DOWN, JOG_PACE, STRENGTH_MOVES } = MARATHON;
-    if (day < FIRST_PLAN_DAY || day > TOTAL_DAYS) return null;
-    const entry = SCHEDULE[day - FIRST_PLAN_DAY];
-
-    if (entry.kind === "race") {
-      return { heading: "Race day", items: [{ id: "race", label: entry.text, detail: "" }] };
-    }
-    if (entry.kind === "run") {
-      return {
-        heading: "Run day",
-        items: [
-          { id: "warmup",   label: "Warm-up",              detail: WARM_UP },
-          { id: "run",      label: `RUN: ${entry.text}`,   detail: `Jog pace: ${JOG_PACE}` },
-          { id: "cooldown", label: "Cool-down",            detail: COOL_DOWN },
-        ],
-      };
-    }
-    const items = [{ id: "rest", label: entry.label || "Rest day", detail: entry.note || "" }];
-    (entry.optional || []).forEach((text, index) => {
-      items.push({ id: `optional-${index}`, label: `${text} (optional)`, detail: "", optional: true });
-    });
-    if (entry.strengthRounds) {
-      items.push({
-        id: "strength", label: "Light strength (optional)",
-        detail: `${STRENGTH_MOVES}, ${entry.strengthRounds} rounds`, optional: true,
-      });
-    }
-    return { heading: "Rest day", items };
-  }
-
-  const healthSessions = new Map(HEALTH.SESSIONS.map((session) => [session.day, session]));
-
-  function healthKind(day) {
-    if (day === 1) return "baseline";
-    if (day === TOTAL_DAYS) return "race";
-    const session = healthSessions.get(day);
-    return session ? session.kind : "run";
-  }
-
-  function healthWaterGoal(day) {
-    const kind = healthKind(day);
-    if (kind === "race") return null;
-    const higher = day >= 18; // Nov 25: water goals go up
-    if (kind === "run") return higher ? 3.5 : 3.0;
-    return higher ? 3.0 : 2.5;
-  }
-
-  function healthTasks(day) {
-    const { WARM_UP, COOL_DOWN, FOOD_TICK } = HEALTH;
-    const kind = healthKind(day);
-    const session = healthSessions.get(day);
-    const items = [...HEALTH.HABITS.morning];
-    let heading = { baseline: "Baseline day", run: "Run day", race: "Race day",
-                    test: "Test day", mobility: "Mobility day", rest: "Full rest" }[kind];
-
-    if (kind === "baseline") {
-      items.push(
-        { id: "weigh",  label: "Weigh yourself", detail: "First thing in the morning, after the toilet, before eating." },
-        { id: "tape",   label: "Measure with a tape", detail: "Waist (at the belly button), chest, upper arm and thigh. Write the numbers in the measurements table." },
-        { id: "photos", label: "Take front, side and back photos", detail: "Same clothes and lighting. Repeat on Dec 10 and Jan 7." },
-        { id: "tests",  label: "Test: plank hold and dead hang", detail: "Max time for each (dead hang only if you have a bar). Write the numbers down." },
-        { id: "guide",  label: "Read the exercise guide", detail: "So you know the movements before tomorrow." },
-      );
-    } else if (kind === "strength") {
-      heading = `Strength day: ${session.code}`;
-      items.push({ id: "warmup", label: "Warm-up", detail: WARM_UP });
-      if (session.test === "full") {
-        items.push({ id: "tests", label: "Checkpoint tests first",
-          detail: "Push-ups, squats, sit-ups, plank and dead hang, max each, 3 minutes of rest between them, strict form (chest near floor, squats to parallel). Write your results on the Health page." });
-      }
-      items.push(
-        { id: "main", label: `Session ${session.code}`, detail: session.workout },
-        { id: "cooldown", label: "Cool-down", detail: COOL_DOWN },
-      );
-    } else if (session) {
-      items.push({ id: "main", label: session.code, detail: session.workout });
-    }
-
-    const goal = healthWaterGoal(day);
-    if (goal === null) {
-      items.push({ id: "water", label: "Water: about 500 ml, 2 to 3 hours before the start, then sip",
-                   detail: "Drink steadily, don't gulp." });
-    } else {
-      let detail = "One glass is 250 ml. Pale yellow urine means you are drinking enough.";
-      if (kind === "run") detail = "Drink 300 to 500 ml in the 2 hours before the run, and sip after it. " + detail;
-      if (day === 59) detail = "Drink steadily, don't gulp. " + detail;
-      items.push({ id: "water", label: `Drink ${goal.toFixed(1)} L of water`, detail });
-    }
-    items.push({ id: "food", label: "Followed the food plan (optional)", detail: FOOD_TICK, optional: true });
-    items.push(...HEALTH.HABITS.evening);
-    return { heading, items };
-  }
-
   const PLANS = [
-    { id: "rust",     name: "Learn Rust", storageKey: "rust-plan-v1",     totalDays: TOTAL_DAYS, barId: "rust-bar",     labelId: "rust-label",     tasksFor: rustTasks },
-    { id: "marathon", name: "Marathon",   storageKey: "marathon-plan-v1", totalDays: 59,         barId: "marathon-bar", labelId: "marathon-label", tasksFor: marathonTasks }, // Nov 9 - Jan 6
-    { id: "health",   name: "Health",     storageKey: "health-plan-v1",   totalDays: TOTAL_DAYS, barId: "health-bar",   labelId: "health-label",   tasksFor: healthTasks },
+    { id: "rust",     name: "Learn Rust", storageKey: "rust-plan-v1",     totalDays: TOTAL_DAYS, barId: "rust-bar",     labelId: "rust-label",     tasksFor: rustTasksFor },
+    { id: "marathon", name: "Marathon",   storageKey: "marathon-plan-v1", totalDays: 59,         barId: "marathon-bar", labelId: "marathon-label", tasksFor: (day) => MARATHON.tasksFor(day) }, // Nov 9 - Jan 6
+    { id: "health",   name: "Health",     storageKey: "health-plan-v1",   totalDays: TOTAL_DAYS, barId: "health-bar",   labelId: "health-label",   tasksFor: (day) => HEALTH.tasksFor(day) },
     { id: "cubing",   name: "Speedcubing", storageKey: "cubing-plan-v1",  totalDays: TOTAL_DAYS, barId: "cubing-bar",   labelId: "cubing-label",   tasksFor: (day) => CUBING.tasksFor(day) },
   ];
 
@@ -309,7 +163,6 @@
 
   const MY_KEY = "tasks-plan-v1";
   const DIARY_KEY = "diary-plan-v1";
-  const esc = (text) => String(text).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
   const myTasksOn = (state, day) => (state.tasks || {})[isoDate(dayDate(day))] || [];
 
   function renderMyTasksProgress() {
@@ -374,7 +227,7 @@
 
   /** Info boxes for each Health task of a day: { taskId: [field, ...] }. */
   function healthInputs(day) {
-    const kind = healthKind(day);
+    const kind = HEALTH.kindOf(day);
     const inputs = {};
 
     if (kind === "baseline") {
@@ -533,31 +386,30 @@
 
   let shownDay = clampDay(todayNumber());
 
-  /** Required tasks count towards the bar; optional ones are listed but never block it. */
-  function renderTasks() {
-    const day = shownDay;
-    $("tasks-date").textContent = `Day ${day} · ${formatDate(day)}`;
+  /**
+   * One group of today's tasks as HTML, plus how many required tasks it holds and
+   * how many of those are ticked: { html, total, done }.
+   */
+  const NO_GROUP = { html: "", total: 0, done: 0 };
 
+  /** A plan's group (Rust, Marathon, Health or Speedcubing). Optional tasks never count. */
+  function planGroup(plan, day) {
+    const tasks = plan.tasksFor(day);
+    if (!tasks) return NO_GROUP;
+
+    const state = loadState(plan.storageKey);
+    const checked = checkedFor(state, day);
+    const inputs = INPUTS[plan.id] ? INPUTS[plan.id](day) : {};
     let total = 0;
     let done = 0;
-    let html = "";
 
-    shownInputs = {};
-
-    PLANS.forEach((plan) => {
-      const tasks = plan.tasksFor(day);
-      if (!tasks) return;
-      const state = loadState(plan.storageKey);
-      const checked = checkedFor(state, day);
-      const inputs = INPUTS[plan.id] ? INPUTS[plan.id](day) : {};
-
-      const rows = tasks.items.map((item) => {
-        if (!item.optional) {
-          total++;
-          if (checked[item.id]) done++;
-        }
-        const id = `task-${plan.id}-${item.id}`;
-        return `
+    const rows = tasks.items.map((item) => {
+      if (!item.optional) {
+        total++;
+        if (checked[item.id]) done++;
+      }
+      const id = `task-${plan.id}-${item.id}`;
+      return `
           <div class="check-item ${checked[item.id] ? "checked" : ""}">
             <input type="checkbox" id="${id}" data-plan="${plan.id}" data-item="${item.id}" ${checked[item.id] ? "checked" : ""}>
             <label for="${id}">
@@ -565,59 +417,82 @@
               ${item.detail ? `<small>${item.detail}</small>` : ""}
             </label>
           </div>${fieldsHtml(plan, item.id, state, inputs[item.id])}`;
-      }).join("");
+    }).join("");
 
-      html += `
+    const html = `
         <div class="task-group task-${plan.id}">
           <h3>${plan.name} <span>${tasks.heading}</span></h3>
           ${rows}
         </div>`;
-    });
+    return { html, total, done };
+  }
 
+  /** The tasks you added yourself on the My Tasks page, with their subtasks. */
+  function myTasksGroup(day) {
     const myState = loadState(MY_KEY);
     const mine = myTasksOn(myState, day);
-    if (mine.length) {
-      const rows = mine.map((task) => {
-        total++;
-        if (task.done) done++;
-        const id = `task-mytasks-${task.id}`;
-        const subs = task.subtasks || [];
-        const category = (myState.categories || []).find((cat) => cat.id === task.categoryId);
-        const note = [category ? esc(category.name) : "", subs.length ? `${subs.filter((s) => s.done).length} / ${subs.length} subtasks` : ""]
-          .filter(Boolean).join(" · ");
-        const subRows = subs.map((sub) => {
-          const subId = `${id}-${sub.id}`;
-          return `
+    if (!mine.length) return NO_GROUP;
+
+    let done = 0;
+    const rows = mine.map((task) => {
+      if (task.done) done++;
+      const id = `task-mytasks-${task.id}`;
+      const subs = task.subtasks || [];
+      const category = (myState.categories || []).find((cat) => cat.id === task.categoryId);
+      const note = [category ? esc(category.name) : "", subs.length ? `${subs.filter((s) => s.done).length} / ${subs.length} subtasks` : ""]
+        .filter(Boolean).join(" · ");
+
+      const subRows = subs.map((sub) => {
+        const subId = `${id}-${sub.id}`;
+        return `
           <div class="check-item ${sub.done ? "checked" : ""}" style="margin-left:40px">
             <input type="checkbox" id="${subId}" data-plan="mytasks" data-item="${task.id}" data-sub="${sub.id}" ${sub.done ? "checked" : ""}>
             <label for="${subId}"><b>${esc(sub.text)}</b></label>
           </div>`;
-        }).join("");
-        return `
+      }).join("");
+
+      return `
           <div class="check-item ${task.done ? "checked" : ""}">
             <input type="checkbox" id="${id}" data-plan="mytasks" data-item="${task.id}" ${task.done ? "checked" : ""}>
             <label for="${id}"><b>${esc(task.text)}</b>${note ? `<small>${note}</small>` : ""}</label>
           </div>${subRows}`;
-      }).join("");
-      html += `<div class="task-group task-mytasks"><h3>My Tasks <span>added by you</span></h3>${rows}</div>`;
-    }
+    }).join("");
 
-    // Yesterday's diary "do better" items become today's tasks.
-    const yesterday = shownDay > 1 ? loadState(DIARY_KEY).days[shownDay - 1] : null;
+    const html = `<div class="task-group task-mytasks"><h3>My Tasks <span>added by you</span></h3>${rows}</div>`;
+    return { html, total: mine.length, done };
+  }
+
+  /** Yesterday's diary "do better" items become today's tasks. */
+  function diaryGroup(day) {
+    const yesterday = day > 1 ? loadState(DIARY_KEY).days[day - 1] : null;
     const better = (yesterday && yesterday.better) || [];
-    if (better.length) {
-      const rows = better.map((item) => {
-        total++;
-        if (item.done) done++;
-        const id = `task-diary-${item.id}`;
-        return `
+    if (!better.length) return NO_GROUP;
+
+    let done = 0;
+    const rows = better.map((item) => {
+      if (item.done) done++;
+      const id = `task-diary-${item.id}`;
+      return `
           <div class="check-item ${item.done ? "checked" : ""}">
             <input type="checkbox" id="${id}" data-plan="diary" data-item="${item.id}" ${item.done ? "checked" : ""}>
             <label for="${id}"><b>${esc(item.text)}</b></label>
           </div>`;
-      }).join("");
-      html += `<div class="task-group task-diary"><h3>Diary <span>to do better, from yesterday</span></h3>${rows}</div>`;
-    }
+    }).join("");
+
+    const html = `<div class="task-group task-diary"><h3>Diary <span>to do better, from yesterday</span></h3>${rows}</div>`;
+    return { html, total: better.length, done };
+  }
+
+  /** Draws today's tasks from every source and updates the "tasks completed" bar. */
+  function renderTasks() {
+    const day = shownDay;
+    $("tasks-date").textContent = `Day ${day} · ${formatDate(day)}`;
+
+    shownInputs = {};
+    const groups = [...PLANS.map((plan) => planGroup(plan, day)), myTasksGroup(day), diaryGroup(day)];
+    const total = groups.reduce((sum, group) => sum + group.total, 0);
+    const done = groups.reduce((sum, group) => sum + group.done, 0);
+    const html = groups.map((group) => group.html).join("");
 
     $("task-list").innerHTML = html || '<p class="muted-line">No tasks today.</p>';
     $("task-list").querySelectorAll("input[type=checkbox]").forEach((box) => {
@@ -762,5 +637,6 @@
   tickClock();
 })();
 </script>
+
 </body>
 </html>

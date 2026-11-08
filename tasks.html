@@ -9,6 +9,7 @@
 </head>
 <body class="theme-tasks">
 
+  <!-- Page header -->
   <header class="site-header">
     <div class="wrap">
       <a class="home-link" href="index.html">&larr; Home</a>
@@ -23,6 +24,7 @@
 
   <main class="wrap">
 
+    <!-- Progress numbers, calendar and the selected day -->
     <section>
       <div class="stats">
         <div class="stat"><b id="stat-today">0 / 0</b><span>done today</span></div>
@@ -42,6 +44,7 @@
       <div class="panel" id="panel"></div>
     </section>
 
+    <!-- Categories -->
     <section id="categories">
       <h2>Categories</h2>
       <p class="sub">
@@ -56,6 +59,7 @@
       <div id="category-list"></div>
     </section>
 
+    <!-- Unfinished from earlier days -->
     <section>
       <h2>Unfinished from earlier days</h2>
       <p class="sub">Tap one to jump to its date.</p>
@@ -64,10 +68,15 @@
 
   </main>
 
+  <!-- Footer -->
   <footer>
     <div class="wrap">Saved in this browser only. Use Settings to export a backup.</div>
   </footer>
 
+  <!-- =====================================================================
+       Script. common.js (loaded in the head) has the shared code,
+       and the script below runs this page.
+       ===================================================================== -->
 <script>
 /**
  * My Tasks page: your own tasks on any date, with categories and subtasks.
@@ -88,14 +97,13 @@
 (() => {
   "use strict";
 
-  const { $, loadState, saveState, isoDate, burstConfetti } = App;
+  const { $, esc, loadState, saveState, isoDate, burstConfetti } = App;
 
   const STORAGE_KEY = "tasks-plan-v1";
   const state = loadState(STORAGE_KEY);
   state.tasks = state.tasks || {};
   state.categories = state.categories || [];
 
-  const esc = (text) => String(text == null ? "" : text).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
   const parseIso = (iso) => { const [y, m, d] = iso.split("-").map(Number); return new Date(y, m - 1, d); };
   const todayIso = () => isoDate(new Date());
   const monthStart = (date) => new Date(date.getFullYear(), date.getMonth(), 1);
@@ -688,5 +696,6 @@
   render();
 })();
 </script>
+
 </body>
 </html>

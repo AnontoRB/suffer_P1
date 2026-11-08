@@ -9,6 +9,7 @@
 </head>
 <body class="theme-rust">
 
+  <!-- Page header -->
   <header class="site-header">
     <div class="wrap">
       <a class="home-link" href="index.html">&larr; Home</a>
@@ -22,6 +23,7 @@
 
   <main class="wrap">
 
+    <!-- Progress numbers, calendar and the selected day -->
     <section>
       <div class="stats">
         <div class="stat"><b id="stat-streak">0</b><span>day streak &#128293;</span></div>
@@ -42,11 +44,13 @@
       <div class="panel" id="panel"></div>
     </section>
 
+    <!-- Badges -->
     <section>
       <h2>Badges</h2>
       <div class="badges" id="badges"></div>
     </section>
 
+    <!-- How this plan stays efficient -->
     <section>
       <h2>How this plan stays efficient</h2>
       <ul>
@@ -59,6 +63,7 @@
       </ul>
     </section>
 
+    <!-- Every day has 3 parts (2 hours) -->
     <section>
       <h2>Every day has 3 parts (2 hours)</h2>
       <div class="scroll">
@@ -73,6 +78,7 @@
       <p><b>Setup (do first, today):</b> install Rust with <code>rustup</code>, install VS Code with the rust-analyzer extension, and install Rustlings (<code>cargo install rustlings</code>).</p>
     </section>
 
+    <!-- If you fall behind -->
     <section>
       <h2>If you fall behind</h2>
       <ul>
@@ -82,6 +88,7 @@
       </ul>
     </section>
 
+    <!-- After Jan 6: how to keep going -->
     <section>
       <h2>After Jan 6: how to keep going</h2>
       <ul>
@@ -94,12 +101,17 @@
 
   </main>
 
+  <!-- Footer -->
   <footer>
     <div class="wrap">
       Resources: The Rust Book, Rustlings, Exercism Rust track, Rust by Example, Tokio tutorial, axum docs.
     </div>
   </footer>
 
+  <!-- =====================================================================
+       Scripts. common.js (loaded in the head) has the shared code,
+       data.js has the plan data, and the script below runs this page.
+       ===================================================================== -->
 <script src="data.js"></script>
 <script>
 /**
@@ -160,23 +172,11 @@
     return PHASES.find((phase) => day <= phase.lastDay).name;
   }
 
-  /** The checklist for one day: [{ id, title, minutes, text, optional? }]. */
-  function getStudyBlocks(day) {
-    const lesson = RUST_DAYS[day - 1];
-    const [learnMin, practiceMin, buildMin] = lesson.minutes || [45, 45, 30];
-
-    return [
-      { id: "learn",    title: "1. Learn",          minutes: learnMin,    text: lesson.learn },
-      { id: "practice", title: "2. Practice",       minutes: practiceMin, text: lesson.practice, optional: !!lesson.practiceOptional },
-      { id: "build",    title: "3. Build/Review",   minutes: buildMin,    text: lesson.build },
-    ];
-  }
-
   function isDayComplete(day) {
     const { checked } = getDayData(day);
-    return getStudyBlocks(day)
-      .filter((block) => !block.optional)
-      .every((block) => checked[block.id]);
+    return rustTasksFor(day).items
+      .filter((item) => !item.optional)
+      .every((item) => checked[item.id]);
   }
 
   // ---------------------------------------------------------------------
@@ -254,27 +254,27 @@
 
   function renderDayPanel() {
     const day = selectedDay;
-    const blocks = getStudyBlocks(day);
+    const { heading, items } = rustTasksFor(day);
     const { checked } = getDayData(day);
     const panel = $("panel");
 
-    const blockRows = blocks.map((block) => `
-      <div class="check-item ${checked[block.id] ? "checked" : ""}">
-        <input type="checkbox" id="block-${block.id}" ${checked[block.id] ? "checked" : ""}>
-        <label for="block-${block.id}">
-          <b>${block.title}${block.minutes ? ` (${block.minutes} min)` : ""}${block.optional ? " (optional)" : ""}</b>
-          <small>${block.text}</small>
+    const blockRows = items.map((item) => `
+      <div class="check-item ${checked[item.id] ? "checked" : ""}">
+        <input type="checkbox" id="block-${item.id}" ${checked[item.id] ? "checked" : ""}>
+        <label for="block-${item.id}">
+          <b>${item.label}</b>
+          <small>${item.detail}</small>
         </label>
       </div>`).join("");
 
     panel.innerHTML = `
-      <h2>Day ${day}: ${RUST_DAYS[day - 1].title}</h2>
+      <h2>Day ${day}: ${heading}</h2>
       <div class="panel-date">${formatDate(day)} &middot; ${phaseOf(day)}${dayTag(day, isDayComplete(day))}</div>
       ${blockRows}`;
 
-    blocks.forEach((block) => {
-      const checkbox = $(`block-${block.id}`);
-      checkbox.onchange = () => handleBlockToggle(day, block.id, checkbox);
+    items.forEach((item) => {
+      const checkbox = $(`block-${item.id}`);
+      checkbox.onchange = () => handleBlockToggle(day, item.id, checkbox);
     });
   }
 
@@ -388,5 +388,6 @@
   render();
 })();
 </script>
+
 </body>
 </html>

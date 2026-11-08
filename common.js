@@ -4,6 +4,10 @@
  * Load it in the <head> of every page so the theme applies before first paint.
  */
 
+// ======================================================================
+// PART 1: SiteSettings
+// ======================================================================
+
 /**
  * Top bar (site name on the left, Settings on the right), the settings panel,
  * and the export / import system. Load it in the <head> of every page.
@@ -281,8 +285,14 @@ const SiteSettings = (() => {
   return { get, set, exportData, importData, resetAll };
 })();
 
+// ======================================================================
+// PART 2: App
+// Shared helpers used by every page (dates, calendar, saved progress,
+// confetti, toasts). Exposes one global object: App.
+// ======================================================================
+
 /**
- * Shared helpers used by the home, Rust and marathon pages.
+ * Shared helpers used by all the pages.
  * Exposes one global object: App.
  *
  * The plan covers 60 calendar days, from Nov 8, 2026 (day 1)
@@ -326,6 +336,11 @@ const App = (() => {
     return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
   }
 
+  /** Whole days from today until plan day `day` (negative once it has passed). */
+  function daysUntil(day) {
+    return Math.round((dayDate(day) - startOfDay(new Date())) / MS_PER_DAY);
+  }
+
   function clampDay(day) {
     return Math.min(TOTAL_DAYS, Math.max(1, day));
   }
@@ -338,6 +353,14 @@ const App = (() => {
 
   function shortDate(day) {
     return dayDate(day).toLocaleDateString(undefined, { month: "short", day: "numeric" });
+  }
+
+  /** Makes text safe to put inside HTML, including inside "quoted" attribute values. */
+  function esc(text) {
+    return String(text == null ? "" : text)
+      .replace(/&/g, "&amp;")
+      .replace(/"/g, "&quot;")
+      .replace(/</g, "&lt;");
   }
 
   // ---------------------------------------------------------------------
@@ -523,7 +546,7 @@ const App = (() => {
 
   return {
     $, TOTAL_DAYS,
-    isoDate, dayDate, todayNumber, daysUntilRace, clampDay, formatDate, shortDate,
+    esc, isoDate, dayDate, todayNumber, daysUntil, daysUntilRace, clampDay, formatDate, shortDate,
     loadState, saveState,
     burstConfetti, showToast,
     renderCalendar, renderDayNav, dayTag,
