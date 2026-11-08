@@ -37,6 +37,12 @@ const App = (() => {
     return Math.round((RACE_DATE - startOfDay(new Date())) / MS_PER_DAY);
   }
 
+  /** "YYYY-MM-DD" for a date, in local time. */
+  function isoDate(date) {
+    const pad = (n) => String(n).padStart(2, "0");
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+  }
+
   function clampDay(day) {
     return Math.min(TOTAL_DAYS, Math.max(1, day));
   }
@@ -234,7 +240,7 @@ const App = (() => {
 
   return {
     $, TOTAL_DAYS,
-    dayDate, todayNumber, daysUntilRace, clampDay, formatDate, shortDate,
+    isoDate, dayDate, todayNumber, daysUntilRace, clampDay, formatDate, shortDate,
     loadState, saveState,
     burstConfetti, showToast,
     renderCalendar, renderDayNav, dayTag,

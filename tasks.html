@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>My Tasks</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="settings.js"></script>
+</head>
+<body class="theme-tasks">
+
+  <header class="site-header">
+    <div class="wrap">
+      <a class="home-link" href="index.html">&larr; Home</a>
+      <h1>My Tasks</h1>
+      <p>
+        Your own to-do list. Pick any date, add as many tasks as you like, tick them off, edit them or delete them.
+        Today's tasks also show up on the home page.
+      </p>
+    </div>
+  </header>
+
+  <main class="wrap">
+
+    <section>
+      <div class="stats">
+        <div class="stat"><b id="stat-today">0 / 0</b><span>done today</span></div>
+        <div class="stat"><b id="stat-open">0</b><span>open tasks</span></div>
+        <div class="stat"><b id="stat-done">0</b><span>tasks completed</span></div>
+        <div class="stat"><b id="stat-overdue">0</b><span>unfinished, earlier days</span></div>
+      </div>
+
+      <h2>Calendar</h2>
+      <p class="legend">
+        Green = all done &middot; red outline = unfinished on a past day &middot; coloured border = has tasks &middot; dashed = today.
+        Tap a date to see and add its tasks.
+      </p>
+      <div class="day-nav" id="month-nav"></div>
+      <div id="calendar"></div>
+      <div class="panel" id="panel"></div>
+    </section>
+
+    <section>
+      <h2>Unfinished from earlier days</h2>
+      <p class="sub">Tap one to jump to its date.</p>
+      <div id="overdue"></div>
+    </section>
+
+  </main>
+
+  <footer>
+    <div class="wrap">Saved in this browser only. Use Settings to export a backup.</div>
+  </footer>
+
+  <script src="common.js"></script>
+  <script src="tasks.js"></script>
+</body>
+</html>

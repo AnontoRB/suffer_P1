@@ -1,7 +1,7 @@
 /**
  * Home page: digital clock with a "time left today" bar, a "tasks completed"
  * bar, race countdown, a progress bar for each plan, and today's tasks from
- * all four plans in one list.
+ * all four plans and your own tasks in one list.
  *
  * The task lists are built here from the same data files the plan pages use
  * (rust-data.js, marathon-data.js, health-data.js, cubing-data.js), and ticking a task saves
@@ -12,7 +12,7 @@
   "use strict";
 
   const { $, TOTAL_DAYS, loadState, saveState, todayNumber, daysUntilRace, clampDay,
-          formatDate, dayDate, burstConfetti } = App;
+          formatDate, dayDate, burstConfetti, isoDate } = App;
 
   // ---------------------------------------------------------------------
   // Tasks for one day, per plan: { heading, items: [{ id, label, detail, optional? }] }
@@ -135,6 +135,40 @@
   ];
 
   // ---------------------------------------------------------------------
+  // Your own tasks (added on the My Tasks page, saved by date)
+  // ---------------------------------------------------------------------
+
+  const MY_KEY = "tasks-plan-v1";
+  const esc = (text) => String(text).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
+  const myTasksOn = (state, day) => (state.tasks || {})[isoDate(dayDate(day))] || [];
+
+  function renderMyTasksProgress() {
+    let total = 0;
+    let done = 0;
+    Object.values(loadState(MY_KEY).tasks || {}).forEach((list) => list.forEach((task) => {
+      total++;
+      if (task.done) done++;
+    }));
+    $("mytasks-bar").style.width = total ? `${(done / total) * 100}%` : "0%";
+    $("mytasks-label").textContent = total ? `${done} / ${total} tasks done` : "No tasks yet";
+  }
+
+  function toggleMyTask(box) {
+    const state = loadState(MY_KEY);
+    const task = myTasksOn(state, shownDay).find((t) => t.id === box.dataset.item);
+    if (!task) return;
+    task.done = box.checked;
+    saveState(MY_KEY, state);
+
+    const before = $("tasks-count").textContent;
+    const { done, total } = renderTasks();
+    renderMyTasksProgress();
+    if (total > 0 && done === total && before !== `${done} / ${total}`) {
+      burstConfetti(window.innerWidth / 2, window.innerHeight / 2, 160);
+    }
+  }
+
+  // ---------------------------------------------------------------------
   // Saved progress
   // ---------------------------------------------------------------------
 
@@ -224,6 +258,21 @@
         </div>`;
     });
 
+    const mine = myTasksOn(loadState(MY_KEY), day);
+    if (mine.length) {
+      const rows = mine.map((task) => {
+        total++;
+        if (task.done) done++;
+        const id = `task-mytasks-${task.id}`;
+        return `
+          <div class="check-item ${task.done ? "checked" : ""}">
+            <input type="checkbox" id="${id}" data-plan="mytasks" data-item="${task.id}" ${task.done ? "checked" : ""}>
+            <label for="${id}"><b>${esc(task.text)}</b></label>
+          </div>`;
+      }).join("");
+      html += `<div class="task-group task-mytasks"><h3>My Tasks <span>added by you</span></h3>${rows}</div>`;
+    }
+
     $("task-list").innerHTML = html || '<p class="muted-line">No tasks today.</p>';
     $("task-list").querySelectorAll("input[type=checkbox]").forEach((box) => {
       box.onchange = () => toggleTask(box);
@@ -239,6 +288,7 @@
   }
 
   function toggleTask(box) {
+    if (box.dataset.plan === "mytasks") return toggleMyTask(box);
     const plan = PLANS.find((p) => p.id === box.dataset.plan);
     const state = loadState(plan.storageKey);
     const day = shownDay;
@@ -263,6 +313,7 @@
   function renderAll() {
     renderCountdown();
     PLANS.forEach(renderPlanProgress);
+    renderMyTasksProgress();
     renderTasks();
   }
 

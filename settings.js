@@ -14,7 +14,7 @@ const SiteSettings = (() => {
   const DEFAULTS = { name: DEFAULT_NAME, theme: "auto", accent: "default", size: "normal", confetti: true };
 
   /** Every localStorage key the site uses. Export and import only touch these. */
-  const DATA_KEYS = ["rust-plan-v1", "marathon-plan-v1", "health-plan-v1", "cubing-plan-v1", "home-clock-24h", KEY];
+  const DATA_KEYS = ["rust-plan-v1", "marathon-plan-v1", "health-plan-v1", "cubing-plan-v1", "tasks-plan-v1", "home-clock-24h", KEY];
 
   const ACCENTS = { orange: "#D9561E", teal: "#0E7C7B", blue: "#2D7FB8", purple: "#7B3FA0", green: "#2E7D5B" };
 
