@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Speedcubing: Nov 8 to Jan 6</title>
   <link rel="stylesheet" href="styles.css">
-  <script src="settings.js"></script>
+  <script src="common.js"></script>
 </head>
 <body class="theme-cubing">
 
@@ -50,8 +50,261 @@
     <div class="wrap">General guidance. Stop if your wrists or fingers hurt.</div>
   </footer>
 
-  <script src="common.js"></script>
-  <script src="cubing-data.js"></script>
-  <script src="cubing.js"></script>
+<script src="data.js"></script>
+<script>
+/**
+ * Speedcubing page (60-day plan).
+ * Needs: common.js (App) and data.js (CUBING).
+ *
+ * Each plan day has a checklist and a small log (solves, best ao12, minutes, notes).
+ * A day is "complete" when every required item is ticked. Progress is saved in localStorage.
+ */
+(() => {
+  "use strict";
+
+  const {
+    $, TOTAL_DAYS,
+    loadState, saveState, todayNumber, clampDay, formatDate, shortDate, dayDate,
+    renderCalendar, renderDayNav, dayTag, burstConfetti, showToast,
+  } = App;
+
+  const { SCHEDULE, BLOCKS, SECTIONS, CHECKPOINTS, SUNDAYS } = CUBING;
+
+  const STORAGE_KEY = "cubing-plan-v1";
+  const FINAL_TEST_DAY = 57; // Jan 3
+
+  const state = loadState(STORAGE_KEY);
+  state.tests = state.tests || {};
+  state.sundays = state.sundays || {};
+  let selectedDay = clampDay(todayNumber());
+
+  const esc = (text) => String(text == null ? "" : text).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
+  const weekdayOf = (day) => dayDate(day).toLocaleDateString(undefined, { weekday: "short" });
+  const blockOf = (day) => BLOCKS.find((block) => day >= block.firstDay && day <= block.lastDay);
+
+  function getDayData(day) {
+    if (!state.days[day]) state.days[day] = {};
+    const data = state.days[day];
+    data.checked = data.checked || {};
+    data.log = data.log || {};
+    return data;
+  }
+
+  function isDayComplete(day) {
+    const { checked } = getDayData(day);
+    return CUBING.tasksFor(day).items.filter((item) => !item.optional).every((item) => checked[item.id]);
+  }
+
+  // ---------------------------------------------------------------------
+  // The day panel
+  // ---------------------------------------------------------------------
+
+  function renderDayPanel() {
+    const day = selectedDay;
+    const entry = SCHEDULE[day - 1];
+    const { checked, log } = getDayData(day);
+    const { items } = CUBING.tasksFor(day);
+
+    const rows = items.map((item) => `
+      <div class="check-item ${checked[item.id] ? "checked" : ""}">
+        <input type="checkbox" id="item-${item.id}" ${checked[item.id] ? "checked" : ""}>
+        <label for="item-${item.id}">
+          <b>${item.label}${item.optional && !/optional/.test(item.label) ? " (optional)" : ""}</b>
+          ${item.detail ? `<small>${item.detail}</small>` : ""}
+        </label>
+      </div>`).join("");
+
+    const fields = [];
+    if (["baseline", "benchmark", "checkpoint"].includes(entry.kind)) {
+      fields.push(["result", entry.kind === "baseline" ? "Baseline ao12 (s)" : entry.kind === "checkpoint" ? "Result: ao25 (s)" : "Result: ao12 (s)", "number"]);
+    }
+    fields.push(["solves", "Solves", "number"], ["best", "Best ao12 of the day (s)", "number"], ["minutes", "Minutes", "number"], ["notes", "Notes", "text"]);
+    const fieldHtml = fields.map(([key, label, type]) => `
+      <label class="field">${label}
+        <input type="${type}" ${type === "number" ? 'step="0.01" min="0"' : ""} data-log="${key}" value="${esc(log[key])}">
+      </label>`).join("");
+
+    $("panel").innerHTML = `
+      <h2>${entry.session}</h2>
+      <div class="panel-date">Day ${day} &middot; ${formatDate(day)} &middot; ${blockOf(day).name}${entry.deload ? " (deload)" : ""}${dayTag(day, isDayComplete(day))}</div>
+      <div class="box">${rows}</div>
+      <h3 class="log-title">Daily log</h3>
+      <div class="log-grid">${fieldHtml}</div>`;
+
+    items.forEach((item) => {
+      const checkbox = $(`item-${item.id}`);
+      checkbox.onchange = () => handleToggle(day, item.id, checkbox);
+    });
+    $("panel").querySelectorAll("[data-log]").forEach((input) => {
+      input.oninput = () => {
+        getDayData(day).log[input.dataset.log] = input.value;
+        saveState(STORAGE_KEY, state);
+        renderStats();
+        renderLogTable();
+      };
+    });
+  }
+
+  // ---------------------------------------------------------------------
+  // Stats and next-up line
+  // ---------------------------------------------------------------------
+
+  function currentStreak() {
+    let streak = 0;
+    let day = Math.min(TOTAL_DAYS, todayNumber());
+    if (day >= 1 && !isDayComplete(day)) day--;
+    while (day >= 1 && isDayComplete(day)) { streak++; day--; }
+    return streak;
+  }
+
+  /** Updates the stat boxes. Returns the number of completed days. */
+  function renderStats() {
+    let completed = 0;
+    let solves = 0;
+    let best = Infinity;
+    for (let day = 1; day <= TOTAL_DAYS; day++) {
+      if (isDayComplete(day)) completed++;
+      const log = getDayData(day).log;
+      solves += Number(log.solves) || 0;
+      const time = parseFloat(log.best);
+      if (time > 0) best = Math.min(best, time);
+    }
+    $("stat-streak").textContent = currentStreak();
+    $("stat-done").textContent = `${completed} / ${TOTAL_DAYS}`;
+    $("stat-solves").textContent = solves;
+    $("stat-best").textContent = best === Infinity ? "-" : `${best} s`;
+    renderNextUp();
+    return completed;
+  }
+
+  function renderNextUp() {
+    const today = todayNumber();
+    let missed = 0;
+    let next = null;
+    for (let day = 1; day <= TOTAL_DAYS; day++) {
+      if (isDayComplete(day)) continue;
+      if (next === null) next = day;
+      if (day < today) missed++;
+    }
+    const parts = [];
+    if (today < 1) parts.push("Your plan starts on Nov 8.");
+    parts.push(next === null ? "Every day is done. Good luck!" : `Next unfinished day: ${shortDate(next)}, ${SCHEDULE[next - 1].session}.`);
+    if (missed > 0) parts.push(`Missed so far: ${missed}.`);
+    $("next-up").textContent = parts.join(" ");
+  }
+
+  function renderCountdown() {
+    const left = Math.round((dayDate(FINAL_TEST_DAY) - new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate())) / 86400000);
+    $("race-countdown").textContent = left > 0 ? `Final test on Jan 3: ${left} days to go` : left === 0 ? "Final test today. Good luck!" : "The final test is done.";
+  }
+
+  // ---------------------------------------------------------------------
+  // Static sections (rendered from data.js) and tables with inputs
+  // ---------------------------------------------------------------------
+
+  const table = (head, rows) => `
+    <div class="scroll"><table>
+      <tr>${head.map((h) => `<th>${h}</th>`).join("")}</tr>
+      ${rows.map((row) => `<tr>${row.map((cell) => `<td>${cell}</td>`).join("")}</tr>`).join("")}
+    </table></div>`;
+
+  function scheduleHtml() {
+    const today = todayNumber();
+    return BLOCKS.map((block) => {
+      const rows = [];
+      for (let day = block.firstDay; day <= block.lastDay; day++) {
+        const e = SCHEDULE[day - 1];
+        const status = isDayComplete(day) ? "✓ done" : (day < today ? "missed" : "");
+        rows.push([shortDate(day), weekdayOf(day), e.session, e.drill, e.alg, e.timed, status]);
+      }
+      return `<h3 style="margin-top:20px">Block ${block.name} (${block.dates})</h3><p class="sub">${block.sub}</p>` +
+        table(["Date", "Day", "Session", "Skill drill / main set", "Algorithm block", "Timed solves", "Status"], rows);
+    }).join("");
+  }
+
+  const inputCell = (attr, label, value) =>
+    `<input type="text" class="cell-input" ${attr} aria-label="${esc(label)}" value="${esc(value)}">`;
+
+  function sectionHtml(section) {
+    let html = `<section><h2>${section.title}</h2>`;
+    if (section.intro) html += `<p>${section.intro}</p>`;
+    if (section.table) html += table(section.table.head, section.table.rows);
+    if (section.list) html += `<ul>${section.list.map((li) => `<li>${li}</li>`).join("")}</ul>`;
+    if (section.outro) html += `<p>${section.outro}</p>`;
+
+    if (section.special === "blocks") {
+      html += table(["Block", "Dates", "Goal", "How it feels"], BLOCKS.map((b) => [b.name, b.dates, b.goal, b.feel]));
+    } else if (section.special === "schedule") {
+      html += `<p>Every row follows the 60-minute structure: 5 min warm-up, the skill drill, the algorithm block, the timed solves, then 5 min review. Sundays are benchmark days, and every second Sunday is a checkpoint.</p><div id="schedule-tables">${scheduleHtml()}</div>`;
+    } else if (section.special === "checkpoints") {
+      html += table(["Test", "ao12 target", "Cross + F2L split", "OLL + PLL split", "TPS", "My result"],
+        CHECKPOINTS.map((row, i) => [...row, inputCell(`data-test="${i}"`, `${row[0]} result`, state.tests[i])]));
+    } else if (section.special === "sundays") {
+      html += table(["Sunday", "% of baseline", "ao12 target (26 s baseline)", "My ao12"],
+        SUNDAYS.map((row, i) => [...row, inputCell(`data-sunday="${i}"`, `${row[0]} ao12`, state.sundays[i])]));
+    } else if (section.special === "log") {
+      html += `<div id="log-table"></div>`;
+    }
+    return html + "</section>";
+  }
+
+  function renderLogTable() {
+    const rows = SCHEDULE.map((e) => {
+      const log = getDayData(e.day).log;
+      return `<tr><td>${shortDate(e.day)}</td><td>${e.session}</td><td>${esc(log.solves)}</td><td>${esc(log.best)}</td><td>${esc(log.minutes)}</td><td>${esc(log.notes)}</td></tr>`;
+    }).join("");
+    $("log-table").innerHTML = `<div class="scroll"><table>
+      <tr><th>Date</th><th>Session</th><th>Solves</th><th>Best ao12</th><th>Min</th><th>Notes</th></tr>${rows}</table></div>`;
+  }
+
+  function renderStaticSections() {
+    $("sections").innerHTML = SECTIONS.map(sectionHtml).join("");
+    document.querySelectorAll("[data-test]").forEach((input) => {
+      input.oninput = () => { state.tests[input.dataset.test] = input.value; saveState(STORAGE_KEY, state); };
+    });
+    document.querySelectorAll("[data-sunday]").forEach((input) => {
+      input.oninput = () => { state.sundays[input.dataset.sunday] = input.value; saveState(STORAGE_KEY, state); };
+    });
+    renderLogTable();
+  }
+
+  // ---------------------------------------------------------------------
+  // Render, toggle, start
+  // ---------------------------------------------------------------------
+
+  function selectDay(day) {
+    selectedDay = day;
+    render();
+  }
+
+  function render() {
+    renderCalendar({ container: $("calendar"), selectedDay, isDayComplete, onPick: selectDay });
+    renderDayPanel();
+    state.completedCount = renderStats(); // the home page reads this
+    $("schedule-tables").innerHTML = scheduleHtml();
+    renderCountdown();
+    saveState(STORAGE_KEY, state);
+  }
+
+  function handleToggle(day, itemId, checkbox) {
+    const wasComplete = isDayComplete(day);
+    getDayData(day).checked[itemId] = checkbox.checked;
+    render();
+    if (wasComplete || !isDayComplete(day)) return;
+
+    if (day === TOTAL_DAYS) {
+      burstConfetti(window.innerWidth / 2, window.innerHeight / 2, 200);
+      showToast("60 days of cubing done!");
+    } else {
+      burstConfetti(window.innerWidth / 2, window.innerHeight / 3, 120);
+      showToast(`Day ${day} complete!`);
+    }
+  }
+
+  renderStaticSections();
+  renderDayNav({ container: $("day-nav"), getSelectedDay: () => selectedDay, onPick: selectDay });
+  render();
+})();
+</script>
 </body>
 </html>
